@@ -1,0 +1,84 @@
+{
+  "downloaded": [
+    {
+      "name": "riskgameboard",
+      "url": "https://upload.wikimedia.org/wikipedia/en/5/55/Riskgameboard.svg",
+      "files": [
+        "riskgameboard.svg"
+      ]
+    },
+    {
+      "name": "blankmap-world-flattened",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/0/0c/BlankMap-World-Flattened.svg",
+      "files": [
+        "blankmap-world-flattened.svg"
+      ]
+    },
+    {
+      "name": "continents-outlines",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/e/ef/SVG_locator_maps_of_continents_%28Equirectangular_projection%2C_only_outlines%29.svg",
+      "files": [
+        "continents-outlines.svg"
+      ]
+    },
+    {
+      "name": "simplemaps-world",
+      "url": "https://simplemaps.com/static/demos/resources/svg-library/svgs/world.svg",
+      "files": [
+        "simplemaps-world.svg"
+      ]
+    },
+    {
+      "name": "blankmap-world",
+      "url": "https://upload.wikimedia.org/wikipedia/commons/4/4d/BlankMap-World.svg",
+      "files": [
+        "blankmap-world.svg"
+      ]
+    },
+    {
+      "name": "freevectormaps-continents",
+      "url": "https://freevectormaps.com/world-maps/world-map-continents",
+      "files": [
+        "freevectormaps-continents-fvm-logo.svg"
+      ]
+    },
+    {
+      "name": "mapsvg-world",
+      "url": "https://mapsvg.com/maps/world",
+      "files": [
+        "mapsvg-world-logo.svg",
+        "mapsvg-world-world.svg"
+      ]
+    },
+    {
+      "name": "vecteezy-world",
+      "url": "https://www.vecteezy.com/free-svg/world-map",
+      "files": [
+        "vecteezy-world-safari-pinned-tab.svg",
+        "vecteezy-world-google-DicjUQvA.svg"
+      ]
+    }
+  ],
+  "failed": [
+    {
+      "name": "freesvg-world-outline",
+      "url": "https://freesvg.org/world-map-outline",
+      "reason": "no svg links found"
+    },
+    {
+      "name": "amcharts-world",
+      "url": "https://www.amcharts.com/svg-maps/",
+      "reason": "no svg links found"
+    },
+    {
+      "name": "svgrepo-continents",
+      "url": "https://www.svgrepo.com/collection/continents/",
+      "reason": "HTTP Error 429: Too Many Requests"
+    },
+    {
+      "name": "svgrepo-world-search",
+      "url": "https://www.svgrepo.com/search/?q=world+map",
+      "reason": "HTTP Error 429: Too Many Requests"
+    }
+  ]
+}

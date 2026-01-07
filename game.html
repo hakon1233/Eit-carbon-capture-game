@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carbon Capture: Climate Overseer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="in-game">
+    <div class="game-shell">
+      <div class="topbar-wrapper">
+        <header class="topbar">
+          <div class="topbar-brand">
+            <p class="eyebrow">Climate Strategy Simulator</p>
+            <h1>Carbon Capture: Climate Overseer</h1>
+          </div>
+
+          <div id="stats-strip" class="stat-strip" role="button" tabindex="0" aria-label="Game stats (click for details)">
+            <div class="stat">
+              <span class="label">Credits</span>
+              <span id="credits" class="value">100</span>
+            </div>
+            <div class="stat">
+              <span class="label">Global Temperature</span>
+              <span id="temperature" class="value">+1.20°C</span>
+            </div>
+            <div class="stat">
+              <span class="label">CO2</span>
+              <span id="co2" class="value">420 ppm</span>
+            </div>
+            <div class="stat">
+              <span class="label">Date</span>
+              <span id="date" class="value">Jan 2025</span>
+            </div>
+          </div>
+
+          <button id="stats-info-toggle" class="ghost-button small">Stats Info</button>
+        </header>
+
+        <div id="stats-info" class="stats-info is-hidden">
+          <h2>Stats Guide</h2>
+          <p>Credits fund projects. CO2 drives temperature. Keep temperature below 1.0°C by 2100 to win.</p>
+        </div>
+      </div>
+
+      <div class="game-screen">
+        <div class="map-stage">
+          <div class="map-container">
+            <object
+              id="map-object"
+              type="image/svg+xml"
+              data="assets/maps/mapsvg-world-world.svg"
+              aria-label="World map"
+            ></object>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <div class="sidebar-actions">
+            <button id="next-month" class="primary-button">Next Month</button>
+            <button id="restart-button" class="ghost-button">Restart</button>
+          </div>
+
+          <div class="map-tools">
+            <label class="map-label" for="map-style">Granularity</label>
+            <select id="map-style" class="map-select">
+              <option value="regions" selected>Regions (continents)</option>
+              <option value="macro">Macro regions</option>
+              <option value="regional">Regional zones</option>
+              <option value="subregional">Subregions</option>
+              <option value="countries">Countries</option>
+            </select>
+
+            <label class="map-label" for="map-mode">Map View</label>
+            <select id="map-mode" class="map-select">
+              <option value="default" selected>Default</option>
+              <option value="temperature">Temperature</option>
+              <option value="emissions">Emissions</option>
+              <option value="renewables">Renewable Potential</option>
+              <option value="economy">Economy (GDP)</option>
+            </select>
+          </div>
+
+          <div id="map-legend" class="map-legend"></div>
+
+          <section class="action-panel">
+            <h2>Region Actions</h2>
+            <div id="selected-region" class="selected-region">Select a region to take action.</div>
+
+            <div id="region-income" class="region-income"></div>
+
+            <div id="emissions-breakdown" class="emissions-breakdown"></div>
+
+            <div id="effectiveness-panel" class="effectiveness-panel"></div>
+
+            <div id="project-buttons" class="project-buttons"></div>
+            <div id="region-projects" class="region-projects"></div>
+
+            <div id="region-fact" class="region-fact"></div>
+          </section>
+
+          <section class="news-panel">
+            <h2>Global Briefing</h2>
+            <div id="news-log" class="news-log"></div>
+          </section>
+        </aside>
+      </div>
+    </div>
+
+    <script src="climate-data.js"></script>
+    <script src="game.js"></script>
+  </body>
+</html>
