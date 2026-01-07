@@ -32,110 +32,56 @@ const DEFAULT_REGION_OFFSETS = {
 };
 
 const GRANULARITY_CONFIG = {
-  regions: {
+  continents: {
     map: "assets/maps/mapsvg-world-world.svg",
     selector: "path[id]",
-    grouping: "regions",
+    grouping: "continents",
+    level: 1,
   },
-  macro: {
+  major_regions: {
     map: "assets/maps/mapsvg-world-world.svg",
     selector: "path[id]",
-    grouping: "macro",
-  },
-  regional: {
-    map: "assets/maps/mapsvg-world-world.svg",
-    selector: "path[id]",
-    grouping: "regional",
-  },
-  subregional: {
-    map: "assets/maps/mapsvg-world-world.svg",
-    selector: "path[id]",
-    grouping: "subregional",
+    grouping: "major_regions",
+    level: 2,
   },
   countries: {
     map: "assets/maps/mapsvg-world-world.svg",
     selector: "path[id]",
     grouping: "countries",
+    level: 3,
   },
 };
 
-const GRANULARITY_LABELS = {
-  regions: { ...DEFAULT_REGION_NAMES },
-  macro: {
-    north_america: "North America",
-    central_america: "Central America & Caribbean",
-    south_america: "South America",
-    europe_north: "Northern Europe",
-    europe_south: "Southern Europe",
-    africa_north: "North Africa",
-    africa_south: "Sub-Saharan Africa",
-    asia_west: "West Asia",
-    asia_south: "South Asia",
-    asia_east: "East Asia",
-    asia_southeast: "Southeast Asia",
-    oceania: "Oceania",
-  },
-  regional: {
-    north_america_north: "Northern North America",
-    north_america_west: "Western North America",
-    north_america_east: "Eastern North America",
-    central_america: "Central America",
-    caribbean: "Caribbean",
-    south_america_north: "Northern South America",
-    south_america_south: "Southern South America",
-    europe_north: "Northern Europe",
-    europe_west: "Western Europe",
-    europe_central: "Central Europe",
-    europe_east: "Eastern Europe",
-    europe_south: "Southern Europe",
-    africa_north: "North Africa",
-    africa_west: "West Africa",
-    africa_central: "Central Africa",
-    africa_east: "East Africa",
-    africa_south: "Southern Africa",
-    asia_west: "West Asia",
-    asia_central: "Central Asia",
-    asia_south: "South Asia",
-    asia_east: "East Asia",
-    asia_southeast: "Southeast Asia",
-    oceania_australia: "Australia & NZ",
-    oceania_pacific: "Pacific Islands",
-  },
-  subregional: {
-    north_america_northwest: "Northwest North America",
-    north_america_northeast: "Northeast North America",
-    north_america_southwest: "Southwest North America",
-    north_america_southeast: "Southeast North America",
-    central_america: "Central America",
-    caribbean: "Caribbean",
-    south_america_northwest: "Northwest South America",
-    south_america_northeast: "Northeast South America",
-    south_america_southwest: "Southwest South America",
-    south_america_southeast: "Southeast South America",
-    europe_northwest: "Northwest Europe",
-    europe_northeast: "Northeast Europe",
-    europe_southwest: "Southwest Europe",
-    europe_southeast: "Southeast Europe",
-    europe_west: "Western Europe",
-    europe_central: "Central Europe",
-    europe_east: "Eastern Europe",
-    africa_northwest: "Northwest Africa",
-    africa_northeast: "Northeast Africa",
-    africa_west: "West Africa",
-    africa_central: "Central Africa",
-    africa_east: "East Africa",
-    africa_southwest: "Southwest Africa",
-    africa_southeast: "Southeast Africa",
-    asia_west: "West Asia",
-    asia_central: "Central Asia",
-    asia_south: "South Asia",
-    asia_east: "East Asia",
-    asia_northeast: "Northeast Asia",
-    asia_southeast: "Southeast Asia",
-    oceania_australia: "Australia & NZ",
-    oceania_pacific: "Pacific Islands",
-  },
+// Labels are dynamically loaded from CLIMATE_DATA
+// These are initialized after CLIMATE_DATA loads
+let GRANULARITY_LABELS = {
+  continents: {},
+  major_regions: {},
+  countries: {},
 };
+
+// Initialize labels from CLIMATE_DATA when available
+function initGranularityLabels() {
+  if (!window.CLIMATE_DATA) return;
+
+  const { CONTINENTS, MAJOR_REGIONS } = window.CLIMATE_DATA;
+
+  // Continent labels
+  if (CONTINENTS) {
+    Object.entries(CONTINENTS).forEach(([id, data]) => {
+      GRANULARITY_LABELS.continents[id] = data.name;
+    });
+  }
+
+  // Major region labels
+  if (MAJOR_REGIONS) {
+    Object.entries(MAJOR_REGIONS).forEach(([id, data]) => {
+      GRANULARITY_LABELS.major_regions[id] = data.name;
+    });
+  }
+
+  // Country labels are loaded from SVG element titles
+}
 
 const GEO_DEFAULTS = {
   minLon: -169.110266,
@@ -222,7 +168,7 @@ let svgGeoBounds = null;
 let svgSize = null;
 let regionGeoCache = new Map();
 let mapColors = {};
-let currentGranularity = "regions";
+let currentGranularity = "continents";
 let currentMapMode = "default";
 let availableRegionIds = [];
 let regionNames = { ...DEFAULT_REGION_NAMES };
@@ -308,7 +254,7 @@ function hashString(value) {
 }
 
 function getRegionOffset(regionId) {
-  if (currentGranularity === "regions" && DEFAULT_REGION_OFFSETS[regionId] !== undefined) {
+  if (currentGranularity === "continents" && DEFAULT_REGION_OFFSETS[regionId] !== undefined) {
     return DEFAULT_REGION_OFFSETS[regionId];
   }
   const seed = hashString(regionId);
@@ -587,25 +533,33 @@ function getRegionIdForGranularity(regionEl, granularity) {
   if (!regionId) {
     return "";
   }
+
+  // For countries, use the ISO code directly
   if (granularity === "countries") {
     return regionId;
   }
+
+  // Use CLIMATE_DATA mapping for continents and major_regions
+  if (window.CLIMATE_DATA?.getParentRegion) {
+    const config = GRANULARITY_CONFIG[granularity];
+    const level = config?.level || 1;
+    const parentRegion = window.CLIMATE_DATA.getParentRegion(regionId, level);
+    if (parentRegion) {
+      return parentRegion;
+    }
+  }
+
+  // Fallback to geo-based detection for unmapped countries
   const geo = getRegionGeoCenter(regionEl);
   if (!geo) {
     return "";
   }
   const continent = getContinentId(geo);
-  if (granularity === "regions") {
+  if (granularity === "continents") {
     return continent;
   }
-  if (granularity === "macro") {
+  if (granularity === "major_regions") {
     return getMacroRegionId(continent, geo);
-  }
-  if (granularity === "regional") {
-    return getRegionalRegionId(continent, geo);
-  }
-  if (granularity === "subregional") {
-    return getSubregionalRegionId(continent, geo);
   }
   return regionId;
 }
@@ -899,7 +853,17 @@ function renderRegionIncome(region, climateData) {
 function getClimateDataForRegion(regionId) {
   if (!window.CLIMATE_DATA) return null;
 
-  // Try to get country-level data first
+  // Use granularity-aware data fetching
+  const config = GRANULARITY_CONFIG[currentGranularity];
+  const level = config?.level || 3;
+
+  // Try the new getDataForGranularity first
+  if (window.CLIMATE_DATA.getDataForGranularity) {
+    const data = window.CLIMATE_DATA.getDataForGranularity(level, regionId);
+    if (data) return data;
+  }
+
+  // Fallback to old method for backwards compatibility
   const normalized = regionId.toLowerCase().replace(/[\s-]/g, "_");
   return window.CLIMATE_DATA.getClimateData(normalized);
 }
@@ -1559,7 +1523,7 @@ function wireMap() {
     svgDoc = nextDoc;
     ensureSvgStyles();
     loadSvgGeoData();
-    const config = GRANULARITY_CONFIG[currentGranularity] || GRANULARITY_CONFIG.regions;
+    const config = GRANULARITY_CONFIG[currentGranularity] || GRANULARITY_CONFIG.continents;
     const grouping = config.grouping || currentGranularity;
     const regionElements = svgDoc.querySelectorAll(config.selector);
     const baseLabels = GRANULARITY_LABELS[grouping];
@@ -1657,7 +1621,7 @@ function wireMapSelector() {
   if (!mapSelector) {
     return;
   }
-  const initialGranularity = mapSelector.value || "regions";
+  const initialGranularity = mapSelector.value || "continents";
   setGranularity(initialGranularity);
   mapSelector.addEventListener("change", (event) => {
     setGranularity(event.target.value, true);
@@ -1726,6 +1690,7 @@ function wireControls() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  initGranularityLabels();
   loadMapColors();
   wireControls();
   wireMap();

@@ -7,10 +7,432 @@
  * - IEA (energy mix)
  * - Global Carbon Project
  * - IPCC AR6 (potentials)
+ * - World Bank (GDP, population)
+ * - Global Solar Atlas (solar potential)
+ * - IRENA (renewable capacity)
  *
  * Note: Values are simplified/rounded for educational purposes
  * Data primarily from 2022-2023 reports
  */
+
+// ═══════════════════════════════════════════════════════════════
+// ISO 3166-1 ALPHA-2 CODE MAPPING
+// Maps SVG country IDs to COUNTRY_DATA keys
+// ═══════════════════════════════════════════════════════════════
+
+const ISO_TO_KEY = {
+  // Major economies (already in COUNTRY_DATA)
+  US: "usa",
+  CN: "china",
+  IN: "india",
+  JP: "japan",
+  DE: "germany",
+  GB: "uk",
+  FR: "france",
+  IT: "italy",
+  BR: "brazil",
+  CA: "canada",
+  RU: "russia",
+  KR: "south_korea",
+  AU: "australia",
+  ES: "spain",
+  MX: "mexico",
+  ID: "indonesia",
+  NL: "netherlands",
+  SA: "saudi_arabia",
+  TR: "turkey",
+  CH: "switzerland",
+  PL: "poland",
+  SE: "sweden",
+  BE: "belgium",
+  AR: "argentina",
+  NO: "norway",
+  AT: "austria",
+  AE: "uae",
+  IL: "israel",
+  TH: "thailand",
+  IE: "ireland",
+  SG: "singapore",
+  MY: "malaysia",
+  DK: "denmark",
+  PH: "philippines",
+  ZA: "south_africa",
+  EG: "egypt",
+  NG: "nigeria",
+  IR: "iran",
+
+  // Europe - Additional
+  PT: "portugal",
+  CZ: "czech_republic",
+  RO: "romania",
+  NZ: "new_zealand",
+  GR: "greece",
+  FI: "finland",
+  HU: "hungary",
+  UA: "ukraine",
+  SK: "slovakia",
+  BG: "bulgaria",
+  HR: "croatia",
+  LT: "lithuania",
+  SI: "slovenia",
+  LV: "latvia",
+  EE: "estonia",
+  LU: "luxembourg",
+  CY: "cyprus",
+  MT: "malta",
+  IS: "iceland",
+  RS: "serbia",
+  BA: "bosnia",
+  AL: "albania",
+  MK: "north_macedonia",
+  ME: "montenegro",
+  BY: "belarus",
+  MD: "moldova",
+  AD: "andorra",
+  MC: "monaco",
+  SM: "san_marino",
+  VA: "vatican",
+  LI: "liechtenstein",
+  XK: "kosovo",
+
+  // Asia - Additional
+  PK: "pakistan",
+  BD: "bangladesh",
+  VN: "vietnam",
+  TW: "taiwan",
+  HK: "hong_kong",
+  MO: "macau",
+  KP: "north_korea",
+  MM: "myanmar",
+  KH: "cambodia",
+  LA: "laos",
+  NP: "nepal",
+  LK: "sri_lanka",
+  AF: "afghanistan",
+  UZ: "uzbekistan",
+  KZ: "kazakhstan",
+  TM: "turkmenistan",
+  TJ: "tajikistan",
+  KG: "kyrgyzstan",
+  AZ: "azerbaijan",
+  GE: "georgia",
+  AM: "armenia",
+  MN: "mongolia",
+  BN: "brunei",
+  TL: "timor_leste",
+  BT: "bhutan",
+  MV: "maldives",
+
+  // Middle East - Additional
+  IQ: "iraq",
+  KW: "kuwait",
+  QA: "qatar",
+  BH: "bahrain",
+  OM: "oman",
+  JO: "jordan",
+  LB: "lebanon",
+  SY: "syria",
+  YE: "yemen",
+  PS: "palestine",
+
+  // Africa - Additional
+  MA: "morocco",
+  DZ: "algeria",
+  TN: "tunisia",
+  LY: "libya",
+  SD: "sudan",
+  SS: "south_sudan",
+  ET: "ethiopia",
+  KE: "kenya",
+  TZ: "tanzania",
+  UG: "uganda",
+  RW: "rwanda",
+  BI: "burundi",
+  CD: "dr_congo",
+  CG: "congo",
+  AO: "angola",
+  ZM: "zambia",
+  ZW: "zimbabwe",
+  BW: "botswana",
+  NA: "namibia",
+  MZ: "mozambique",
+  MW: "malawi",
+  MG: "madagascar",
+  MU: "mauritius",
+  SC: "seychelles",
+  KM: "comoros",
+  GH: "ghana",
+  CI: "ivory_coast",
+  SN: "senegal",
+  ML: "mali",
+  BF: "burkina_faso",
+  NE: "niger",
+  TD: "chad",
+  MR: "mauritania",
+  CM: "cameroon",
+  GA: "gabon",
+  GQ: "equatorial_guinea",
+  CF: "central_african_republic",
+  BJ: "benin",
+  TG: "togo",
+  GN: "guinea",
+  SL: "sierra_leone",
+  LR: "liberia",
+  GM: "gambia",
+  GW: "guinea_bissau",
+  CV: "cape_verde",
+  ST: "sao_tome",
+  ER: "eritrea",
+  DJ: "djibouti",
+  SO: "somalia",
+  LS: "lesotho",
+  SZ: "eswatini",
+
+  // Americas - Additional
+  CL: "chile",
+  CO: "colombia",
+  PE: "peru",
+  VE: "venezuela",
+  EC: "ecuador",
+  BO: "bolivia",
+  PY: "paraguay",
+  UY: "uruguay",
+  GY: "guyana",
+  SR: "suriname",
+  GF: "french_guiana",
+  PA: "panama",
+  CR: "costa_rica",
+  NI: "nicaragua",
+  HN: "honduras",
+  SV: "el_salvador",
+  GT: "guatemala",
+  BZ: "belize",
+  CU: "cuba",
+  DO: "dominican_republic",
+  HT: "haiti",
+  JM: "jamaica",
+  TT: "trinidad_tobago",
+  BB: "barbados",
+  BS: "bahamas",
+  LC: "saint_lucia",
+  GD: "grenada",
+  VC: "saint_vincent",
+  AG: "antigua_barbuda",
+  DM: "dominica",
+  KN: "saint_kitts",
+  PR: "puerto_rico",
+  VI: "us_virgin_islands",
+  VG: "british_virgin_islands",
+  KY: "cayman_islands",
+  TC: "turks_caicos",
+  AI: "anguilla",
+  MS: "montserrat",
+  BM: "bermuda",
+  AW: "aruba",
+  CW: "curacao",
+  SX: "sint_maarten",
+  BQ: "caribbean_netherlands",
+  MF: "saint_martin",
+  BL: "saint_barthelemy",
+  GP: "guadeloupe",
+  MQ: "martinique",
+  FK: "falkland_islands",
+
+  // Oceania - Additional
+  NZ: "new_zealand",
+  PG: "papua_new_guinea",
+  FJ: "fiji",
+  SB: "solomon_islands",
+  VU: "vanuatu",
+  NC: "new_caledonia",
+  PF: "french_polynesia",
+  WS: "samoa",
+  TO: "tonga",
+  FM: "micronesia",
+  KI: "kiribati",
+  MH: "marshall_islands",
+  PW: "palau",
+  NR: "nauru",
+  TV: "tuvalu",
+  GU: "guam",
+  AS: "american_samoa",
+  MP: "northern_mariana",
+  CK: "cook_islands",
+  NU: "niue",
+  TK: "tokelau",
+  WF: "wallis_futuna",
+
+  // Territories & Special regions
+  GL: "greenland",
+  FO: "faroe_islands",
+  GI: "gibraltar",
+  IM: "isle_of_man",
+  JE: "jersey",
+  GG: "guernsey",
+  AX: "aland_islands",
+  SJ: "svalbard",
+  PM: "saint_pierre_miquelon",
+  RE: "reunion",
+  YT: "mayotte",
+  SH: "saint_helena",
+  IO: "british_indian_ocean",
+  TF: "french_southern",
+  HM: "heard_mcdonald",
+  BV: "bouvet_island",
+  GS: "south_georgia",
+  AQ: "antarctica",
+  CC: "cocos_islands",
+  CX: "christmas_island",
+  NF: "norfolk_island",
+  PN: "pitcairn",
+  EH: "western_sahara",
+};
+
+// ═══════════════════════════════════════════════════════════════
+// MAJOR REGIONS (15 regions based on UN M49 standard)
+// Used for intermediate granularity level
+// ═══════════════════════════════════════════════════════════════
+
+const MAJOR_REGIONS = {
+  // AFRICA
+  north_africa: {
+    name: "North Africa",
+    continent: "africa",
+    countries: ["DZ", "EG", "LY", "MA", "SD", "TN", "EH"],
+  },
+  sub_saharan_africa: {
+    name: "Sub-Saharan Africa",
+    continent: "africa",
+    countries: [
+      "AO", "BJ", "BW", "BF", "BI", "CM", "CV", "CF", "TD", "KM",
+      "CG", "CD", "CI", "DJ", "GQ", "ER", "SZ", "ET", "GA", "GM",
+      "GH", "GN", "GW", "KE", "LS", "LR", "MG", "MW", "ML", "MR",
+      "MU", "MZ", "NA", "NE", "NG", "RW", "ST", "SN", "SC", "SL",
+      "SO", "ZA", "SS", "TZ", "TG", "UG", "ZM", "ZW",
+    ],
+  },
+
+  // ASIA
+  west_asia: {
+    name: "West Asia",
+    continent: "asia",
+    countries: [
+      "AM", "AZ", "BH", "CY", "GE", "IQ", "IL", "JO", "KW", "LB",
+      "OM", "PS", "QA", "SA", "SY", "TR", "AE", "YE",
+    ],
+  },
+  central_asia: {
+    name: "Central Asia",
+    continent: "asia",
+    countries: ["KZ", "KG", "TJ", "TM", "UZ"],
+  },
+  south_asia: {
+    name: "South Asia",
+    continent: "asia",
+    countries: ["AF", "BD", "BT", "IN", "MV", "NP", "PK", "LK"],
+  },
+  east_asia: {
+    name: "East Asia",
+    continent: "asia",
+    countries: ["CN", "JP", "KP", "KR", "MN", "TW", "HK", "MO"],
+  },
+  southeast_asia: {
+    name: "Southeast Asia",
+    continent: "asia",
+    countries: ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
+  },
+
+  // EUROPE
+  northern_europe: {
+    name: "Northern Europe",
+    continent: "europe",
+    countries: ["DK", "EE", "FI", "IS", "IE", "LV", "LT", "NO", "SE", "GB"],
+  },
+  western_europe: {
+    name: "Western Europe",
+    continent: "europe",
+    countries: ["AT", "BE", "FR", "DE", "LI", "LU", "MC", "NL", "CH"],
+  },
+  southern_europe: {
+    name: "Southern Europe",
+    continent: "europe",
+    countries: [
+      "AL", "AD", "BA", "HR", "GR", "IT", "MT", "ME", "MK", "PT",
+      "SM", "RS", "SI", "ES", "VA", "XK",
+    ],
+  },
+  eastern_europe: {
+    name: "Eastern Europe",
+    continent: "europe",
+    countries: ["BY", "BG", "CZ", "HU", "MD", "PL", "RO", "RU", "SK", "UA"],
+  },
+
+  // AMERICAS
+  north_america: {
+    name: "North America",
+    continent: "north_america",
+    countries: ["CA", "US", "MX", "GL"],
+  },
+  central_america_caribbean: {
+    name: "Central America & Caribbean",
+    continent: "north_america",
+    countries: [
+      "AI", "AG", "AW", "BS", "BB", "BZ", "BM", "VG", "KY", "CR",
+      "CU", "CW", "DM", "DO", "SV", "GD", "GP", "GT", "HT", "HN",
+      "JM", "MQ", "NI", "PA", "PR", "KN", "LC", "MF", "VC", "SX",
+      "TT", "TC", "VI",
+    ],
+  },
+  south_america: {
+    name: "South America",
+    continent: "south_america",
+    countries: [
+      "AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PY",
+      "PE", "SR", "UY", "VE",
+    ],
+  },
+
+  // OCEANIA
+  oceania: {
+    name: "Oceania",
+    continent: "oceania",
+    countries: [
+      "AU", "FJ", "PF", "GU", "KI", "MH", "FM", "NR", "NC", "NZ",
+      "PW", "PG", "WS", "SB", "TO", "TV", "VU",
+    ],
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// CONTINENTS (6 continents referencing major regions)
+// ═══════════════════════════════════════════════════════════════
+
+const CONTINENTS = {
+  africa: {
+    name: "Africa",
+    majorRegions: ["north_africa", "sub_saharan_africa"],
+  },
+  asia: {
+    name: "Asia",
+    majorRegions: ["west_asia", "central_asia", "south_asia", "east_asia", "southeast_asia"],
+  },
+  europe: {
+    name: "Europe",
+    majorRegions: ["northern_europe", "western_europe", "southern_europe", "eastern_europe"],
+  },
+  north_america: {
+    name: "North America",
+    majorRegions: ["north_america", "central_america_caribbean"],
+  },
+  south_america: {
+    name: "South America",
+    majorRegions: ["south_america"],
+  },
+  oceania: {
+    name: "Oceania",
+    majorRegions: ["oceania"],
+  },
+};
 
 const EMISSION_SECTORS = {
   electricity: {
@@ -1347,6 +1769,611 @@ const COUNTRY_DATA = {
       "Positioning as green hydrogen superpower",
     ],
   },
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADDITIONAL EUROPEAN COUNTRIES
+  // ═══════════════════════════════════════════════════════════════
+
+  turkey: {
+    name: "Turkey",
+    region: "europe",
+    population: 85,
+    gdp: 0.91,
+    emissions: {
+      total: 0.42,
+      perCapita: 4.9,
+      trend: 1.5,
+      sources: { electricity: 0.33, transport: 0.22, industry: 0.28, buildings: 0.12, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.42, coalShare: 0.32, gasShare: 0.23, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.80 }, wind: { score: 0.70 }, forest: { score: 0.45 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.65 } },
+    facts: ["High geothermal potential", "Major renewable energy growth", "Bridge between Europe and Asia"],
+  },
+
+  switzerland: {
+    name: "Switzerland",
+    region: "europe",
+    population: 9,
+    gdp: 0.81,
+    emissions: {
+      total: 0.04,
+      perCapita: 4.0,
+      trend: -2.5,
+      sources: { electricity: 0.05, transport: 0.35, industry: 0.25, buildings: 0.30, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.75, coalShare: 0.00, gasShare: 0.10, nuclearShare: 0.35 },
+    potential: { solar: { score: 0.45 }, wind: { score: 0.40 }, forest: { score: 0.50 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.30 } },
+    facts: ["75% renewable electricity from hydro", "Carbon neutral target 2050", "High per capita wealth"],
+  },
+
+  belgium: {
+    name: "Belgium",
+    region: "europe",
+    population: 12,
+    gdp: 0.58,
+    emissions: {
+      total: 0.10,
+      perCapita: 8.3,
+      trend: -3.5,
+      sources: { electricity: 0.20, transport: 0.25, industry: 0.30, buildings: 0.20, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.25, coalShare: 0.03, gasShare: 0.30, nuclearShare: 0.40 },
+    potential: { solar: { score: 0.40 }, wind: { score: 0.80 }, forest: { score: 0.25 }, carbonCapture: { score: 0.60 }, geothermal: { score: 0.20 } },
+    facts: ["Major offshore wind expansion", "Nuclear phase-out debates", "EU headquarters in Brussels"],
+  },
+
+  austria: {
+    name: "Austria",
+    region: "europe",
+    population: 9,
+    gdp: 0.47,
+    emissions: {
+      total: 0.07,
+      perCapita: 7.8,
+      trend: -3.0,
+      sources: { electricity: 0.15, transport: 0.30, industry: 0.25, buildings: 0.25, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.78, coalShare: 0.05, gasShare: 0.15, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.50 }, wind: { score: 0.55 }, forest: { score: 0.65 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.25 } },
+    facts: ["78% renewable electricity (mostly hydro)", "Alpine forests as carbon sinks", "No nuclear power by law"],
+  },
+
+  portugal: {
+    name: "Portugal",
+    region: "europe",
+    population: 10,
+    gdp: 0.25,
+    emissions: {
+      total: 0.04,
+      perCapita: 4.3,
+      trend: -5.0,
+      sources: { electricity: 0.22, transport: 0.35, industry: 0.20, buildings: 0.15, agriculture: 0.08 },
+    },
+    energy: { renewableShare: 0.75, coalShare: 0.00, gasShare: 0.20, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.80 }, forest: { score: 0.55 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.30 } },
+    facts: ["75% renewable electricity", "Coal-free since 2021", "Excellent solar and wind resources"],
+  },
+
+  greece: {
+    name: "Greece",
+    region: "europe",
+    population: 10,
+    gdp: 0.22,
+    emissions: {
+      total: 0.06,
+      perCapita: 5.8,
+      trend: -6.0,
+      sources: { electricity: 0.35, transport: 0.28, industry: 0.18, buildings: 0.14, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.45, coalShare: 0.12, gasShare: 0.40, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.90 }, wind: { score: 0.75 }, forest: { score: 0.35 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.45 } },
+    facts: ["Excellent Mediterranean solar", "Rapid lignite phase-out", "Island energy challenges"],
+  },
+
+  czech_republic: {
+    name: "Czech Republic",
+    region: "europe",
+    population: 11,
+    gdp: 0.29,
+    emissions: {
+      total: 0.10,
+      perCapita: 9.3,
+      trend: -2.0,
+      sources: { electricity: 0.40, transport: 0.18, industry: 0.25, buildings: 0.12, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.15, coalShare: 0.40, gasShare: 0.18, nuclearShare: 0.37 },
+    potential: { solar: { score: 0.45 }, wind: { score: 0.50 }, forest: { score: 0.55 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.25 } },
+    facts: ["Heavy coal dependence", "Nuclear expansion planned", "EU industrial center"],
+  },
+
+  romania: {
+    name: "Romania",
+    region: "europe",
+    population: 19,
+    gdp: 0.30,
+    emissions: {
+      total: 0.07,
+      perCapita: 3.7,
+      trend: -1.5,
+      sources: { electricity: 0.28, transport: 0.22, industry: 0.25, buildings: 0.18, agriculture: 0.07 },
+    },
+    energy: { renewableShare: 0.43, coalShare: 0.18, gasShare: 0.22, nuclearShare: 0.18 },
+    potential: { solar: { score: 0.65 }, wind: { score: 0.70 }, forest: { score: 0.60 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.30 } },
+    facts: ["Good mix of hydro and nuclear", "Black Sea offshore wind potential", "Large forest coverage"],
+  },
+
+  finland: {
+    name: "Finland",
+    region: "europe",
+    population: 6,
+    gdp: 0.30,
+    emissions: {
+      total: 0.04,
+      perCapita: 7.0,
+      trend: -5.5,
+      sources: { electricity: 0.15, transport: 0.28, industry: 0.30, buildings: 0.20, agriculture: 0.07 },
+    },
+    energy: { renewableShare: 0.50, coalShare: 0.08, gasShare: 0.05, nuclearShare: 0.34 },
+    potential: { solar: { score: 0.30 }, wind: { score: 0.75 }, forest: { score: 0.85 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.15 } },
+    facts: ["Carbon neutral target 2035", "Vast boreal forests", "Nuclear + renewables mix"],
+  },
+
+  ireland: {
+    name: "Ireland",
+    region: "europe",
+    population: 5,
+    gdp: 0.53,
+    emissions: {
+      total: 0.04,
+      perCapita: 7.5,
+      trend: -2.0,
+      sources: { electricity: 0.18, transport: 0.35, industry: 0.15, buildings: 0.12, agriculture: 0.20 },
+    },
+    energy: { renewableShare: 0.40, coalShare: 0.02, gasShare: 0.52, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.35 }, wind: { score: 0.95 }, forest: { score: 0.45 }, carbonCapture: { score: 0.55 }, geothermal: { score: 0.15 } },
+    facts: ["Among best wind resources globally", "High agriculture emissions", "Data center energy demand"],
+  },
+
+  hungary: {
+    name: "Hungary",
+    region: "europe",
+    population: 10,
+    gdp: 0.18,
+    emissions: {
+      total: 0.05,
+      perCapita: 5.0,
+      trend: -1.0,
+      sources: { electricity: 0.25, transport: 0.25, industry: 0.22, buildings: 0.20, agriculture: 0.08 },
+    },
+    energy: { renewableShare: 0.15, coalShare: 0.08, gasShare: 0.30, nuclearShare: 0.45 },
+    potential: { solar: { score: 0.60 }, wind: { score: 0.50 }, forest: { score: 0.40 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.55 } },
+    facts: ["Nuclear provides 45% of electricity", "Good solar potential", "Geothermal resources"],
+  },
+
+  ukraine: {
+    name: "Ukraine",
+    region: "europe",
+    population: 43,
+    gdp: 0.16,
+    emissions: {
+      total: 0.19,
+      perCapita: 4.4,
+      trend: -8.0,
+      sources: { electricity: 0.30, transport: 0.18, industry: 0.32, buildings: 0.12, agriculture: 0.08 },
+    },
+    energy: { renewableShare: 0.12, coalShare: 0.30, gasShare: 0.08, nuclearShare: 0.55 },
+    potential: { solar: { score: 0.55 }, wind: { score: 0.65 }, forest: { score: 0.50 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.20 } },
+    facts: ["Nuclear provides 55% of electricity", "Large agricultural sector", "Energy infrastructure challenges"],
+  },
+
+  denmark: {
+    name: "Denmark",
+    region: "europe",
+    population: 6,
+    gdp: 0.40,
+    emissions: {
+      total: 0.03,
+      perCapita: 5.0,
+      trend: -7.0,
+      sources: { electricity: 0.10, transport: 0.35, industry: 0.20, buildings: 0.25, agriculture: 0.10 },
+    },
+    energy: { renewableShare: 0.80, coalShare: 0.05, gasShare: 0.12, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.40 }, wind: { score: 0.95 }, forest: { score: 0.30 }, carbonCapture: { score: 0.70 }, geothermal: { score: 0.15 } },
+    projects: {
+      wind: { costMultiplier: 0.70, effectMultiplier: 1.45, reason: "Global offshore wind leader" },
+    },
+    facts: ["70% wind & solar electricity", "World leader in offshore wind", "Carbon neutral target 2050"],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADDITIONAL ASIAN COUNTRIES
+  // ═══════════════════════════════════════════════════════════════
+
+  pakistan: {
+    name: "Pakistan",
+    region: "asia",
+    population: 230,
+    gdp: 0.35,
+    emissions: {
+      total: 0.20,
+      perCapita: 0.9,
+      trend: 3.5,
+      sources: { electricity: 0.32, transport: 0.25, industry: 0.22, buildings: 0.08, agriculture: 0.13 },
+    },
+    energy: { renewableShare: 0.35, coalShare: 0.10, gasShare: 0.35, nuclearShare: 0.08 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.65 }, forest: { score: 0.40 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.25 } },
+    facts: ["Low per capita emissions", "High solar potential", "Major hydro capacity"],
+  },
+
+  bangladesh: {
+    name: "Bangladesh",
+    region: "asia",
+    population: 170,
+    gdp: 0.42,
+    emissions: {
+      total: 0.10,
+      perCapita: 0.6,
+      trend: 6.0,
+      sources: { electricity: 0.35, transport: 0.20, industry: 0.25, buildings: 0.10, agriculture: 0.10 },
+    },
+    energy: { renewableShare: 0.05, coalShare: 0.02, gasShare: 0.90, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.80 }, wind: { score: 0.45 }, forest: { score: 0.30 }, carbonCapture: { score: 0.25 }, geothermal: { score: 0.15 } },
+    facts: ["Most climate-vulnerable major nation", "World's largest solar home system program", "Very low per capita emissions"],
+  },
+
+  vietnam: {
+    name: "Vietnam",
+    region: "asia",
+    population: 98,
+    gdp: 0.41,
+    emissions: {
+      total: 0.33,
+      perCapita: 3.4,
+      trend: 5.5,
+      sources: { electricity: 0.38, transport: 0.15, industry: 0.30, buildings: 0.08, agriculture: 0.09 },
+    },
+    energy: { renewableShare: 0.35, coalShare: 0.50, gasShare: 0.08, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.80 }, wind: { score: 0.70 }, forest: { score: 0.55 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.20 } },
+    projects: {
+      solar: { costMultiplier: 0.75, effectMultiplier: 1.25, reason: "Fastest growing solar market in Asia" },
+    },
+    facts: ["Fastest growing solar market in SE Asia", "Net zero target 2050", "Major manufacturing hub"],
+  },
+
+  thailand: {
+    name: "Thailand",
+    region: "asia",
+    population: 70,
+    gdp: 0.50,
+    emissions: {
+      total: 0.27,
+      perCapita: 3.9,
+      trend: 1.5,
+      sources: { electricity: 0.35, transport: 0.28, industry: 0.25, buildings: 0.07, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.15, coalShare: 0.18, gasShare: 0.60, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.45 }, forest: { score: 0.50 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.20 } },
+    facts: ["Major EV manufacturing hub", "Good solar resources", "Tourism economy"],
+  },
+
+  philippines: {
+    name: "Philippines",
+    region: "asia",
+    population: 115,
+    gdp: 0.40,
+    emissions: {
+      total: 0.16,
+      perCapita: 1.4,
+      trend: 4.0,
+      sources: { electricity: 0.40, transport: 0.22, industry: 0.18, buildings: 0.12, agriculture: 0.08 },
+    },
+    energy: { renewableShare: 0.22, coalShare: 0.55, gasShare: 0.18, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.65 }, forest: { score: 0.45 }, carbonCapture: { score: 0.30 }, geothermal: { score: 0.85 } },
+    projects: {
+      geothermal: { costMultiplier: 0.75, effectMultiplier: 1.35, reason: "Second largest geothermal producer globally" },
+    },
+    facts: ["World's second largest geothermal producer", "Archipelago challenges", "High climate vulnerability"],
+  },
+
+  malaysia: {
+    name: "Malaysia",
+    region: "asia",
+    population: 34,
+    gdp: 0.41,
+    emissions: {
+      total: 0.26,
+      perCapita: 7.7,
+      trend: 2.0,
+      sources: { electricity: 0.35, transport: 0.30, industry: 0.25, buildings: 0.05, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.20, coalShare: 0.38, gasShare: 0.40, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.40 }, forest: { score: 0.70 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.20 } },
+    facts: ["Major palm oil producer", "Rainforest conservation needed", "Growing solar sector"],
+  },
+
+  singapore: {
+    name: "Singapore",
+    region: "asia",
+    population: 6,
+    gdp: 0.52,
+    emissions: {
+      total: 0.05,
+      perCapita: 8.0,
+      trend: -1.0,
+      sources: { electricity: 0.40, transport: 0.20, industry: 0.30, buildings: 0.08, agriculture: 0.02 },
+    },
+    energy: { renewableShare: 0.05, coalShare: 0.00, gasShare: 0.95, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.80 }, wind: { score: 0.20 }, forest: { score: 0.10 }, carbonCapture: { score: 0.60 }, geothermal: { score: 0.10 } },
+    facts: ["City-state limited land", "Regional green finance hub", "Importing solar from neighbors"],
+  },
+
+  taiwan: {
+    name: "Taiwan",
+    region: "asia",
+    population: 24,
+    gdp: 0.79,
+    emissions: {
+      total: 0.27,
+      perCapita: 11.3,
+      trend: -1.5,
+      sources: { electricity: 0.40, transport: 0.15, industry: 0.35, buildings: 0.08, agriculture: 0.02 },
+    },
+    energy: { renewableShare: 0.10, coalShare: 0.42, gasShare: 0.40, nuclearShare: 0.08 },
+    potential: { solar: { score: 0.70 }, wind: { score: 0.80 }, forest: { score: 0.35 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.40 } },
+    facts: ["Major semiconductor manufacturing", "Offshore wind expansion", "Nuclear phase-out planned"],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADDITIONAL MIDDLE EAST COUNTRIES
+  // ═══════════════════════════════════════════════════════════════
+
+  iraq: {
+    name: "Iraq",
+    region: "asia",
+    population: 43,
+    gdp: 0.27,
+    emissions: {
+      total: 0.22,
+      perCapita: 5.1,
+      trend: 2.5,
+      sources: { electricity: 0.35, transport: 0.25, industry: 0.30, buildings: 0.05, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.02, coalShare: 0.00, gasShare: 0.30, nuclearShare: 0.00, oilShare: 0.68 },
+    potential: { solar: { score: 0.95 }, wind: { score: 0.55 }, forest: { score: 0.15 }, carbonCapture: { score: 0.65 }, geothermal: { score: 0.25 } },
+    facts: ["Major oil producer", "Excellent solar potential untapped", "Gas flaring issues"],
+  },
+
+  kuwait: {
+    name: "Kuwait",
+    region: "asia",
+    population: 4,
+    gdp: 0.18,
+    emissions: {
+      total: 0.10,
+      perCapita: 23.0,
+      trend: 0.5,
+      sources: { electricity: 0.55, transport: 0.20, industry: 0.18, buildings: 0.05, agriculture: 0.02 },
+    },
+    energy: { renewableShare: 0.01, coalShare: 0.00, gasShare: 0.25, nuclearShare: 0.00, oilShare: 0.74 },
+    potential: { solar: { score: 0.98 }, wind: { score: 0.50 }, forest: { score: 0.05 }, carbonCapture: { score: 0.70 }, geothermal: { score: 0.15 } },
+    facts: ["Among highest per capita emissions", "Oil-dependent economy", "Extreme solar potential"],
+  },
+
+  qatar: {
+    name: "Qatar",
+    region: "asia",
+    population: 3,
+    gdp: 0.23,
+    emissions: {
+      total: 0.11,
+      perCapita: 35.6,
+      trend: 1.0,
+      sources: { electricity: 0.35, transport: 0.15, industry: 0.40, buildings: 0.08, agriculture: 0.02 },
+    },
+    energy: { renewableShare: 0.01, coalShare: 0.00, gasShare: 0.99, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.95 }, wind: { score: 0.45 }, forest: { score: 0.05 }, carbonCapture: { score: 0.80 }, geothermal: { score: 0.15 } },
+    facts: ["Highest per capita emissions globally", "World's largest LNG exporter", "FIFA 2022 host"],
+  },
+
+  israel: {
+    name: "Israel",
+    region: "asia",
+    population: 9,
+    gdp: 0.52,
+    emissions: {
+      total: 0.07,
+      perCapita: 7.5,
+      trend: -2.0,
+      sources: { electricity: 0.40, transport: 0.28, industry: 0.15, buildings: 0.12, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.10, coalShare: 0.20, gasShare: 0.65, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.90 }, wind: { score: 0.50 }, forest: { score: 0.30 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.30 } },
+    facts: ["Pioneer in solar thermal tech", "Rapid natural gas shift", "Water desalination leader"],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADDITIONAL AFRICAN COUNTRIES
+  // ═══════════════════════════════════════════════════════════════
+
+  morocco: {
+    name: "Morocco",
+    region: "africa",
+    population: 37,
+    gdp: 0.13,
+    emissions: {
+      total: 0.07,
+      perCapita: 1.9,
+      trend: 2.5,
+      sources: { electricity: 0.38, transport: 0.25, industry: 0.20, buildings: 0.10, agriculture: 0.07 },
+    },
+    energy: { renewableShare: 0.20, coalShare: 0.52, gasShare: 0.10, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.95 }, wind: { score: 0.80 }, forest: { score: 0.35 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.25 } },
+    projects: {
+      solar: { costMultiplier: 0.70, effectMultiplier: 1.40, reason: "Home to Noor Ouarzazate, world's largest concentrated solar plant" },
+    },
+    facts: ["Noor - world's largest concentrated solar plant", "52% renewable target by 2030", "Green hydrogen ambitions"],
+  },
+
+  algeria: {
+    name: "Algeria",
+    region: "africa",
+    population: 45,
+    gdp: 0.19,
+    emissions: {
+      total: 0.18,
+      perCapita: 4.0,
+      trend: 1.5,
+      sources: { electricity: 0.40, transport: 0.28, industry: 0.20, buildings: 0.07, agriculture: 0.05 },
+    },
+    energy: { renewableShare: 0.02, coalShare: 0.00, gasShare: 0.98, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.98 }, wind: { score: 0.65 }, forest: { score: 0.15 }, carbonCapture: { score: 0.55 }, geothermal: { score: 0.30 } },
+    facts: ["Sahara - world's best solar potential", "Major gas exporter", "Vast untapped renewable resources"],
+  },
+
+  kenya: {
+    name: "Kenya",
+    region: "africa",
+    population: 54,
+    gdp: 0.11,
+    emissions: {
+      total: 0.02,
+      perCapita: 0.4,
+      trend: 4.0,
+      sources: { electricity: 0.15, transport: 0.30, industry: 0.15, buildings: 0.10, agriculture: 0.30 },
+    },
+    energy: { renewableShare: 0.90, coalShare: 0.00, gasShare: 0.00, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.75 }, forest: { score: 0.55 }, carbonCapture: { score: 0.30 }, geothermal: { score: 0.85 } },
+    projects: {
+      geothermal: { costMultiplier: 0.70, effectMultiplier: 1.40, reason: "Rift Valley geothermal powerhouse" },
+    },
+    facts: ["90% renewable electricity", "Rift Valley geothermal leader", "Mobile money pioneer"],
+  },
+
+  ethiopia: {
+    name: "Ethiopia",
+    region: "africa",
+    population: 120,
+    gdp: 0.13,
+    emissions: {
+      total: 0.02,
+      perCapita: 0.2,
+      trend: 5.0,
+      sources: { electricity: 0.05, transport: 0.20, industry: 0.10, buildings: 0.10, agriculture: 0.55 },
+    },
+    energy: { renewableShare: 0.95, coalShare: 0.00, gasShare: 0.00, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.70 }, forest: { score: 0.60 }, carbonCapture: { score: 0.25 }, geothermal: { score: 0.70 } },
+    facts: ["Nearly 100% renewable electricity", "Grand Ethiopian Renaissance Dam", "Very low per capita emissions"],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // ADDITIONAL AMERICAS COUNTRIES
+  // ═══════════════════════════════════════════════════════════════
+
+  chile: {
+    name: "Chile",
+    region: "south_america",
+    population: 19,
+    gdp: 0.30,
+    emissions: {
+      total: 0.09,
+      perCapita: 4.7,
+      trend: -3.0,
+      sources: { electricity: 0.30, transport: 0.28, industry: 0.25, buildings: 0.10, agriculture: 0.07 },
+    },
+    energy: { renewableShare: 0.55, coalShare: 0.20, gasShare: 0.15, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.98 }, wind: { score: 0.85 }, forest: { score: 0.50 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.65 } },
+    projects: {
+      solar: { costMultiplier: 0.65, effectMultiplier: 1.50, reason: "Atacama Desert - world's best solar irradiance" },
+    },
+    facts: ["Atacama - world's best solar radiation", "Green hydrogen ambitions", "Copper mining major emitter"],
+  },
+
+  colombia: {
+    name: "Colombia",
+    region: "south_america",
+    population: 52,
+    gdp: 0.34,
+    emissions: {
+      total: 0.10,
+      perCapita: 1.9,
+      trend: 1.0,
+      sources: { electricity: 0.10, transport: 0.35, industry: 0.20, buildings: 0.10, agriculture: 0.25 },
+    },
+    energy: { renewableShare: 0.75, coalShare: 0.08, gasShare: 0.15, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.80 }, wind: { score: 0.70 }, forest: { score: 0.85 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.35 } },
+    facts: ["75% renewable electricity (hydro)", "Amazon rainforest portion", "Coal export phase-out"],
+  },
+
+  peru: {
+    name: "Peru",
+    region: "south_america",
+    population: 34,
+    gdp: 0.24,
+    emissions: {
+      total: 0.06,
+      perCapita: 1.8,
+      trend: 2.0,
+      sources: { electricity: 0.15, transport: 0.30, industry: 0.25, buildings: 0.08, agriculture: 0.22 },
+    },
+    energy: { renewableShare: 0.60, coalShare: 0.02, gasShare: 0.35, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.70 }, forest: { score: 0.80 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.50 } },
+    facts: ["Amazon rainforest protection", "High Andes solar potential", "Mining sector challenges"],
+  },
+
+  venezuela: {
+    name: "Venezuela",
+    region: "south_america",
+    population: 28,
+    gdp: 0.10,
+    emissions: {
+      total: 0.12,
+      perCapita: 4.3,
+      trend: -5.0,
+      sources: { electricity: 0.12, transport: 0.35, industry: 0.30, buildings: 0.08, agriculture: 0.15 },
+    },
+    energy: { renewableShare: 0.68, coalShare: 0.00, gasShare: 0.08, nuclearShare: 0.00, oilShare: 0.24 },
+    potential: { solar: { score: 0.85 }, wind: { score: 0.60 }, forest: { score: 0.70 }, carbonCapture: { score: 0.55 }, geothermal: { score: 0.20 } },
+    facts: ["Large hydropower from Guri Dam", "Major oil reserves", "Economic crisis affecting energy"],
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // OCEANIA - ADDITIONAL
+  // ═══════════════════════════════════════════════════════════════
+
+  new_zealand: {
+    name: "New Zealand",
+    region: "oceania",
+    population: 5,
+    gdp: 0.25,
+    emissions: {
+      total: 0.04,
+      perCapita: 7.0,
+      trend: -3.0,
+      sources: { electricity: 0.05, transport: 0.25, industry: 0.15, buildings: 0.10, agriculture: 0.45 },
+    },
+    energy: { renewableShare: 0.85, coalShare: 0.02, gasShare: 0.12, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.55 }, wind: { score: 0.85 }, forest: { score: 0.70 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.80 } },
+    projects: {
+      geothermal: { costMultiplier: 0.75, effectMultiplier: 1.30, reason: "Geothermal pioneer since 1950s" },
+    },
+    facts: ["85% renewable electricity", "High agricultural emissions", "Geothermal pioneer"],
+  },
+
+  papua_new_guinea: {
+    name: "Papua New Guinea",
+    region: "oceania",
+    population: 10,
+    gdp: 0.03,
+    emissions: {
+      total: 0.01,
+      perCapita: 0.8,
+      trend: 3.0,
+      sources: { electricity: 0.20, transport: 0.25, industry: 0.20, buildings: 0.05, agriculture: 0.30 },
+    },
+    energy: { renewableShare: 0.35, coalShare: 0.00, gasShare: 0.60, nuclearShare: 0.00 },
+    potential: { solar: { score: 0.80 }, wind: { score: 0.45 }, forest: { score: 0.95 }, carbonCapture: { score: 0.30 }, geothermal: { score: 0.60 } },
+    facts: ["Third largest rainforest", "LNG exporter", "High forest carbon potential"],
+  },
 };
 
 // ═══════════════════════════════════════════════════════════════
@@ -1730,15 +2757,341 @@ function getRandomFact(regionId) {
   return data.facts[Math.floor(Math.random() * data.facts.length)];
 }
 
+// ═══════════════════════════════════════════════════════════════
+// GRANULARITY AGGREGATION FUNCTIONS
+// Support for 3-tier granularity: Continents → Major Regions → Countries
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Get country data by ISO code, with fallback to regional defaults
+ */
+function getCountryByIso(isoCode) {
+  const key = ISO_TO_KEY[isoCode];
+  if (key && COUNTRY_DATA[key]) {
+    return COUNTRY_DATA[key];
+  }
+  return null;
+}
+
+/**
+ * Create default data for a country that lacks complete data
+ * Uses regional averages from available countries in same major region
+ */
+function createDefaultCountryData(isoCode, majorRegionId) {
+  const region = MAJOR_REGIONS[majorRegionId];
+  if (!region) return null;
+
+  // Find countries in same region with data
+  const regionCountries = region.countries
+    .map((iso) => getCountryByIso(iso))
+    .filter(Boolean);
+
+  if (regionCountries.length === 0) {
+    // Absolute fallback: minimal default data
+    return {
+      name: isoCode,
+      iso: isoCode,
+      region: region.continent,
+      majorRegion: majorRegionId,
+      population: 1,
+      gdp: 0.01,
+      emissions: {
+        total: 0.001,
+        perCapita: 1.0,
+        trend: 0,
+        sources: {
+          electricity: 0.35,
+          transport: 0.25,
+          industry: 0.20,
+          buildings: 0.12,
+          agriculture: 0.08,
+        },
+      },
+      energy: {
+        renewableShare: 0.20,
+        coalShare: 0.30,
+        gasShare: 0.25,
+        nuclearShare: 0.05,
+      },
+      potential: {
+        solar: { score: 0.50 },
+        wind: { score: 0.50 },
+        forest: { score: 0.50 },
+        carbonCapture: { score: 0.50 },
+        geothermal: { score: 0.30 },
+      },
+      estimated: true,
+    };
+  }
+
+  // Use regional average per capita emissions
+  const avgPerCapita =
+    regionCountries.reduce((sum, c) => sum + c.emissions.perCapita, 0) /
+    regionCountries.length;
+
+  // Average emission sources (weighted by total emissions)
+  const totalEmissions = regionCountries.reduce(
+    (sum, c) => sum + c.emissions.total,
+    0
+  );
+  const avgSources = {};
+  ["electricity", "transport", "industry", "buildings", "agriculture"].forEach(
+    (key) => {
+      avgSources[key] =
+        regionCountries.reduce(
+          (sum, c) => sum + (c.emissions.sources[key] || 0) * c.emissions.total,
+          0
+        ) / totalEmissions;
+    }
+  );
+
+  // Average potentials
+  const avgPotential = {};
+  ["solar", "wind", "forest", "carbonCapture", "geothermal"].forEach((key) => {
+    const scores = regionCountries
+      .map((c) => {
+        const p = c.potential?.[key];
+        return typeof p === "object" ? p.score : p;
+      })
+      .filter((s) => s !== undefined);
+    avgPotential[key] = {
+      score: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0.5,
+    };
+  });
+
+  return {
+    name: isoCode,
+    iso: isoCode,
+    region: region.continent,
+    majorRegion: majorRegionId,
+    population: 1, // Will be overridden if known
+    gdp: 0.01,
+    emissions: {
+      total: avgPerCapita * 0.001, // Assume 1 million population
+      perCapita: avgPerCapita,
+      trend: 0,
+      sources: avgSources,
+    },
+    energy: {
+      renewableShare: 0.20,
+      coalShare: 0.30,
+      gasShare: 0.25,
+      nuclearShare: 0.05,
+    },
+    potential: avgPotential,
+    estimated: true,
+  };
+}
+
+/**
+ * Aggregate multiple countries into a single region data object
+ * @param {string[]} countryIsoCodes - Array of ISO country codes
+ * @param {string} regionName - Name for the aggregated region
+ * @param {string} regionId - ID for the aggregated region
+ */
+function aggregateCountriesToRegion(countryIsoCodes, regionName, regionId) {
+  const countries = countryIsoCodes
+    .map((iso) => {
+      const data = getCountryByIso(iso);
+      if (data) return data;
+      // Find which major region this country belongs to
+      for (const [mrId, mr] of Object.entries(MAJOR_REGIONS)) {
+        if (mr.countries.includes(iso)) {
+          return createDefaultCountryData(iso, mrId);
+        }
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  if (countries.length === 0) return null;
+
+  // Sum totals
+  const totalPopulation = countries.reduce((sum, c) => sum + (c.population || 0), 0);
+  const totalGdp = countries.reduce((sum, c) => sum + (c.gdp || 0), 0);
+  const totalEmissions = countries.reduce((sum, c) => sum + c.emissions.total, 0);
+
+  // Weighted average for per-capita emissions
+  const avgPerCapita =
+    totalPopulation > 0 ? (totalEmissions / totalPopulation) * 1000 : 0;
+
+  // Weighted average for emission sources (by total emissions)
+  const sources = {};
+  ["electricity", "transport", "industry", "buildings", "agriculture"].forEach(
+    (key) => {
+      if (totalEmissions > 0) {
+        sources[key] =
+          countries.reduce(
+            (sum, c) =>
+              sum + (c.emissions.sources[key] || 0) * c.emissions.total,
+            0
+          ) / totalEmissions;
+      } else {
+        sources[key] = 0.2;
+      }
+    }
+  );
+
+  // GDP-weighted average for potential scores
+  const potential = {};
+  ["solar", "wind", "forest", "carbonCapture", "geothermal"].forEach((key) => {
+    if (totalGdp > 0) {
+      const weightedSum = countries.reduce((sum, c) => {
+        const p = c.potential?.[key];
+        const score = typeof p === "object" ? p.score : p || 0.5;
+        return sum + score * (c.gdp || 0.01);
+      }, 0);
+      potential[key] = { score: weightedSum / totalGdp };
+    } else {
+      potential[key] = { score: 0.5 };
+    }
+  });
+
+  // Sum base income
+  const baseIncome = countries.reduce((sum, c) => {
+    // Calculate income from GDP if not specified
+    const income = c.baseIncome || Math.max(1, Math.round(c.gdp * 0.5));
+    return sum + income;
+  }, 0);
+
+  // Collect facts
+  const facts = countries
+    .flatMap((c) => c.facts || [])
+    .filter(Boolean)
+    .slice(0, 6);
+
+  return {
+    name: regionName,
+    region: regionId,
+    population: totalPopulation,
+    gdp: totalGdp,
+    baseIncome: baseIncome,
+    emissions: {
+      total: totalEmissions,
+      perCapita: avgPerCapita,
+      sources,
+    },
+    potential,
+    facts,
+    aggregated: true,
+    countryCount: countries.length,
+  };
+}
+
+/**
+ * Get data for a major region by aggregating its countries
+ */
+function getMajorRegionData(majorRegionId) {
+  const region = MAJOR_REGIONS[majorRegionId];
+  if (!region) return null;
+
+  return aggregateCountriesToRegion(
+    region.countries,
+    region.name,
+    majorRegionId
+  );
+}
+
+/**
+ * Get data for a continent by aggregating all its major regions
+ */
+function getContinentData(continentId) {
+  const continent = CONTINENTS[continentId];
+  if (!continent) return null;
+
+  // Collect all countries from all major regions in this continent
+  const allCountries = continent.majorRegions.flatMap((mrId) => {
+    const mr = MAJOR_REGIONS[mrId];
+    return mr ? mr.countries : [];
+  });
+
+  return aggregateCountriesToRegion(allCountries, continent.name, continentId);
+}
+
+/**
+ * Get data for any granularity level
+ * @param {number} level - 1=continents, 2=major_regions, 3=countries
+ * @param {string} id - Region/country ID (ISO code for countries, region key for others)
+ */
+function getDataForGranularity(level, id) {
+  switch (level) {
+    case 1: // Continents
+      return getContinentData(id);
+    case 2: // Major Regions
+      return getMajorRegionData(id);
+    case 3: // Countries
+      const countryData = getCountryByIso(id) || getClimateData(id);
+      if (countryData) return countryData;
+      // Try to find which major region this country belongs to
+      for (const [mrId, mr] of Object.entries(MAJOR_REGIONS)) {
+        if (mr.countries.includes(id)) {
+          return createDefaultCountryData(id, mrId);
+        }
+      }
+      return null;
+    default:
+      return null;
+  }
+}
+
+/**
+ * Get all region IDs for a given granularity level
+ * @param {number} level - 1=continents, 2=major_regions, 3=countries
+ */
+function getRegionIdsForGranularity(level) {
+  switch (level) {
+    case 1:
+      return Object.keys(CONTINENTS);
+    case 2:
+      return Object.keys(MAJOR_REGIONS);
+    case 3:
+      return Object.keys(ISO_TO_KEY);
+    default:
+      return [];
+  }
+}
+
+/**
+ * Map a country ISO code to its parent region at a given granularity
+ * @param {string} isoCode - Country ISO code
+ * @param {number} level - Target granularity level
+ */
+function getParentRegion(isoCode, level) {
+  if (level === 3) return isoCode;
+
+  // Find the major region containing this country
+  for (const [mrId, mr] of Object.entries(MAJOR_REGIONS)) {
+    if (mr.countries.includes(isoCode)) {
+      if (level === 2) return mrId;
+      if (level === 1) return mr.continent;
+    }
+  }
+  return null;
+}
+
 // Export for use in game.js
 if (typeof window !== "undefined") {
   window.CLIMATE_DATA = {
+    // Data constants
     COUNTRY_DATA,
     REGION_AGGREGATES,
     EMISSION_SECTORS,
     ADVANCED_PROJECT_TYPES,
+    // New 3-tier granularity constants
+    ISO_TO_KEY,
+    MAJOR_REGIONS,
+    CONTINENTS,
+    // Original functions
     getClimateData,
     calculateProjectEffectiveness,
     getRandomFact,
+    // New granularity functions
+    getCountryByIso,
+    getDataForGranularity,
+    getRegionIdsForGranularity,
+    getParentRegion,
+    getMajorRegionData,
+    getContinentData,
+    aggregateCountriesToRegion,
   };
 }
