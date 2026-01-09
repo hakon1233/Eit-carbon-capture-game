@@ -317,7 +317,7 @@ const MAJOR_REGIONS = {
     name: "West Asia",
     continent: "asia",
     countries: [
-      "AM", "AZ", "BH", "CY", "GE", "IQ", "IL", "JO", "KW", "LB",
+      "AM", "AZ", "BH", "CY", "GE", "IQ", "IL", "IR", "JO", "KW", "LB",
       "OM", "PS", "QA", "SA", "SY", "TR", "AE", "YE",
     ],
   },
@@ -471,11 +471,11 @@ const COUNTRY_DATA = {
     name: "China",
     region: "asia",
     population: 1412,
-    gdp: 17.9,
+    gdp: 19.23,
     emissions: {
-      total: 11.4,
-      perCapita: 8.0,
-      trend: 0.9,
+      total: 11.9,
+      perCapita: 10.8,
+      trend: 0.8,
       sources: {
         electricity: 0.44,
         industry: 0.28,
@@ -485,9 +485,9 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.31,
-      coalShare: 0.56,
-      gasShare: 0.08,
+      renewableShare: 0.35,
+      coalShare: 0.58,
+      gasShare: 0.04,
       nuclearShare: 0.05,
     },
     potential: {
@@ -508,22 +508,38 @@ const COUNTRY_DATA = {
       parisCommitment: -65,
     },
     facts: [
-      "Largest CO2 emitter, producing ~30% of global emissions",
+      "Largest CO2 emitter, producing ~32% of global emissions",
       "Also world's largest investor in renewable energy",
-      "Three Gorges Dam is the world's largest hydroelectric plant",
+      "Clean energy now over 10% of economy",
       "Has planted over 70 billion trees since 1978",
     ],
+    climateFinance: {
+      currentPercent: 2.5,
+      maxPercent: 5.0,
+      minPercent: 0.5,
+      difficulty: 0.4,
+      politicalResistance: 0.3,
+    },
+    disasterVulnerability: {
+      heatWave: 0.7,      // Severe heat in northern/western regions
+      hurricane: 0.4,     // Typhoons hit southern coast
+      flooding: 0.8,      // Major river flooding (Yangtze, Yellow)
+      drought: 0.5,       // Northern regions drought-prone
+      wildfire: 0.3,      // Some forest fire risk
+      extremeCold: 0.3,   // Northern regions get cold snaps
+      resilience: 0.6,    // Improving infrastructure
+    },
   },
 
   india: {
     name: "India",
     region: "asia",
-    population: 1417,
-    gdp: 3.4,
+    population: 1460,
+    gdp: 4.19,
     emissions: {
-      total: 2.7,
-      perCapita: 1.9,
-      trend: 4.8,
+      total: 2.9,
+      perCapita: 2.0,
+      trend: 3.9,
       sources: {
         electricity: 0.40,
         industry: 0.22,
@@ -534,8 +550,8 @@ const COUNTRY_DATA = {
     },
     energy: {
       renewableShare: 0.22,
-      coalShare: 0.55,
-      gasShare: 0.06,
+      coalShare: 0.73,
+      gasShare: 0.03,
       nuclearShare: 0.03,
     },
     potential: {
@@ -556,22 +572,38 @@ const COUNTRY_DATA = {
       parisCommitment: -45,
     },
     facts: [
+      "World's most populous country since 2023",
       "Third largest emitter but very low per capita emissions",
       "Home to the International Solar Alliance",
       "Aims for 500 GW renewable capacity by 2030",
-      "Largest democracy tackling energy poverty and climate",
     ],
+    climateFinance: {
+      currentPercent: 2.0,
+      maxPercent: 6.5,
+      minPercent: 0.5,
+      difficulty: 0.5,
+      politicalResistance: 0.4,
+    },
+    disasterVulnerability: {
+      heatWave: 0.9,      // Extreme heat, especially in north
+      hurricane: 0.5,     // Cyclones from Bay of Bengal
+      flooding: 0.9,      // Monsoon flooding is severe
+      drought: 0.6,       // Significant drought risk
+      wildfire: 0.2,      // Limited wildfire risk
+      extremeCold: 0.1,   // Minimal cold (Himalayan regions only)
+      resilience: 0.3,    // Developing infrastructure
+    },
   },
 
   japan: {
     name: "Japan",
     region: "asia",
     population: 125,
-    gdp: 4.2,
+    gdp: 4.19,
     emissions: {
-      total: 1.1,
+      total: 1.0,
       perCapita: 8.5,
-      trend: -2.1,
+      trend: -2.8,
       sources: {
         electricity: 0.42,
         industry: 0.25,
@@ -582,9 +614,9 @@ const COUNTRY_DATA = {
     },
     energy: {
       renewableShare: 0.22,
-      coalShare: 0.31,
-      gasShare: 0.37,
-      nuclearShare: 0.07,
+      coalShare: 0.30,
+      gasShare: 0.35,
+      nuclearShare: 0.08,
     },
     potential: {
       solar: { score: 0.60, capacity: 400 },
@@ -606,20 +638,36 @@ const COUNTRY_DATA = {
     },
     facts: [
       "Pioneer in hydrogen technology and fuel cells",
-      "Third largest economy, high-tech industrial base",
-      "Post-Fukushima shift away from nuclear power",
+      "Fourth largest economy in Asia",
+      "Restarting nuclear power after Fukushima pause",
       "Leader in energy efficiency technology",
     ],
+    climateFinance: {
+      currentPercent: 1.2,
+      maxPercent: 3.5,
+      minPercent: 0.3,
+      difficulty: 0.5,
+      politicalResistance: 0.4,
+    },
+    disasterVulnerability: {
+      heatWave: 0.5,      // Hot summers
+      hurricane: 0.7,     // Typhoons are major threat
+      flooding: 0.6,      // Monsoon flooding
+      drought: 0.2,       // Limited drought
+      wildfire: 0.2,      // Some forest fires
+      extremeCold: 0.2,   // Cold winters
+      resilience: 0.9,    // Excellent infrastructure
+    },
   },
 
   south_korea: {
     name: "South Korea",
     region: "asia",
     population: 52,
-    gdp: 1.7,
+    gdp: 1.76,
     emissions: {
-      total: 0.62,
-      perCapita: 11.9,
+      total: 0.59,
+      perCapita: 11.6,
       trend: -0.5,
       sources: {
         electricity: 0.38,
@@ -630,10 +678,10 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.09,
-      coalShare: 0.34,
-      gasShare: 0.29,
-      nuclearShare: 0.27,
+      renewableShare: 0.10,
+      coalShare: 0.32,
+      gasShare: 0.28,
+      nuclearShare: 0.30,
     },
     potential: {
       solar: { score: 0.55, capacity: 100 },
@@ -647,7 +695,7 @@ const COUNTRY_DATA = {
       wind: { costMultiplier: 0.95, effectMultiplier: 1.10, reason: "Offshore wind development focus" },
     },
     policies: {
-      carbonPrice: 18,
+      carbonPrice: 12,
       netZeroTarget: 2050,
       parisCommitment: -40,
     },
@@ -657,17 +705,33 @@ const COUNTRY_DATA = {
       "Strong push for green hydrogen economy",
       "Operates Asia's first emissions trading system",
     ],
+    climateFinance: {
+      currentPercent: 1.2,
+      maxPercent: 3.0,
+      minPercent: 0.3,
+      difficulty: 0.4,
+      politicalResistance: 0.3,
+    },
+    disasterVulnerability: {
+      heatWave: 0.4,      // Summers can be hot
+      hurricane: 0.5,     // Typhoons from Pacific
+      flooding: 0.5,      // Monsoon-related
+      drought: 0.2,       // Limited
+      wildfire: 0.2,      // Some forest fires
+      extremeCold: 0.3,   // Cold winters
+      resilience: 0.85,   // Good infrastructure
+    },
   },
 
   indonesia: {
     name: "Indonesia",
     region: "asia",
-    population: 276,
-    gdp: 1.3,
+    population: 278,
+    gdp: 1.47,
     emissions: {
       total: 0.69,
       perCapita: 2.5,
-      trend: 2.8,
+      trend: 5.0,
       sources: {
         electricity: 0.35,
         industry: 0.20,
@@ -695,7 +759,7 @@ const COUNTRY_DATA = {
       solar: { costMultiplier: 0.80, effectMultiplier: 1.25, reason: "Excellent equatorial solar resources" },
     },
     policies: {
-      carbonPrice: 2,
+      carbonPrice: 0,
       netZeroTarget: 2060,
       parisCommitment: -32,
     },
@@ -705,6 +769,22 @@ const COUNTRY_DATA = {
       "Major palm oil producer - deforestation concerns",
       "17,000+ islands create unique energy challenges",
     ],
+    climateFinance: {
+      currentPercent: 1.8,
+      maxPercent: 5.0,
+      minPercent: 0.4,
+      difficulty: 0.6,
+      politicalResistance: 0.5,
+    },
+    disasterVulnerability: {
+      heatWave: 0.6,      // Tropical heat
+      hurricane: 0.0,     // Wrong latitude for hurricanes
+      flooding: 0.8,      // Severe monsoon flooding
+      drought: 0.3,       // Some regions
+      wildfire: 0.6,      // Forest fires during dry season
+      extremeCold: 0.0,   // Tropical - no cold
+      resilience: 0.35,   // Developing infrastructure
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -714,12 +794,12 @@ const COUNTRY_DATA = {
   usa: {
     name: "United States",
     region: "north_america",
-    population: 331,
-    gdp: 25.5,
+    population: 347,
+    gdp: 30.51,
     emissions: {
-      total: 5.01,
-      perCapita: 15.1,
-      trend: -0.8,
+      total: 4.9,
+      perCapita: 17.3,
+      trend: 0.4,
       sources: {
         electricity: 0.25,
         transport: 0.28,
@@ -729,10 +809,10 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.22,
-      coalShare: 0.20,
-      gasShare: 0.38,
-      nuclearShare: 0.19,
+      renewableShare: 0.23,
+      coalShare: 0.16,
+      gasShare: 0.40,
+      nuclearShare: 0.18,
     },
     potential: {
       solar: { score: 0.85, capacity: 3200 },
@@ -748,26 +828,42 @@ const COUNTRY_DATA = {
     },
     policies: {
       carbonPrice: 0,
-      netZeroTarget: 2050,
+      netZeroTarget: null,
       parisCommitment: -50,
     },
     facts: [
       "Second largest emitter globally after China",
-      "Inflation Reduction Act (2022) is largest climate investment in US history",
-      "Texas produces more wind energy than any other state",
+      "World's largest economy at $30+ trillion",
+      "Natural gas dominates electricity generation (40%)",
       "Per capita emissions among highest in the world",
     ],
+    climateFinance: {
+      currentPercent: 0.9,
+      maxPercent: 2.5,
+      minPercent: 0.3,
+      difficulty: 0.8,
+      politicalResistance: 0.7,
+    },
+    disasterVulnerability: {
+      heatWave: 0.5,      // Southwest heat, expanding
+      hurricane: 0.6,     // Gulf Coast, East Coast
+      flooding: 0.5,      // River flooding, coastal
+      drought: 0.5,       // Southwest, California
+      wildfire: 0.6,      // California, West
+      extremeCold: 0.3,   // Northern states, polar vortex
+      resilience: 0.7,    // Good but aging infrastructure
+    },
   },
 
   canada: {
     name: "Canada",
     region: "north_america",
-    population: 39,
-    gdp: 2.1,
+    population: 41,
+    gdp: 2.24,
     emissions: {
-      total: 0.67,
-      perCapita: 17.3,
-      trend: -1.2,
+      total: 0.68,
+      perCapita: 19.8,
+      trend: -1.0,
       sources: {
         electricity: 0.11,
         transport: 0.25,
@@ -795,25 +891,41 @@ const COUNTRY_DATA = {
       carbonCapture: { costMultiplier: 0.80, effectMultiplier: 1.25, reason: "Pioneer in CCS technology, oil sands expertise" },
     },
     policies: {
-      carbonPrice: 50,
+      carbonPrice: 65,
       netZeroTarget: 2050,
       parisCommitment: -40,
     },
     facts: [
       "Already 68% renewable electricity (mostly hydro)",
       "High per capita emissions due to oil sands and cold climate",
+      "Federal carbon price rising to $170/t by 2030",
       "World's second largest boreal forest",
-      "Federal carbon price is rising annually",
     ],
+    climateFinance: {
+      currentPercent: 1.2,
+      maxPercent: 3.5,
+      minPercent: 0.3,
+      difficulty: 0.5,
+      politicalResistance: 0.45,
+    },
+    disasterVulnerability: {
+      heatWave: 0.2,      // Rare, localized
+      hurricane: 0.3,     // Atlantic coast, rare
+      flooding: 0.4,      // Spring flooding
+      drought: 0.3,       // Prairies
+      wildfire: 0.7,      // Boreal forest fires increasing
+      extremeCold: 0.6,   // Extreme polar cold
+      resilience: 0.75,   // Good infrastructure
+    },
   },
 
   mexico: {
     name: "Mexico",
     region: "north_america",
     population: 130,
-    gdp: 1.3,
+    gdp: 1.85,
     emissions: {
-      total: 0.47,
+      total: 0.48,
       perCapita: 3.6,
       trend: 0.5,
       sources: {
@@ -842,7 +954,7 @@ const COUNTRY_DATA = {
       geothermal: { costMultiplier: 0.85, effectMultiplier: 1.15, reason: "Pacific Ring of Fire location" },
     },
     policies: {
-      carbonPrice: 4,
+      carbonPrice: 3,
       netZeroTarget: 2050,
       parisCommitment: -22,
     },
@@ -852,6 +964,22 @@ const COUNTRY_DATA = {
       "Diverse ecosystems from deserts to rainforests",
       "Growing renewable energy sector despite policy uncertainty",
     ],
+    climateFinance: {
+      currentPercent: 1.2,
+      maxPercent: 3.5,
+      minPercent: 0.3,
+      difficulty: 0.6,
+      politicalResistance: 0.5,
+    },
+    disasterVulnerability: {
+      heatWave: 0.6,      // Hot climate, intensifying
+      hurricane: 0.7,     // Caribbean, Gulf coast
+      flooding: 0.5,      // Coastal and river flooding
+      drought: 0.5,       // Northern Mexico
+      wildfire: 0.4,      // Some forest fires
+      extremeCold: 0.0,   // Never cold
+      resilience: 0.45,   // Moderate infrastructure
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -861,12 +989,12 @@ const COUNTRY_DATA = {
   brazil: {
     name: "Brazil",
     region: "south_america",
-    population: 215,
-    gdp: 1.9,
+    population: 217,
+    gdp: 2.33,
     emissions: {
-      total: 0.49,
-      perCapita: 2.3,
-      trend: 1.5,
+      total: 0.48,
+      perCapita: 2.2,
+      trend: 0.2,
       sources: {
         electricity: 0.08,
         transport: 0.32,
@@ -876,8 +1004,8 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.84,
-      coalShare: 0.03,
+      renewableShare: 0.85,
+      coalShare: 0.04,
       gasShare: 0.08,
       nuclearShare: 0.02,
     },
@@ -899,11 +1027,27 @@ const COUNTRY_DATA = {
       parisCommitment: -43,
     },
     facts: [
-      "84% renewable electricity - mostly hydropower",
+      "85% renewable electricity - mostly hydropower",
       "Amazon rainforest produces 20% of world's oxygen",
       "Largest ethanol biofuel program globally",
       "Deforestation is biggest emissions driver",
     ],
+    climateFinance: {
+      currentPercent: 1.3,
+      maxPercent: 4.0,
+      minPercent: 0.3,
+      difficulty: 0.6,
+      politicalResistance: 0.5,
+    },
+    disasterVulnerability: {
+      heatWave: 0.5,      // Tropical heat in north
+      hurricane: 0.2,     // Coastal Brazil, rare
+      flooding: 0.7,      // Amazon and urban flooding
+      drought: 0.6,       // Northeast Brazil very dry
+      wildfire: 0.8,      // Amazon fires, major issue
+      extremeCold: 0.0,   // Tropical - never cold
+      resilience: 0.4,    // Developing infrastructure
+    },
   },
 
   argentina: {
@@ -950,6 +1094,22 @@ const COUNTRY_DATA = {
       "Major agricultural exporter",
       "Growing lithium production for batteries",
     ],
+    climateFinance: {
+      currentPercent: 1.0,
+      maxPercent: 3.5,
+      minPercent: 0.3,
+      difficulty: 0.6,
+      politicalResistance: 0.5,
+    },
+    disasterVulnerability: {
+      heatWave: 0.3,      // Pampa region heat
+      hurricane: 0.0,     // Wrong location
+      flooding: 0.5,      // River flooding
+      drought: 0.4,       // Pampa droughts
+      wildfire: 0.3,      // Some grassland fires
+      extremeCold: 0.2,   // Patagonia cold snaps
+      resilience: 0.5,    // Moderate infrastructure
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -960,11 +1120,11 @@ const COUNTRY_DATA = {
     name: "Germany",
     region: "europe",
     population: 84,
-    gdp: 4.1,
+    gdp: 4.74,
     emissions: {
-      total: 0.67,
-      perCapita: 8.0,
-      trend: -5.4,
+      total: 0.6,
+      perCapita: 8.2,
+      trend: -3.0,
       sources: {
         electricity: 0.32,
         industry: 0.24,
@@ -974,9 +1134,9 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.46,
-      coalShare: 0.27,
-      gasShare: 0.13,
+      renewableShare: 0.52,
+      coalShare: 0.26,
+      gasShare: 0.12,
       nuclearShare: 0.00,
     },
     potential: {
@@ -991,27 +1151,43 @@ const COUNTRY_DATA = {
       evInfra: { costMultiplier: 0.80, effectMultiplier: 1.25, reason: "Strong auto industry transitioning to EVs" },
     },
     policies: {
-      carbonPrice: 45,
+      carbonPrice: 65,
       netZeroTarget: 2045,
       parisCommitment: -65,
     },
     facts: [
       "Energiewende - most ambitious energy transition globally",
       "Phased out nuclear power in 2023",
-      "Europe's largest economy and industrial base",
-      "46% renewable electricity despite limited sun",
+      "Europe's largest economy at $4.7 trillion",
+      "Over 50% renewable electricity despite limited sun",
     ],
+    climateFinance: {
+      currentPercent: 2.0,
+      maxPercent: 5.0,
+      minPercent: 0.5,
+      difficulty: 0.3,
+      politicalResistance: 0.2,
+    },
+    disasterVulnerability: {
+      heatWave: 0.5,      // Summer heat waves increasing
+      hurricane: 0.0,     // Never - wrong location
+      flooding: 0.6,      // Rhine flooding, major issue
+      drought: 0.3,       // Some dry periods
+      wildfire: 0.2,      // Rare forest fires
+      extremeCold: 0.3,   // Cold winters
+      resilience: 0.9,    // Excellent infrastructure
+    },
   },
 
   uk: {
     name: "United Kingdom",
     region: "europe",
-    population: 67,
-    gdp: 3.1,
+    population: 68,
+    gdp: 3.49,
     emissions: {
-      total: 0.34,
-      perCapita: 5.1,
-      trend: -3.8,
+      total: 0.33,
+      perCapita: 5.6,
+      trend: -4.0,
       sources: {
         electricity: 0.21,
         transport: 0.27,
@@ -1021,9 +1197,9 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.42,
-      coalShare: 0.02,
-      gasShare: 0.38,
+      renewableShare: 0.45,
+      coalShare: 0.01,
+      gasShare: 0.35,
       nuclearShare: 0.15,
     },
     potential: {
@@ -1038,26 +1214,42 @@ const COUNTRY_DATA = {
       carbonCapture: { costMultiplier: 0.85, effectMultiplier: 1.20, reason: "North Sea storage potential" },
     },
     policies: {
-      carbonPrice: 85,
+      carbonPrice: 45,
       netZeroTarget: 2050,
       parisCommitment: -68,
     },
     facts: [
       "First major economy to legislate net zero",
-      "Coal-free days are now common",
+      "Nearly eliminated coal from electricity",
       "World's largest offshore wind capacity",
       "Hosted COP26 climate summit in Glasgow",
     ],
+    climateFinance: {
+      currentPercent: 1.8,
+      maxPercent: 4.0,
+      minPercent: 0.4,
+      difficulty: 0.35,
+      politicalResistance: 0.3,
+    },
+    disasterVulnerability: {
+      heatWave: 0.4,      // Some heat waves
+      hurricane: 0.0,     // Never
+      flooding: 0.6,      // River and coastal flooding
+      drought: 0.2,       // Rare
+      wildfire: 0.1,      // Very rare
+      extremeCold: 0.2,   // Occasional cold snaps
+      resilience: 0.8,    // Good infrastructure
+    },
   },
 
   france: {
     name: "France",
     region: "europe",
     population: 68,
-    gdp: 2.8,
+    gdp: 3.05,
     emissions: {
-      total: 0.30,
-      perCapita: 4.5,
+      total: 0.28,
+      perCapita: 4.2,
       trend: -2.5,
       sources: {
         electricity: 0.10,
@@ -1068,10 +1260,10 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.27,
+      renewableShare: 0.28,
       coalShare: 0.01,
-      gasShare: 0.07,
-      nuclearShare: 0.63,
+      gasShare: 0.10,
+      nuclearShare: 0.65,
     },
     potential: {
       solar: { score: 0.60, capacity: 150 },
@@ -1085,27 +1277,43 @@ const COUNTRY_DATA = {
       solar: { costMultiplier: 0.95, effectMultiplier: 1.05, reason: "Good southern resources" },
     },
     policies: {
-      carbonPrice: 45,
+      carbonPrice: 65,
       netZeroTarget: 2050,
       parisCommitment: -55,
     },
     facts: [
-      "Lowest carbon electricity in Europe due to nuclear",
+      "65% nuclear - lowest carbon electricity in Europe",
       "Paris Agreement was signed here in 2015",
       "Transport is largest emissions source",
-      "Pioneering nuclear renaissance in EU",
+      "Building 6 new nuclear reactors",
     ],
+    climateFinance: {
+      currentPercent: 1.6,
+      maxPercent: 4.0,
+      minPercent: 0.4,
+      difficulty: 0.4,
+      politicalResistance: 0.35,
+    },
+    disasterVulnerability: {
+      heatWave: 0.6,      // Mediterranean heat waves
+      hurricane: 0.0,     // Never
+      flooding: 0.5,      // Seine flooding, coastal
+      drought: 0.4,       // Southern France
+      wildfire: 0.5,      // Mediterranean forest fires
+      extremeCold: 0.2,   // Rare
+      resilience: 0.85,   // Very good infrastructure
+    },
   },
 
   italy: {
     name: "Italy",
     region: "europe",
     population: 59,
-    gdp: 2.0,
+    gdp: 2.37,
     emissions: {
-      total: 0.33,
-      perCapita: 5.5,
-      trend: -3.0,
+      total: 0.32,
+      perCapita: 5.4,
+      trend: -2.0,
       sources: {
         electricity: 0.24,
         transport: 0.26,
@@ -1132,7 +1340,7 @@ const COUNTRY_DATA = {
       geothermal: { costMultiplier: 0.90, effectMultiplier: 1.10, reason: "Tuscany geothermal heritage" },
     },
     policies: {
-      carbonPrice: 45,
+      carbonPrice: 65,
       netZeroTarget: 2050,
       parisCommitment: -55,
     },
@@ -1140,18 +1348,34 @@ const COUNTRY_DATA = {
       "First country to use geothermal electricity (1904)",
       "No nuclear power since 1990 referendum",
       "Dependent on imported natural gas",
-      "Growing solar installation rate",
+      "8th largest economy in the world",
     ],
+    climateFinance: {
+      currentPercent: 1.4,
+      maxPercent: 3.5,
+      minPercent: 0.3,
+      difficulty: 0.45,
+      politicalResistance: 0.4,
+    },
+    disasterVulnerability: {
+      heatWave: 0.7,      // Mediterranean very hot
+      hurricane: 0.0,     // Never
+      flooding: 0.5,      // River flooding
+      drought: 0.5,       // Southern Italy
+      wildfire: 0.6,      // Forest fires in summer
+      extremeCold: 0.1,   // Rare
+      resilience: 0.7,    // Good infrastructure
+    },
   },
 
   poland: {
     name: "Poland",
     region: "europe",
     population: 38,
-    gdp: 0.69,
+    gdp: 0.85,
     emissions: {
-      total: 0.31,
-      perCapita: 8.2,
+      total: 0.29,
+      perCapita: 8.0,
       trend: -1.0,
       sources: {
         electricity: 0.45,
@@ -1179,7 +1403,7 @@ const COUNTRY_DATA = {
       nuclear: { costMultiplier: 0.95, effectMultiplier: 1.10, reason: "Planning first nuclear plants" },
     },
     policies: {
-      carbonPrice: 45,
+      carbonPrice: 65,
       netZeroTarget: 2050,
       parisCommitment: -55,
     },
@@ -1189,16 +1413,32 @@ const COUNTRY_DATA = {
       "Rapidly expanding solar rooftop capacity",
       "Plans to build first nuclear plant by 2030s",
     ],
+    climateFinance: {
+      currentPercent: 0.9,
+      maxPercent: 3.0,
+      minPercent: 0.3,
+      difficulty: 0.6,
+      politicalResistance: 0.5,
+    },
+    disasterVulnerability: {
+      heatWave: 0.3,      // Some summer heat
+      hurricane: 0.0,     // Never
+      flooding: 0.5,      // River flooding
+      drought: 0.2,       // Rare
+      wildfire: 0.2,      // Some forest fires
+      extremeCold: 0.5,   // Cold winters
+      resilience: 0.6,    // Moderate infrastructure
+    },
   },
 
   russia: {
     name: "Russia",
     region: "europe",
     population: 144,
-    gdp: 1.8,
+    gdp: 2.02,
     emissions: {
       total: 1.76,
-      perCapita: 12.2,
+      perCapita: 18.0,
       trend: 0.2,
       sources: {
         electricity: 0.35,
@@ -1209,7 +1449,7 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.21,
+      renewableShare: 0.22,
       coalShare: 0.16,
       gasShare: 0.46,
       nuclearShare: 0.20,
@@ -1236,6 +1476,22 @@ const COUNTRY_DATA = {
       "Siberian forests are massive carbon sink",
       "Nuclear power provides 20% of electricity",
     ],
+    climateFinance: {
+      currentPercent: 0.3,
+      maxPercent: 1.5,
+      minPercent: 0.1,
+      difficulty: 0.95,
+      politicalResistance: 0.9,
+    },
+    disasterVulnerability: {
+      heatWave: 0.3,      // Siberian summers getting hotter
+      hurricane: 0.0,     // Never
+      flooding: 0.4,      // Spring melt flooding
+      drought: 0.3,       // Some regions
+      wildfire: 0.6,      // Massive Siberian fires
+      extremeCold: 0.7,   // Extreme Siberian cold
+      resilience: 0.5,    // Variable infrastructure
+    },
   },
 
   spain: {
@@ -1273,7 +1529,7 @@ const COUNTRY_DATA = {
       wind: { costMultiplier: 0.85, effectMultiplier: 1.15, reason: "Strong wind resources" },
     },
     policies: {
-      carbonPrice: 45,
+      carbonPrice: 65,
       netZeroTarget: 2050,
       parisCommitment: -55,
     },
@@ -1283,16 +1539,32 @@ const COUNTRY_DATA = {
       "Leading concentrating solar power technology",
       "Rapidly phasing out coal",
     ],
+    climateFinance: {
+      currentPercent: 1.3,
+      maxPercent: 3.5,
+      minPercent: 0.4,
+      difficulty: 0.4,
+      politicalResistance: 0.3,
+    },
+    disasterVulnerability: {
+      heatWave: 0.8,      // Extreme Mediterranean heat
+      hurricane: 0.0,     // Never
+      flooding: 0.4,      // Some river flooding
+      drought: 0.7,       // Major drought risk
+      wildfire: 0.8,      // Severe forest fires
+      extremeCold: 0.0,   // Never
+      resilience: 0.7,    // Good infrastructure
+    },
   },
 
   netherlands: {
     name: "Netherlands",
     region: "europe",
     population: 18,
-    gdp: 0.99,
+    gdp: 1.17,
     emissions: {
-      total: 0.15,
-      perCapita: 8.5,
+      total: 0.14,
+      perCapita: 8.1,
       trend: -4.8,
       sources: {
         electricity: 0.28,
@@ -1320,7 +1592,7 @@ const COUNTRY_DATA = {
       carbonCapture: { costMultiplier: 0.85, effectMultiplier: 1.20, reason: "Depleted gas fields for storage" },
     },
     policies: {
-      carbonPrice: 45,
+      carbonPrice: 65,
       netZeroTarget: 2050,
       parisCommitment: -55,
     },
@@ -1330,13 +1602,29 @@ const COUNTRY_DATA = {
       "Leading offshore wind developer",
       "Ambitious green hydrogen plans",
     ],
+    climateFinance: {
+      currentPercent: 1.4,
+      maxPercent: 3.5,
+      minPercent: 0.4,
+      difficulty: 0.3,
+      politicalResistance: 0.25,
+    },
+    disasterVulnerability: {
+      heatWave: 0.3,      // Mild summers
+      hurricane: 0.0,     // Never
+      flooding: 0.9,      // 1/3 below sea level - extreme flood risk
+      drought: 0.1,       // Wet climate
+      wildfire: 0.0,      // Never
+      extremeCold: 0.2,   // Some winter cold
+      resilience: 0.9,    // World-class water management
+    },
   },
 
   sweden: {
     name: "Sweden",
     region: "europe",
-    population: 10,
-    gdp: 0.59,
+    population: 10.5,
+    gdp: 0.60,
     emissions: {
       total: 0.04,
       perCapita: 3.8,
@@ -1350,10 +1638,10 @@ const COUNTRY_DATA = {
       },
     },
     energy: {
-      renewableShare: 0.69,
+      renewableShare: 0.72,
       coalShare: 0.01,
       gasShare: 0.01,
-      nuclearShare: 0.29,
+      nuclearShare: 0.30,
     },
     potential: {
       solar: { score: 0.35, capacity: 25 },
@@ -1367,26 +1655,42 @@ const COUNTRY_DATA = {
       wind: { costMultiplier: 0.85, effectMultiplier: 1.15, reason: "Good onshore and offshore resources" },
     },
     policies: {
-      carbonPrice: 120,
+      carbonPrice: 126,
       netZeroTarget: 2045,
       parisCommitment: -55,
     },
     facts: [
-      "World's highest carbon tax ($120/tonne)",
-      "69% renewable + 29% nuclear = 98% clean electricity",
+      "World's highest carbon tax ($126/tonne)",
+      "72% renewable + 30% nuclear = clean electricity",
       "Pioneering green steel production",
       "Carbon neutral target by 2045",
     ],
+    climateFinance: {
+      currentPercent: 2.5,
+      maxPercent: 5.5,
+      minPercent: 0.8,
+      difficulty: 0.2,
+      politicalResistance: 0.15,
+    },
+    disasterVulnerability: {
+      heatWave: 0.2,      // Cool climate
+      hurricane: 0.0,     // Never
+      flooding: 0.4,      // Some spring flooding
+      drought: 0.1,       // Wet climate
+      wildfire: 0.4,      // Northern forest fires increasing
+      extremeCold: 0.5,   // Arctic winters
+      resilience: 0.9,    // Excellent infrastructure
+    },
   },
 
   norway: {
     name: "Norway",
     region: "europe",
-    population: 5,
-    gdp: 0.48,
+    population: 5.5,
+    gdp: 0.50,
     emissions: {
-      total: 0.05,
-      perCapita: 9.5,
+      total: 0.04,
+      perCapita: 7.5,
       trend: -2.5,
       sources: {
         electricity: 0.02,
@@ -1415,7 +1719,7 @@ const COUNTRY_DATA = {
       evInfra: { costMultiplier: 0.75, effectMultiplier: 1.30, reason: "Highest EV adoption globally" },
     },
     policies: {
-      carbonPrice: 90,
+      carbonPrice: 91,
       netZeroTarget: 2050,
       parisCommitment: -55,
     },
@@ -1425,6 +1729,22 @@ const COUNTRY_DATA = {
       "Major oil/gas producer investing in transition",
       "Pioneer in carbon capture and storage",
     ],
+    climateFinance: {
+      currentPercent: 2.8,
+      maxPercent: 6.0,
+      minPercent: 0.8,
+      difficulty: 0.2,
+      politicalResistance: 0.15,
+    },
+    disasterVulnerability: {
+      heatWave: 0.1,      // Very cool climate
+      hurricane: 0.0,     // Never
+      flooding: 0.5,      // Coastal and spring floods
+      drought: 0.1,       // Wet climate
+      wildfire: 0.3,      // Northern forest fires
+      extremeCold: 0.6,   // Arctic winters
+      resilience: 0.9,    // Excellent infrastructure
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -1434,11 +1754,11 @@ const COUNTRY_DATA = {
   saudi_arabia: {
     name: "Saudi Arabia",
     region: "asia",
-    population: 36,
-    gdp: 1.1,
+    population: 37,
+    gdp: 1.11,
     emissions: {
-      total: 0.59,
-      perCapita: 16.4,
+      total: 0.66,
+      perCapita: 22.8,
       trend: 1.5,
       sources: {
         electricity: 0.42,
@@ -1475,18 +1795,34 @@ const COUNTRY_DATA = {
       "World's largest oil exporter",
       "Vision 2030 includes massive renewable buildout",
       "NEOM - futuristic green city project",
-      "Highest solar irradiance on Earth",
+      "Highest per capita emitter (22.8 tonnes)",
     ],
+    climateFinance: {
+      currentPercent: 0.4,
+      maxPercent: 2.0,
+      minPercent: 0.1,
+      difficulty: 0.9,
+      politicalResistance: 0.85,
+    },
+    disasterVulnerability: {
+      heatWave: 1.0,      // Most extreme heat on Earth
+      hurricane: 0.0,     // Never (Red Sea doesn't generate cyclones)
+      flooding: 0.3,      // Flash floods in rare rain events
+      drought: 0.9,       // Extreme desert drought
+      wildfire: 0.0,      // No vegetation to burn
+      extremeCold: 0.0,   // Never
+      resilience: 0.7,    // Good modern infrastructure
+    },
   },
 
   iran: {
     name: "Iran",
     region: "asia",
-    population: 87,
-    gdp: 0.39,
+    population: 89,
+    gdp: 0.40,
     emissions: {
       total: 0.75,
-      perCapita: 8.6,
+      perCapita: 8.4,
       trend: 1.2,
       sources: {
         electricity: 0.38,
@@ -1514,25 +1850,41 @@ const COUNTRY_DATA = {
     },
     policies: {
       carbonPrice: 0,
-      netZeroTarget: 0,
+      netZeroTarget: null,
       parisCommitment: -4,
     },
     facts: [
       "World's second largest natural gas reserves",
       "Heavily subsidized domestic fuel prices",
-      "Large potential for solar in central deserts",
+      "No net zero target announced",
       "Growing nuclear energy program",
     ],
+    climateFinance: {
+      currentPercent: 0.3,
+      maxPercent: 1.5,
+      minPercent: 0.1,
+      difficulty: 0.9,
+      politicalResistance: 0.85,
+    },
+    disasterVulnerability: {
+      heatWave: 0.9,      // Extreme Middle East heat
+      hurricane: 0.0,     // Never
+      flooding: 0.4,      // Flash floods in mountains
+      drought: 0.8,       // Severe drought
+      wildfire: 0.2,      // Some forest fire risk
+      extremeCold: 0.2,   // Mountain regions can get cold
+      resilience: 0.4,    // Limited infrastructure
+    },
   },
 
   uae: {
     name: "United Arab Emirates",
     region: "asia",
     population: 10,
-    gdp: 0.50,
+    gdp: 0.53,
     emissions: {
-      total: 0.19,
-      perCapita: 19.3,
+      total: 0.20,
+      perCapita: 20.0,
       trend: 0.8,
       sources: {
         electricity: 0.40,
@@ -1571,6 +1923,22 @@ const COUNTRY_DATA = {
       "Home to world's largest single-site solar park",
       "First Arab nation to commit to net zero",
     ],
+    climateFinance: {
+      currentPercent: 0.8,
+      maxPercent: 2.5,
+      minPercent: 0.2,
+      difficulty: 0.7,
+      politicalResistance: 0.6,
+    },
+    disasterVulnerability: {
+      heatWave: 1.0,      // Extreme desert heat
+      hurricane: 0.0,     // Never
+      flooding: 0.3,      // Flash floods
+      drought: 0.9,       // Extreme desert drought
+      wildfire: 0.0,      // No vegetation
+      extremeCold: 0.0,   // Never
+      resilience: 0.8,    // Good modern infrastructure
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -1580,7 +1948,7 @@ const COUNTRY_DATA = {
   south_africa: {
     name: "South Africa",
     region: "africa",
-    population: 60,
+    population: 62,
     gdp: 0.40,
     emissions: {
       total: 0.44,
@@ -1622,13 +1990,29 @@ const COUNTRY_DATA = {
       "Excellent renewable resources underutilized",
       "Critical minerals for battery supply chains",
     ],
+    climateFinance: {
+      currentPercent: 1.0,
+      maxPercent: 4.0,
+      minPercent: 0.3,
+      difficulty: 0.6,
+      politicalResistance: 0.5,
+    },
+    disasterVulnerability: {
+      heatWave: 0.6,      // Hot summers
+      hurricane: 0.0,     // Never
+      flooding: 0.4,      // Some river flooding
+      drought: 0.7,       // Significant drought risk
+      wildfire: 0.5,      // Bush fires
+      extremeCold: 0.0,   // Never
+      resilience: 0.4,    // Developing infrastructure
+    },
   },
 
   egypt: {
     name: "Egypt",
     region: "africa",
-    population: 104,
-    gdp: 0.38,
+    population: 111,
+    gdp: 0.40,
     emissions: {
       total: 0.25,
       perCapita: 2.4,
@@ -1660,7 +2044,7 @@ const COUNTRY_DATA = {
     },
     policies: {
       carbonPrice: 0,
-      netZeroTarget: 0,
+      netZeroTarget: 2050,
       parisCommitment: -33,
     },
     facts: [
@@ -1668,14 +2052,31 @@ const COUNTRY_DATA = {
       "Benban is Africa's largest solar park",
       "Gulf of Suez has excellent wind speeds",
       "Suez Canal - global shipping bottleneck",
+      "Net zero target 2050",
     ],
+    climateFinance: {
+      currentPercent: 0.8,
+      maxPercent: 4.0,
+      minPercent: 0.2,
+      difficulty: 0.7,
+      politicalResistance: 0.6,
+    },
+    disasterVulnerability: {
+      heatWave: 0.8,      // Extreme desert heat
+      hurricane: 0.0,     // Never
+      flooding: 0.4,      // Nile delta flooding
+      drought: 0.8,       // Severe desert drought
+      wildfire: 0.1,      // Minimal vegetation
+      extremeCold: 0.0,   // Never
+      resilience: 0.4,    // Developing infrastructure
+    },
   },
 
   nigeria: {
     name: "Nigeria",
     region: "africa",
-    population: 218,
-    gdp: 0.44,
+    population: 230,
+    gdp: 0.48,
     emissions: {
       total: 0.14,
       perCapita: 0.6,
@@ -1716,6 +2117,22 @@ const COUNTRY_DATA = {
       "Gas flaring major issue in oil industry",
       "Massive solar potential largely untapped",
     ],
+    climateFinance: {
+      currentPercent: 0.5,
+      maxPercent: 4.0,
+      minPercent: 0.2,
+      difficulty: 0.7,
+      politicalResistance: 0.6,
+    },
+    disasterVulnerability: {
+      heatWave: 0.7,      // Hot tropical/Sahel climate
+      hurricane: 0.1,     // Rare Atlantic influence
+      flooding: 0.6,      // Niger River flooding
+      drought: 0.6,       // Sahel drought
+      wildfire: 0.3,      // Some bush fires
+      extremeCold: 0.0,   // Never
+      resilience: 0.2,    // Limited infrastructure
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -1725,11 +2142,11 @@ const COUNTRY_DATA = {
   australia: {
     name: "Australia",
     region: "oceania",
-    population: 26,
-    gdp: 1.7,
+    population: 27,
+    gdp: 1.77,
     emissions: {
-      total: 0.40,
-      perCapita: 15.4,
+      total: 0.39,
+      perCapita: 22.3,
       trend: -2.0,
       sources: {
         electricity: 0.32,
@@ -1741,8 +2158,8 @@ const COUNTRY_DATA = {
     },
     energy: {
       renewableShare: 0.35,
-      coalShare: 0.43,
-      gasShare: 0.20,
+      coalShare: 0.47,
+      gasShare: 0.17,
       nuclearShare: 0.00,
     },
     potential: {
@@ -1758,16 +2175,32 @@ const COUNTRY_DATA = {
       greenHydrogen: { costMultiplier: 0.75, effectMultiplier: 1.35, reason: "Emerging renewable hydrogen exporter" },
     },
     policies: {
-      carbonPrice: 30,
+      carbonPrice: 0,
       netZeroTarget: 2050,
       parisCommitment: -43,
     },
     facts: [
-      "Among highest per capita emitters globally",
+      "Second highest per capita emitter (22.3 tonnes)",
       "Rooftop solar leader - 30% of homes have panels",
       "World's largest coal exporter",
       "Positioning as green hydrogen superpower",
     ],
+    climateFinance: {
+      currentPercent: 0.8,
+      maxPercent: 3.0,
+      minPercent: 0.3,
+      difficulty: 0.7,
+      politicalResistance: 0.6,
+    },
+    disasterVulnerability: {
+      heatWave: 0.9,      // Extreme outback heat
+      hurricane: 0.4,     // Tropical cyclones in north
+      flooding: 0.5,      // Flash floods in outback
+      drought: 0.9,       // Severe drought (major crisis)
+      wildfire: 1.0,      // World's worst bushfires
+      extremeCold: 0.0,   // Never
+      resilience: 0.7,    // Good infrastructure but vast land
+    },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -1777,33 +2210,46 @@ const COUNTRY_DATA = {
   turkey: {
     name: "Turkey",
     region: "europe",
-    population: 85,
-    gdp: 0.91,
+    population: 86,
+    gdp: 1.35,
     emissions: {
       total: 0.42,
-      perCapita: 4.9,
+      perCapita: 5.0,
       trend: 1.5,
       sources: { electricity: 0.33, transport: 0.22, industry: 0.28, buildings: 0.12, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.42, coalShare: 0.32, gasShare: 0.23, nuclearShare: 0.00 },
     potential: { solar: { score: 0.80 }, wind: { score: 0.70 }, forest: { score: 0.45 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.65 } },
+    policies: { carbonPrice: 0, netZeroTarget: 2053, parisCommitment: -21 },
     facts: ["High geothermal potential", "Major renewable energy growth", "Bridge between Europe and Asia"],
+    climateFinance: { currentPercent: 1.0, maxPercent: 3.0, minPercent: 0.3, difficulty: 0.6, politicalResistance: 0.5 },
+    disasterVulnerability: {
+      heatWave: 0.7,      // Hot Mediterranean/Anatolian summers
+      hurricane: 0.0,     // Never
+      flooding: 0.5,      // River and flash floods
+      drought: 0.5,       // Central Anatolia drought risk
+      wildfire: 0.6,      // Mediterranean forest fires
+      extremeCold: 0.3,   // Eastern mountain winters
+      resilience: 0.5,    // Moderate infrastructure
+    },
   },
 
   switzerland: {
     name: "Switzerland",
     region: "europe",
     population: 9,
-    gdp: 0.81,
+    gdp: 0.92,
     emissions: {
-      total: 0.04,
+      total: 0.03,
       perCapita: 4.0,
       trend: -2.5,
       sources: { electricity: 0.05, transport: 0.35, industry: 0.25, buildings: 0.30, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.75, coalShare: 0.00, gasShare: 0.10, nuclearShare: 0.35 },
     potential: { solar: { score: 0.45 }, wind: { score: 0.40 }, forest: { score: 0.50 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.30 } },
-    facts: ["75% renewable electricity from hydro", "Carbon neutral target 2050", "High per capita wealth"],
+    policies: { carbonPrice: 131, netZeroTarget: 2050, parisCommitment: -50 },
+    facts: ["75% renewable electricity from hydro", "World's highest carbon price ($131/t)", "High per capita wealth"],
+    climateFinance: { currentPercent: 1.5, maxPercent: 3.5, minPercent: 0.5, difficulty: 0.3, politicalResistance: 0.2 },
   },
 
   belgium: {
@@ -1819,7 +2265,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.25, coalShare: 0.03, gasShare: 0.30, nuclearShare: 0.40 },
     potential: { solar: { score: 0.40 }, wind: { score: 0.80 }, forest: { score: 0.25 }, carbonCapture: { score: 0.60 }, geothermal: { score: 0.20 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["Major offshore wind expansion", "Nuclear phase-out debates", "EU headquarters in Brussels"],
+    climateFinance: { currentPercent: 1.3, maxPercent: 3.5, minPercent: 0.4, difficulty: 0.35, politicalResistance: 0.25 },
   },
 
   austria: {
@@ -1835,7 +2283,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.78, coalShare: 0.05, gasShare: 0.15, nuclearShare: 0.00 },
     potential: { solar: { score: 0.50 }, wind: { score: 0.55 }, forest: { score: 0.65 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.25 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2040, parisCommitment: -55 },
     facts: ["78% renewable electricity (mostly hydro)", "Alpine forests as carbon sinks", "No nuclear power by law"],
+    climateFinance: { currentPercent: 1.4, maxPercent: 3.5, minPercent: 0.5, difficulty: 0.3, politicalResistance: 0.25 },
   },
 
   portugal: {
@@ -1851,7 +2301,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.75, coalShare: 0.00, gasShare: 0.20, nuclearShare: 0.00 },
     potential: { solar: { score: 0.85 }, wind: { score: 0.80 }, forest: { score: 0.55 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.30 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["75% renewable electricity", "Coal-free since 2021", "Excellent solar and wind resources"],
+    climateFinance: { currentPercent: 1.2, maxPercent: 3.5, minPercent: 0.4, difficulty: 0.45, politicalResistance: 0.4 },
   },
 
   greece: {
@@ -1867,7 +2319,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.45, coalShare: 0.12, gasShare: 0.40, nuclearShare: 0.00 },
     potential: { solar: { score: 0.90 }, wind: { score: 0.75 }, forest: { score: 0.35 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.45 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["Excellent Mediterranean solar", "Rapid lignite phase-out", "Island energy challenges"],
+    climateFinance: { currentPercent: 0.9, maxPercent: 3.0, minPercent: 0.3, difficulty: 0.5, politicalResistance: 0.45 },
   },
 
   czech_republic: {
@@ -1883,7 +2337,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.15, coalShare: 0.40, gasShare: 0.18, nuclearShare: 0.37 },
     potential: { solar: { score: 0.45 }, wind: { score: 0.50 }, forest: { score: 0.55 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.25 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["Heavy coal dependence", "Nuclear expansion planned", "EU industrial center"],
+    climateFinance: { currentPercent: 0.8, maxPercent: 3.0, minPercent: 0.3, difficulty: 0.5, politicalResistance: 0.45 },
   },
 
   romania: {
@@ -1899,13 +2355,15 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.43, coalShare: 0.18, gasShare: 0.22, nuclearShare: 0.18 },
     potential: { solar: { score: 0.65 }, wind: { score: 0.70 }, forest: { score: 0.60 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.30 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["Good mix of hydro and nuclear", "Black Sea offshore wind potential", "Large forest coverage"],
+    climateFinance: { currentPercent: 0.9, maxPercent: 3.5, minPercent: 0.3, difficulty: 0.5, politicalResistance: 0.4 },
   },
 
   finland: {
     name: "Finland",
     region: "europe",
-    population: 6,
+    population: 5.5,
     gdp: 0.30,
     emissions: {
       total: 0.04,
@@ -1915,7 +2373,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.50, coalShare: 0.08, gasShare: 0.05, nuclearShare: 0.34 },
     potential: { solar: { score: 0.30 }, wind: { score: 0.75 }, forest: { score: 0.85 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.15 } },
-    facts: ["Carbon neutral target 2035", "Vast boreal forests", "Nuclear + renewables mix"],
+    policies: { carbonPrice: 100, netZeroTarget: 2035, parisCommitment: -55 },
+    facts: ["World's earliest net zero target (2035)", "Vast boreal forests", "Nuclear + renewables mix"],
+    climateFinance: { currentPercent: 2.3, maxPercent: 5.5, minPercent: 0.7, difficulty: 0.25, politicalResistance: 0.2 },
   },
 
   ireland: {
@@ -1931,7 +2391,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.40, coalShare: 0.02, gasShare: 0.52, nuclearShare: 0.00 },
     potential: { solar: { score: 0.35 }, wind: { score: 0.95 }, forest: { score: 0.45 }, carbonCapture: { score: 0.55 }, geothermal: { score: 0.15 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["Among best wind resources globally", "High agriculture emissions", "Data center energy demand"],
+    climateFinance: { currentPercent: 1.2, maxPercent: 3.0, minPercent: 0.4, difficulty: 0.4, politicalResistance: 0.35 },
   },
 
   hungary: {
@@ -1947,7 +2409,9 @@ const COUNTRY_DATA = {
     },
     energy: { renewableShare: 0.15, coalShare: 0.08, gasShare: 0.30, nuclearShare: 0.45 },
     potential: { solar: { score: 0.60 }, wind: { score: 0.50 }, forest: { score: 0.40 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.55 } },
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
     facts: ["Nuclear provides 45% of electricity", "Good solar potential", "Geothermal resources"],
+    climateFinance: { currentPercent: 0.8, maxPercent: 2.5, minPercent: 0.3, difficulty: 0.6, politicalResistance: 0.5 },
   },
 
   ukraine: {
@@ -1964,13 +2428,14 @@ const COUNTRY_DATA = {
     energy: { renewableShare: 0.12, coalShare: 0.30, gasShare: 0.08, nuclearShare: 0.55 },
     potential: { solar: { score: 0.55 }, wind: { score: 0.65 }, forest: { score: 0.50 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.20 } },
     facts: ["Nuclear provides 55% of electricity", "Large agricultural sector", "Energy infrastructure challenges"],
+    climateFinance: { currentPercent: 0.6, maxPercent: 3.0, minPercent: 0.2, difficulty: 0.7, politicalResistance: 0.6 },
   },
 
   denmark: {
     name: "Denmark",
     region: "europe",
     population: 6,
-    gdp: 0.40,
+    gdp: 0.42,
     emissions: {
       total: 0.03,
       perCapita: 5.0,
@@ -1982,7 +2447,9 @@ const COUNTRY_DATA = {
     projects: {
       wind: { costMultiplier: 0.70, effectMultiplier: 1.45, reason: "Global offshore wind leader" },
     },
-    facts: ["70% wind & solar electricity", "World leader in offshore wind", "Carbon neutral target 2050"],
+    policies: { carbonPrice: 65, netZeroTarget: 2050, parisCommitment: -55 },
+    facts: ["80% wind & solar electricity", "World leader in offshore wind", "Carbon neutral target 2050"],
+    climateFinance: { currentPercent: 2.2, maxPercent: 5.0, minPercent: 0.7, difficulty: 0.2, politicalResistance: 0.15 },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -1992,24 +2459,30 @@ const COUNTRY_DATA = {
   pakistan: {
     name: "Pakistan",
     region: "asia",
-    population: 230,
-    gdp: 0.35,
+    population: 240,
+    gdp: 0.34,
     emissions: {
-      total: 0.20,
+      total: 0.22,
       perCapita: 0.9,
       trend: 3.5,
       sources: { electricity: 0.32, transport: 0.25, industry: 0.22, buildings: 0.08, agriculture: 0.13 },
     },
     energy: { renewableShare: 0.35, coalShare: 0.10, gasShare: 0.35, nuclearShare: 0.08 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -50,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.65 }, forest: { score: 0.40 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.25 } },
-    facts: ["Low per capita emissions", "High solar potential", "Major hydro capacity"],
+    facts: ["Low per capita emissions", "High solar potential", "Major hydro capacity", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.5, maxPercent: 5.0, minPercent: 0.4, difficulty: 0.6, politicalResistance: 0.5 },
   },
 
   bangladesh: {
     name: "Bangladesh",
     region: "asia",
-    population: 170,
-    gdp: 0.42,
+    population: 173,
+    gdp: 0.46,
     emissions: {
       total: 0.10,
       perCapita: 0.6,
@@ -2017,50 +2490,68 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.35, transport: 0.20, industry: 0.25, buildings: 0.10, agriculture: 0.10 },
     },
     energy: { renewableShare: 0.05, coalShare: 0.02, gasShare: 0.90, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -22,
+    },
     potential: { solar: { score: 0.80 }, wind: { score: 0.45 }, forest: { score: 0.30 }, carbonCapture: { score: 0.25 }, geothermal: { score: 0.15 } },
-    facts: ["Most climate-vulnerable major nation", "World's largest solar home system program", "Very low per capita emissions"],
+    facts: ["Most climate-vulnerable major nation", "World's largest solar home system program", "Very low per capita emissions", "Net zero target 2050"],
+    climateFinance: { currentPercent: 2.0, maxPercent: 6.0, minPercent: 0.5, difficulty: 0.6, politicalResistance: 0.5 },
   },
 
   vietnam: {
     name: "Vietnam",
     region: "asia",
-    population: 98,
-    gdp: 0.41,
+    population: 100,
+    gdp: 0.47,
     emissions: {
       total: 0.33,
-      perCapita: 3.4,
+      perCapita: 3.3,
       trend: 5.5,
       sources: { electricity: 0.38, transport: 0.15, industry: 0.30, buildings: 0.08, agriculture: 0.09 },
     },
     energy: { renewableShare: 0.35, coalShare: 0.50, gasShare: 0.08, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -27,
+    },
     potential: { solar: { score: 0.80 }, wind: { score: 0.70 }, forest: { score: 0.55 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.20 } },
     projects: {
       solar: { costMultiplier: 0.75, effectMultiplier: 1.25, reason: "Fastest growing solar market in Asia" },
     },
     facts: ["Fastest growing solar market in SE Asia", "Net zero target 2050", "Major manufacturing hub"],
+    climateFinance: { currentPercent: 1.5, maxPercent: 4.0, minPercent: 0.4, difficulty: 0.5, politicalResistance: 0.4 },
   },
 
   thailand: {
     name: "Thailand",
     region: "asia",
-    population: 70,
-    gdp: 0.50,
+    population: 72,
+    gdp: 0.53,
     emissions: {
-      total: 0.27,
+      total: 0.28,
       perCapita: 3.9,
       trend: 1.5,
       sources: { electricity: 0.35, transport: 0.28, industry: 0.25, buildings: 0.07, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.15, coalShare: 0.18, gasShare: 0.60, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -30,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.45 }, forest: { score: 0.50 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.20 } },
-    facts: ["Major EV manufacturing hub", "Good solar resources", "Tourism economy"],
+    facts: ["Major EV manufacturing hub", "Good solar resources", "Tourism economy", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.2, maxPercent: 4.0, minPercent: 0.4, difficulty: 0.5, politicalResistance: 0.45 },
   },
 
   philippines: {
     name: "Philippines",
     region: "asia",
-    population: 115,
-    gdp: 0.40,
+    population: 117,
+    gdp: 0.44,
     emissions: {
       total: 0.16,
       perCapita: 1.4,
@@ -2068,18 +2559,24 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.40, transport: 0.22, industry: 0.18, buildings: 0.12, agriculture: 0.08 },
     },
     energy: { renewableShare: 0.22, coalShare: 0.55, gasShare: 0.18, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -75,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.65 }, forest: { score: 0.45 }, carbonCapture: { score: 0.30 }, geothermal: { score: 0.85 } },
     projects: {
       geothermal: { costMultiplier: 0.75, effectMultiplier: 1.35, reason: "Second largest geothermal producer globally" },
     },
-    facts: ["World's second largest geothermal producer", "Archipelago challenges", "High climate vulnerability"],
+    facts: ["World's second largest geothermal producer", "Archipelago challenges", "High climate vulnerability", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.4, maxPercent: 5.0, minPercent: 0.4, difficulty: 0.55, politicalResistance: 0.5 },
   },
 
   malaysia: {
     name: "Malaysia",
     region: "asia",
     population: 34,
-    gdp: 0.41,
+    gdp: 0.43,
     emissions: {
       total: 0.26,
       perCapita: 7.7,
@@ -2087,8 +2584,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.35, transport: 0.30, industry: 0.25, buildings: 0.05, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.20, coalShare: 0.38, gasShare: 0.40, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -45,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.40 }, forest: { score: 0.70 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.20 } },
-    facts: ["Major palm oil producer", "Rainforest conservation needed", "Growing solar sector"],
+    facts: ["Major palm oil producer", "Rainforest conservation needed", "Growing solar sector", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.3, maxPercent: 4.0, minPercent: 0.4, difficulty: 0.55, politicalResistance: 0.45 },
   },
 
   singapore: {
@@ -2103,8 +2606,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.40, transport: 0.20, industry: 0.30, buildings: 0.08, agriculture: 0.02 },
     },
     energy: { renewableShare: 0.05, coalShare: 0.00, gasShare: 0.95, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 25,
+      netZeroTarget: 2050,
+      parisCommitment: -36,
+    },
     potential: { solar: { score: 0.80 }, wind: { score: 0.20 }, forest: { score: 0.10 }, carbonCapture: { score: 0.60 }, geothermal: { score: 0.10 } },
-    facts: ["City-state limited land", "Regional green finance hub", "Importing solar from neighbors"],
+    facts: ["City-state limited land", "Regional green finance hub", "Importing solar from neighbors", "Carbon tax $25/tonne"],
+    climateFinance: { currentPercent: 1.5, maxPercent: 3.5, minPercent: 0.5, difficulty: 0.35, politicalResistance: 0.3 },
   },
 
   taiwan: {
@@ -2119,8 +2628,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.40, transport: 0.15, industry: 0.35, buildings: 0.08, agriculture: 0.02 },
     },
     energy: { renewableShare: 0.10, coalShare: 0.42, gasShare: 0.40, nuclearShare: 0.08 },
+    policies: {
+      carbonPrice: 10,
+      netZeroTarget: 2050,
+      parisCommitment: -50,
+    },
     potential: { solar: { score: 0.70 }, wind: { score: 0.80 }, forest: { score: 0.35 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.40 } },
-    facts: ["Major semiconductor manufacturing", "Offshore wind expansion", "Nuclear phase-out planned"],
+    facts: ["Major semiconductor manufacturing", "Offshore wind expansion", "Nuclear phase-out planned", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.2, maxPercent: 3.0, minPercent: 0.4, difficulty: 0.45, politicalResistance: 0.4 },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -2130,23 +2645,29 @@ const COUNTRY_DATA = {
   iraq: {
     name: "Iraq",
     region: "asia",
-    population: 43,
+    population: 44,
     gdp: 0.27,
     emissions: {
       total: 0.22,
-      perCapita: 5.1,
+      perCapita: 5.0,
       trend: 2.5,
       sources: { electricity: 0.35, transport: 0.25, industry: 0.30, buildings: 0.05, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.02, coalShare: 0.00, gasShare: 0.30, nuclearShare: 0.00, oilShare: 0.68 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: null,
+      parisCommitment: -15,
+    },
     potential: { solar: { score: 0.95 }, wind: { score: 0.55 }, forest: { score: 0.15 }, carbonCapture: { score: 0.65 }, geothermal: { score: 0.25 } },
-    facts: ["Major oil producer", "Excellent solar potential untapped", "Gas flaring issues"],
+    facts: ["Major oil producer", "Excellent solar potential untapped", "Gas flaring issues", "No net zero target"],
+    climateFinance: { currentPercent: 0.3, maxPercent: 2.0, minPercent: 0.1, difficulty: 0.85, politicalResistance: 0.8 },
   },
 
   kuwait: {
     name: "Kuwait",
     region: "asia",
-    population: 4,
+    population: 4.5,
     gdp: 0.18,
     emissions: {
       total: 0.10,
@@ -2155,15 +2676,21 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.55, transport: 0.20, industry: 0.18, buildings: 0.05, agriculture: 0.02 },
     },
     energy: { renewableShare: 0.01, coalShare: 0.00, gasShare: 0.25, nuclearShare: 0.00, oilShare: 0.74 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2060,
+      parisCommitment: -15,
+    },
     potential: { solar: { score: 0.98 }, wind: { score: 0.50 }, forest: { score: 0.05 }, carbonCapture: { score: 0.70 }, geothermal: { score: 0.15 } },
-    facts: ["Among highest per capita emissions", "Oil-dependent economy", "Extreme solar potential"],
+    facts: ["Among highest per capita emissions", "Oil-dependent economy", "Extreme solar potential", "Net zero target 2060"],
+    climateFinance: { currentPercent: 0.4, maxPercent: 2.0, minPercent: 0.1, difficulty: 0.85, politicalResistance: 0.8 },
   },
 
   qatar: {
     name: "Qatar",
     region: "asia",
     population: 3,
-    gdp: 0.23,
+    gdp: 0.24,
     emissions: {
       total: 0.11,
       perCapita: 35.6,
@@ -2171,15 +2698,21 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.35, transport: 0.15, industry: 0.40, buildings: 0.08, agriculture: 0.02 },
     },
     energy: { renewableShare: 0.01, coalShare: 0.00, gasShare: 0.99, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -25,
+    },
     potential: { solar: { score: 0.95 }, wind: { score: 0.45 }, forest: { score: 0.05 }, carbonCapture: { score: 0.80 }, geothermal: { score: 0.15 } },
-    facts: ["Highest per capita emissions globally", "World's largest LNG exporter", "FIFA 2022 host"],
+    facts: ["Highest per capita emissions globally", "World's largest LNG exporter", "FIFA 2022 host", "Net zero target 2050"],
+    climateFinance: { currentPercent: 0.5, maxPercent: 2.5, minPercent: 0.1, difficulty: 0.8, politicalResistance: 0.75 },
   },
 
   israel: {
     name: "Israel",
     region: "asia",
-    population: 9,
-    gdp: 0.52,
+    population: 9.5,
+    gdp: 0.54,
     emissions: {
       total: 0.07,
       perCapita: 7.5,
@@ -2187,8 +2720,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.40, transport: 0.28, industry: 0.15, buildings: 0.12, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.10, coalShare: 0.20, gasShare: 0.65, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -27,
+    },
     potential: { solar: { score: 0.90 }, wind: { score: 0.50 }, forest: { score: 0.30 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.30 } },
-    facts: ["Pioneer in solar thermal tech", "Rapid natural gas shift", "Water desalination leader"],
+    facts: ["Pioneer in solar thermal tech", "Rapid natural gas shift", "Water desalination leader", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.2, maxPercent: 3.0, minPercent: 0.4, difficulty: 0.5, politicalResistance: 0.4 },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -2198,8 +2737,8 @@ const COUNTRY_DATA = {
   morocco: {
     name: "Morocco",
     region: "africa",
-    population: 37,
-    gdp: 0.13,
+    population: 38,
+    gdp: 0.15,
     emissions: {
       total: 0.07,
       perCapita: 1.9,
@@ -2207,18 +2746,24 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.38, transport: 0.25, industry: 0.20, buildings: 0.10, agriculture: 0.07 },
     },
     energy: { renewableShare: 0.20, coalShare: 0.52, gasShare: 0.10, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -46,
+    },
     potential: { solar: { score: 0.95 }, wind: { score: 0.80 }, forest: { score: 0.35 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.25 } },
     projects: {
       solar: { costMultiplier: 0.70, effectMultiplier: 1.40, reason: "Home to Noor Ouarzazate, world's largest concentrated solar plant" },
     },
     facts: ["Noor - world's largest concentrated solar plant", "52% renewable target by 2030", "Green hydrogen ambitions"],
+    climateFinance: { currentPercent: 1.5, maxPercent: 5.0, minPercent: 0.4, difficulty: 0.5, politicalResistance: 0.4 },
   },
 
   algeria: {
     name: "Algeria",
     region: "africa",
-    population: 45,
-    gdp: 0.19,
+    population: 46,
+    gdp: 0.20,
     emissions: {
       total: 0.18,
       perCapita: 4.0,
@@ -2226,15 +2771,21 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.40, transport: 0.28, industry: 0.20, buildings: 0.07, agriculture: 0.05 },
     },
     energy: { renewableShare: 0.02, coalShare: 0.00, gasShare: 0.98, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: null,
+      parisCommitment: -22,
+    },
     potential: { solar: { score: 0.98 }, wind: { score: 0.65 }, forest: { score: 0.15 }, carbonCapture: { score: 0.55 }, geothermal: { score: 0.30 } },
-    facts: ["Sahara - world's best solar potential", "Major gas exporter", "Vast untapped renewable resources"],
+    facts: ["Sahara - world's best solar potential", "Major gas exporter", "Vast untapped renewable resources", "No net zero target"],
+    climateFinance: { currentPercent: 0.5, maxPercent: 3.0, minPercent: 0.2, difficulty: 0.75, politicalResistance: 0.65 },
   },
 
   kenya: {
     name: "Kenya",
     region: "africa",
-    population: 54,
-    gdp: 0.11,
+    population: 55,
+    gdp: 0.12,
     emissions: {
       total: 0.02,
       perCapita: 0.4,
@@ -2242,18 +2793,24 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.15, transport: 0.30, industry: 0.15, buildings: 0.10, agriculture: 0.30 },
     },
     energy: { renewableShare: 0.90, coalShare: 0.00, gasShare: 0.00, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -32,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.75 }, forest: { score: 0.55 }, carbonCapture: { score: 0.30 }, geothermal: { score: 0.85 } },
     projects: {
       geothermal: { costMultiplier: 0.70, effectMultiplier: 1.40, reason: "Rift Valley geothermal powerhouse" },
     },
-    facts: ["90% renewable electricity", "Rift Valley geothermal leader", "Mobile money pioneer"],
+    facts: ["90% renewable electricity", "Rift Valley geothermal leader", "Mobile money pioneer", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.8, maxPercent: 6.0, minPercent: 0.5, difficulty: 0.5, politicalResistance: 0.4 },
   },
 
   ethiopia: {
     name: "Ethiopia",
     region: "africa",
-    population: 120,
-    gdp: 0.13,
+    population: 126,
+    gdp: 0.16,
     emissions: {
       total: 0.02,
       perCapita: 0.2,
@@ -2261,8 +2818,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.05, transport: 0.20, industry: 0.10, buildings: 0.10, agriculture: 0.55 },
     },
     energy: { renewableShare: 0.95, coalShare: 0.00, gasShare: 0.00, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -68,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.70 }, forest: { score: 0.60 }, carbonCapture: { score: 0.25 }, geothermal: { score: 0.70 } },
-    facts: ["Nearly 100% renewable electricity", "Grand Ethiopian Renaissance Dam", "Very low per capita emissions"],
+    facts: ["Nearly 100% renewable electricity", "Grand Ethiopian Renaissance Dam", "Very low per capita emissions", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.5, maxPercent: 6.0, minPercent: 0.4, difficulty: 0.6, politicalResistance: 0.5 },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -2272,27 +2835,33 @@ const COUNTRY_DATA = {
   chile: {
     name: "Chile",
     region: "south_america",
-    population: 19,
-    gdp: 0.30,
+    population: 19.5,
+    gdp: 0.34,
     emissions: {
       total: 0.09,
-      perCapita: 4.7,
+      perCapita: 4.5,
       trend: -3.0,
       sources: { electricity: 0.30, transport: 0.28, industry: 0.25, buildings: 0.10, agriculture: 0.07 },
     },
     energy: { renewableShare: 0.55, coalShare: 0.20, gasShare: 0.15, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 5,
+      netZeroTarget: 2050,
+      parisCommitment: -45,
+    },
     potential: { solar: { score: 0.98 }, wind: { score: 0.85 }, forest: { score: 0.50 }, carbonCapture: { score: 0.50 }, geothermal: { score: 0.65 } },
     projects: {
       solar: { costMultiplier: 0.65, effectMultiplier: 1.50, reason: "Atacama Desert - world's best solar irradiance" },
     },
-    facts: ["Atacama - world's best solar radiation", "Green hydrogen ambitions", "Copper mining major emitter"],
+    facts: ["Atacama - world's best solar radiation", "Green hydrogen ambitions", "Copper mining major emitter", "Carbon tax $5/tonne"],
+    climateFinance: { currentPercent: 1.4, maxPercent: 4.0, minPercent: 0.4, difficulty: 0.45, politicalResistance: 0.35 },
   },
 
   colombia: {
     name: "Colombia",
     region: "south_america",
     population: 52,
-    gdp: 0.34,
+    gdp: 0.36,
     emissions: {
       total: 0.10,
       perCapita: 1.9,
@@ -2300,15 +2869,21 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.10, transport: 0.35, industry: 0.20, buildings: 0.10, agriculture: 0.25 },
     },
     energy: { renewableShare: 0.75, coalShare: 0.08, gasShare: 0.15, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 5,
+      netZeroTarget: 2050,
+      parisCommitment: -51,
+    },
     potential: { solar: { score: 0.80 }, wind: { score: 0.70 }, forest: { score: 0.85 }, carbonCapture: { score: 0.40 }, geothermal: { score: 0.35 } },
-    facts: ["75% renewable electricity (hydro)", "Amazon rainforest portion", "Coal export phase-out"],
+    facts: ["75% renewable electricity (hydro)", "Amazon rainforest portion", "Coal export phase-out", "Carbon tax $5/tonne"],
+    climateFinance: { currentPercent: 1.3, maxPercent: 4.0, minPercent: 0.4, difficulty: 0.5, politicalResistance: 0.45 },
   },
 
   peru: {
     name: "Peru",
     region: "south_america",
     population: 34,
-    gdp: 0.24,
+    gdp: 0.27,
     emissions: {
       total: 0.06,
       perCapita: 1.8,
@@ -2316,8 +2891,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.15, transport: 0.30, industry: 0.25, buildings: 0.08, agriculture: 0.22 },
     },
     energy: { renewableShare: 0.60, coalShare: 0.02, gasShare: 0.35, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -40,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.70 }, forest: { score: 0.80 }, carbonCapture: { score: 0.35 }, geothermal: { score: 0.50 } },
-    facts: ["Amazon rainforest protection", "High Andes solar potential", "Mining sector challenges"],
+    facts: ["Amazon rainforest protection", "High Andes solar potential", "Mining sector challenges", "Net zero target 2050"],
+    climateFinance: { currentPercent: 1.2, maxPercent: 5.0, minPercent: 0.4, difficulty: 0.6, politicalResistance: 0.5 },
   },
 
   venezuela: {
@@ -2332,8 +2913,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.12, transport: 0.35, industry: 0.30, buildings: 0.08, agriculture: 0.15 },
     },
     energy: { renewableShare: 0.68, coalShare: 0.00, gasShare: 0.08, nuclearShare: 0.00, oilShare: 0.24 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: null,
+      parisCommitment: -20,
+    },
     potential: { solar: { score: 0.85 }, wind: { score: 0.60 }, forest: { score: 0.70 }, carbonCapture: { score: 0.55 }, geothermal: { score: 0.20 } },
-    facts: ["Large hydropower from Guri Dam", "Major oil reserves", "Economic crisis affecting energy"],
+    facts: ["Large hydropower from Guri Dam", "Major oil reserves", "Economic crisis affecting energy", "No net zero target"],
+    climateFinance: { currentPercent: 0.4, maxPercent: 3.0, minPercent: 0.1, difficulty: 0.85, politicalResistance: 0.8 },
   },
 
   // ═══════════════════════════════════════════════════════════════
@@ -2343,8 +2930,8 @@ const COUNTRY_DATA = {
   new_zealand: {
     name: "New Zealand",
     region: "oceania",
-    population: 5,
-    gdp: 0.25,
+    population: 5.2,
+    gdp: 0.26,
     emissions: {
       total: 0.04,
       perCapita: 7.0,
@@ -2352,17 +2939,23 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.05, transport: 0.25, industry: 0.15, buildings: 0.10, agriculture: 0.45 },
     },
     energy: { renewableShare: 0.85, coalShare: 0.02, gasShare: 0.12, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 45,
+      netZeroTarget: 2050,
+      parisCommitment: -50,
+    },
     potential: { solar: { score: 0.55 }, wind: { score: 0.85 }, forest: { score: 0.70 }, carbonCapture: { score: 0.45 }, geothermal: { score: 0.80 } },
     projects: {
       geothermal: { costMultiplier: 0.75, effectMultiplier: 1.30, reason: "Geothermal pioneer since 1950s" },
     },
-    facts: ["85% renewable electricity", "High agricultural emissions", "Geothermal pioneer"],
+    facts: ["85% renewable electricity", "High agricultural emissions", "Geothermal pioneer", "ETS carbon price ~$45"],
+    climateFinance: { currentPercent: 1.4, maxPercent: 3.5, minPercent: 0.5, difficulty: 0.35, politicalResistance: 0.3 },
   },
 
   papua_new_guinea: {
     name: "Papua New Guinea",
     region: "oceania",
-    population: 10,
+    population: 10.5,
     gdp: 0.03,
     emissions: {
       total: 0.01,
@@ -2371,8 +2964,14 @@ const COUNTRY_DATA = {
       sources: { electricity: 0.20, transport: 0.25, industry: 0.20, buildings: 0.05, agriculture: 0.30 },
     },
     energy: { renewableShare: 0.35, coalShare: 0.00, gasShare: 0.60, nuclearShare: 0.00 },
+    policies: {
+      carbonPrice: 0,
+      netZeroTarget: 2050,
+      parisCommitment: -50,
+    },
     potential: { solar: { score: 0.80 }, wind: { score: 0.45 }, forest: { score: 0.95 }, carbonCapture: { score: 0.30 }, geothermal: { score: 0.60 } },
-    facts: ["Third largest rainforest", "LNG exporter", "High forest carbon potential"],
+    facts: ["Third largest rainforest", "LNG exporter", "High forest carbon potential", "Net zero target 2050"],
+    climateFinance: { currentPercent: 0.8, maxPercent: 5.0, minPercent: 0.2, difficulty: 0.65, politicalResistance: 0.55 },
   },
 };
 
@@ -2915,6 +3514,17 @@ function aggregateCountriesToRegion(countryIsoCodes, regionName, regionId) {
   const avgPerCapita =
     totalPopulation > 0 ? (totalEmissions / totalPopulation) * 1000 : 0;
 
+  // Emissions-weighted average for trend (higher emitters have more impact)
+  let weightedTrend = 0;
+  if (totalEmissions > 0) {
+    countries.forEach((c) => {
+      if (c.emissions?.trend !== undefined && c.emissions?.total) {
+        weightedTrend += c.emissions.trend * (c.emissions.total / totalEmissions);
+      }
+    });
+  }
+  const avgTrend = Math.round(weightedTrend * 100) / 100;
+
   // Weighted average for emission sources (by total emissions)
   const sources = {};
   ["electricity", "transport", "industry", "buildings", "agriculture"].forEach(
@@ -2932,18 +3542,42 @@ function aggregateCountriesToRegion(countryIsoCodes, regionName, regionId) {
     }
   );
 
-  // GDP-weighted average for potential scores
+  // Context-specific weighting for renewable potentials
   const potential = {};
-  ["solar", "wind", "forest", "carbonCapture", "geothermal"].forEach((key) => {
-    if (totalGdp > 0) {
-      const weightedSum = countries.reduce((sum, c) => {
-        const p = c.potential?.[key];
-        const score = typeof p === "object" ? p.score : p || 0.5;
-        return sum + score * (c.gdp || 0.01);
-      }, 0);
-      potential[key] = { score: weightedSum / totalGdp };
+  const potentialKeys = ["solar", "wind", "forest", "carbonCapture", "geothermal"];
+
+  potentialKeys.forEach((key) => {
+    let weightedSum = 0;
+    let totalWeight = 0;
+    let count = 0;
+
+    countries.forEach((c) => {
+      const p = c.potential?.[key];
+      const score = typeof p === "object" ? p.score : p;
+      if (typeof score === "number") {
+        // Choose weighting based on potential type
+        if (key === "solar" || key === "wind") {
+          // Population-weighted (proxy for land area)
+          const weight = c.population || 1;
+          weightedSum += score * weight;
+          totalWeight += weight;
+        } else if (key === "carbonCapture") {
+          // GDP-weighted (requires infrastructure investment)
+          const weight = c.gdp || 1;
+          weightedSum += score * weight;
+          totalWeight += weight;
+        } else {
+          // Simple average for forest/geothermal (location-specific)
+          weightedSum += score;
+          count++;
+        }
+      }
+    });
+
+    if (key === "forest" || key === "geothermal") {
+      potential[key] = { score: count > 0 ? Math.round((weightedSum / count) * 100) / 100 : 0.5 };
     } else {
-      potential[key] = { score: 0.5 };
+      potential[key] = { score: totalWeight > 0 ? Math.round((weightedSum / totalWeight) * 100) / 100 : 0.5 };
     }
   });
 
@@ -2953,6 +3587,41 @@ function aggregateCountriesToRegion(countryIsoCodes, regionName, regionId) {
     const income = c.baseIncome || Math.max(1, Math.round(c.gdp * 0.5));
     return sum + income;
   }, 0);
+
+  // Aggregate climate finance (GDP-weighted averages)
+  let totalCurrentPercent = 0;
+  let totalMaxPercent = 0;
+  let totalMinPercent = 0;
+  let totalDifficulty = 0;
+  let totalPoliticalResistance = 0;
+  let climateFinanceGdp = 0;
+
+  countries.forEach((c) => {
+    if (c.climateFinance && c.gdp) {
+      climateFinanceGdp += c.gdp;
+      totalCurrentPercent += (c.climateFinance.currentPercent || 0) * c.gdp;
+      totalMaxPercent += (c.climateFinance.maxPercent || 5) * c.gdp;
+      totalMinPercent += (c.climateFinance.minPercent || 0.5) * c.gdp;
+      totalDifficulty += (c.climateFinance.difficulty || 0.5) * c.gdp;
+      totalPoliticalResistance += (c.climateFinance.politicalResistance || 0.5) * c.gdp;
+    }
+  });
+
+  const climateFinance = climateFinanceGdp > 0
+    ? {
+        currentPercent: Math.round((totalCurrentPercent / climateFinanceGdp) * 100) / 100,
+        maxPercent: Math.round((totalMaxPercent / climateFinanceGdp) * 100) / 100,
+        minPercent: Math.round((totalMinPercent / climateFinanceGdp) * 100) / 100,
+        difficulty: Math.round((totalDifficulty / climateFinanceGdp) * 100) / 100,
+        politicalResistance: Math.round((totalPoliticalResistance / climateFinanceGdp) * 100) / 100,
+      }
+    : {
+        currentPercent: 1.5,
+        maxPercent: 5,
+        minPercent: 0.5,
+        difficulty: 0.5,
+        politicalResistance: 0.5,
+      };
 
   // Collect facts
   const facts = countries
@@ -2969,9 +3638,11 @@ function aggregateCountriesToRegion(countryIsoCodes, regionName, regionId) {
     emissions: {
       total: totalEmissions,
       perCapita: avgPerCapita,
+      trend: avgTrend,
       sources,
     },
     potential,
+    climateFinance,
     facts,
     aggregated: true,
     countryCount: countries.length,
