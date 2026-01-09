@@ -758,10 +758,11 @@ const ACHIEVEMENTS = [
   {
     id: "climate_champion",
     name: "Climate Champion",
-    description: "Reduce global temperature below +1.5°C",
+    description: "Reduce global temperature below +1.1°C",
     icon: "🏆",
     condition: (state) => {
-      return state.temperature < 1.5;
+      // Threshold below starting temp (1.2°C) but above win condition (1.0°C)
+      return state.temperature < 1.1;
     },
   },
   {
@@ -1376,6 +1377,11 @@ function checkTippingPoints() {
     showCombinedEventPopup("tipping-point", "Tipping Points Crossed", "⚠️", tippingPointPopupEvents);
   }
 
+  // Update UI if new tipping points were triggered
+  if (newlyTriggered.length > 0) {
+    updateUI();
+  }
+
   return newlyTriggered;
 }
 
@@ -1804,15 +1810,29 @@ function calculateProjectedIncome() {
   // Calculate income from each country's climate finance and projects
   Object.entries(state.regions).forEach(([regionId, region]) => {
     const countryData = CLIMATE_DATA[regionId];
+    const aggregateData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
 
     // Climate finance income (GDP × climate%)
     if (countryData && countryData.climateFinance) {
+      // Country-level: use direct country data
       const gdpTrillions = countryData.gdp || 1;
       const climatePercent = countryData.climateFinance.currentPercent;
       let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000;
       // Apply disaster reduction
       monthlyClimateIncome *= getDisasterIncomeMultiplier(regionId);
       totalIncome += monthlyClimateIncome;
+    } else if (aggregateData && aggregateData.countries) {
+      // Continent-level: aggregate climate finance from constituent countries
+      aggregateData.countries.forEach(countryKey => {
+        const countryInfo = CLIMATE_DATA.COUNTRY_DATA?.[countryKey];
+        if (countryInfo && countryInfo.climateFinance) {
+          const gdpTrillions = countryInfo.gdp || 1;
+          const climatePercent = countryInfo.climateFinance.currentPercent;
+          let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000;
+          monthlyClimateIncome *= getDisasterIncomeMultiplier(countryKey);
+          totalIncome += monthlyClimateIncome;
+        }
+      });
     }
 
     // Project income
@@ -1844,7 +1864,10 @@ function calculateProjectedIncome() {
  * Combines base increase, project reductions, and feedback effects
  */
 function calculateNetCO2Rate() {
-  let rate = DIFFICULTY_SETTINGS[state.difficulty].co2Rate;
+  if (!state?.regions) {
+    return 0;
+  }
+  let rate = getCo2IncreaseRate();
 
   // Subtract project CO2 reductions
   Object.values(state.regions).forEach(region => {
@@ -1852,8 +1875,8 @@ function calculateNetCO2Rate() {
       const projectType = typeof proj === "string" ? proj : proj.type;
       const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
       const project = PROJECT_TYPES[projectType];
-      if (project) {
-        rate += project.co2Effect * effectMult; // co2Effect is negative for reductions
+      if (project && project.co2Reduction) {
+        rate -= project.co2Reduction * effectMult; // co2Reduction is positive, so subtract
       }
     });
   });
@@ -1879,11 +1902,8 @@ function countTotalProjects() {
  * Count total active disasters across all regions
  */
 function countActiveDisasters() {
-  let count = 0;
-  Object.values(state.activeDisasters || {}).forEach(disasters => {
-    count += disasters.length;
-  });
-  return count;
+  // state.activeDisasters is an array of disaster objects
+  return state.activeDisasters?.length || 0;
 }
 
 function getRegionIds() {
@@ -2018,29 +2038,42 @@ function getContinentId(geo) {
 
 function getMacroRegionId(continent, geo) {
   const { lon, lat } = geo;
+  // Use naming consistent with CLIMATE_DATA.MAJOR_REGIONS
   switch (continent) {
     case "north_america":
       if (lat < GEO_THRESHOLDS.centralAmericaLat) {
-        return "central_america";
+        return "central_america_caribbean";
       }
       return "north_america";
     case "south_america":
       return "south_america";
     case "europe":
-      return lat >= GEO_THRESHOLDS.europeNorthLat ? "europe_north" : "europe_south";
+      if (lat >= GEO_THRESHOLDS.europeNorthLat) {
+        return "northern_europe";
+      }
+      if (lat < GEO_THRESHOLDS.europeSouthLat) {
+        return "southern_europe";
+      }
+      if (lon < GEO_THRESHOLDS.europeWestLon) {
+        return "western_europe";
+      }
+      return "eastern_europe";
     case "africa":
-      return lat >= GEO_THRESHOLDS.africaNorthLat ? "africa_north" : "africa_south";
+      return lat >= GEO_THRESHOLDS.africaNorthLat ? "north_africa" : "sub_saharan_africa";
     case "asia":
       if (lon < GEO_THRESHOLDS.asiaWestLon) {
-        return "asia_west";
+        return "west_asia";
+      }
+      if (lon < GEO_THRESHOLDS.asiaCentralLon && lat >= GEO_THRESHOLDS.asiaNorthLat) {
+        return "central_asia";
       }
       if (lat < GEO_THRESHOLDS.asiaSouthLat) {
-        return "asia_south";
+        return "south_asia";
       }
       if (lon >= GEO_THRESHOLDS.asiaEastLon) {
-        return "asia_east";
+        return "east_asia";
       }
-      return "asia_southeast";
+      return "southeast_asia";
     case "oceania":
       return "oceania";
     default:
@@ -2050,6 +2083,7 @@ function getMacroRegionId(continent, geo) {
 
 function getRegionalRegionId(continent, geo) {
   const { lon, lat } = geo;
+  // Use naming consistent with CLIMATE_DATA conventions
   switch (continent) {
     case "north_america":
       if (lat >= GEO_THRESHOLDS.northAmericaLat) {
@@ -2058,51 +2092,51 @@ function getRegionalRegionId(continent, geo) {
       if (lat >= GEO_THRESHOLDS.centralAmericaLat) {
         return lon < GEO_THRESHOLDS.northAmericaWestLon ? "north_america_west" : "north_america_east";
       }
-      return lon < GEO_THRESHOLDS.caribbeanLon ? "central_america" : "caribbean";
+      return lon < GEO_THRESHOLDS.caribbeanLon ? "central_america_caribbean" : "caribbean";
     case "south_america":
       return lat >= GEO_THRESHOLDS.southAmericaSplitLat ? "south_america_north" : "south_america_south";
     case "europe":
       if (lat >= GEO_THRESHOLDS.europeNorthLat) {
-        return "europe_north";
+        return "northern_europe";
       }
       if (lat < GEO_THRESHOLDS.europeSouthLat) {
-        return "europe_south";
+        return "southern_europe";
       }
       if (lon < GEO_THRESHOLDS.europeWestLon) {
-        return "europe_west";
+        return "western_europe";
       }
       if (lon < GEO_THRESHOLDS.europeCentralLon) {
-        return "europe_central";
+        return "central_europe";
       }
-      return "europe_east";
+      return "eastern_europe";
     case "africa":
       if (lat >= GEO_THRESHOLDS.africaNorthLat) {
-        return "africa_north";
+        return "north_africa";
       }
       if (lat < GEO_THRESHOLDS.africaSouthLat) {
-        return "africa_south";
+        return "southern_africa";
       }
       if (lon < GEO_THRESHOLDS.africaWestLon) {
-        return "africa_west";
+        return "west_africa";
       }
       if (lon > GEO_THRESHOLDS.africaEastLon) {
-        return "africa_east";
+        return "east_africa";
       }
-      return "africa_central";
+      return "central_africa";
     case "asia":
       if (lon < GEO_THRESHOLDS.asiaWestLon) {
-        return "asia_west";
+        return "west_asia";
       }
       if (lon < GEO_THRESHOLDS.asiaCentralLon && lat >= GEO_THRESHOLDS.asiaNorthLat) {
-        return "asia_central";
+        return "central_asia";
       }
       if (lat < GEO_THRESHOLDS.asiaSouthLat) {
-        return "asia_south";
+        return "south_asia";
       }
       if (lon >= GEO_THRESHOLDS.asiaEastLon) {
-        return "asia_east";
+        return "east_asia";
       }
-      return "asia_southeast";
+      return "southeast_asia";
     case "oceania":
       return lon < GEO_THRESHOLDS.oceaniaEastLon && lat < GEO_THRESHOLDS.oceaniaSouthLat
         ? "oceania_australia"
@@ -2475,7 +2509,11 @@ function nextMonth() {
   // Calculate income from each country's climate finance (GDP × climate%)
   Object.entries(state.regions).forEach(([regionId, region]) => {
     const countryData = CLIMATE_DATA[regionId];
+    const aggregateData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+
+    // Climate finance income (GDP × climate%)
     if (countryData && countryData.climateFinance) {
+      // Country-level: use direct country data
       // Monthly income = (GDP in trillions × climate% / 100) / 12
       // Result is in billions per month
       const gdpTrillions = countryData.gdp || 1;
@@ -2484,6 +2522,18 @@ function nextMonth() {
       // Apply disaster income reduction if region has active disaster
       monthlyClimateIncome *= getDisasterIncomeMultiplier(regionId);
       totalIncome += monthlyClimateIncome;
+    } else if (aggregateData && aggregateData.countries) {
+      // Continent-level: aggregate climate finance from constituent countries
+      aggregateData.countries.forEach(countryKey => {
+        const countryInfo = CLIMATE_DATA.COUNTRY_DATA?.[countryKey];
+        if (countryInfo && countryInfo.climateFinance) {
+          const gdpTrillions = countryInfo.gdp || 1;
+          const climatePercent = countryInfo.climateFinance.currentPercent;
+          let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000;
+          monthlyClimateIncome *= getDisasterIncomeMultiplier(countryKey);
+          totalIncome += monthlyClimateIncome;
+        }
+      });
     }
 
     // Add income from projects
@@ -2631,20 +2681,52 @@ function processCampaigns() {
 
     if (campaign.monthsRemaining <= 0) {
       // Campaign complete - increase climate dedication
-      const countryData = CLIMATE_DATA[campaign.regionId];
-      if (countryData && countryData.climateFinance) {
-        const oldPercent = countryData.climateFinance.currentPercent;
-        const newPercent = Math.min(
-          countryData.climateFinance.maxPercent,
-          oldPercent + campaign.increaseAmount
-        );
-        countryData.climateFinance.currentPercent = newPercent;
+      if (campaign.isAggregate && campaign.countries) {
+        // Aggregate campaign - apply effect to all constituent countries
+        let totalOldPercent = 0;
+        let totalNewPercent = 0;
+        let countriesAffected = 0;
 
-        const countryName = countryData.name || campaign.regionId;
-        pushMessage(
-          `Climate Policy Campaign succeeded! ${countryName} increased climate spending from ${oldPercent.toFixed(1)}% to ${newPercent.toFixed(1)}% of GDP.`,
-          "good"
-        );
+        campaign.countries.forEach(countryId => {
+          const countryData = CLIMATE_DATA.COUNTRY_DATA?.[countryId];
+          if (countryData && countryData.climateFinance) {
+            const oldPercent = countryData.climateFinance.currentPercent;
+            const newPercent = Math.min(
+              countryData.climateFinance.maxPercent,
+              oldPercent + campaign.increaseAmount
+            );
+            countryData.climateFinance.currentPercent = newPercent;
+            totalOldPercent += oldPercent;
+            totalNewPercent += newPercent;
+            countriesAffected++;
+          }
+        });
+
+        if (countriesAffected > 0) {
+          const avgOld = totalOldPercent / countriesAffected;
+          const avgNew = totalNewPercent / countriesAffected;
+          pushMessage(
+            `Regional Climate Policy Campaign succeeded! ${campaign.countryName} region (${countriesAffected} countries) increased average climate spending from ${avgOld.toFixed(1)}% to ${avgNew.toFixed(1)}% of GDP.`,
+            "good"
+          );
+        }
+      } else {
+        // Single country campaign
+        const countryData = CLIMATE_DATA.COUNTRY_DATA?.[campaign.regionId] || CLIMATE_DATA[campaign.regionId];
+        if (countryData && countryData.climateFinance) {
+          const oldPercent = countryData.climateFinance.currentPercent;
+          const newPercent = Math.min(
+            countryData.climateFinance.maxPercent,
+            oldPercent + campaign.increaseAmount
+          );
+          countryData.climateFinance.currentPercent = newPercent;
+
+          const countryName = countryData.name || campaign.regionId;
+          pushMessage(
+            `Climate Policy Campaign succeeded! ${countryName} increased climate spending from ${oldPercent.toFixed(1)}% to ${newPercent.toFixed(1)}% of GDP.`,
+            "good"
+          );
+        }
       }
       completedCampaigns.push(index);
     }
@@ -2656,35 +2738,93 @@ function processCampaigns() {
   });
 }
 
+// Helper function to get climate finance data for any region type
+function getRegionClimateData(regionId) {
+  // Try country-level data first
+  const countryData = CLIMATE_DATA.COUNTRY_DATA?.[regionId];
+  if (countryData && countryData.climateFinance) {
+    return {
+      name: countryData.name,
+      gdp: countryData.gdp || 1,
+      climateFinance: countryData.climateFinance,
+      isAggregate: false
+    };
+  }
+
+  // Try region aggregate (continent level)
+  const aggregateData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+  if (aggregateData && aggregateData.countries) {
+    // Aggregate climate finance from constituent countries
+    const countries = aggregateData.countries
+      .map(id => CLIMATE_DATA.COUNTRY_DATA?.[id])
+      .filter(c => c && c.climateFinance);
+
+    if (countries.length === 0) {
+      return null;
+    }
+
+    // Calculate weighted averages based on GDP
+    const totalGdp = countries.reduce((sum, c) => sum + (c.gdp || 1), 0);
+    const weightedCurrentPercent = countries.reduce((sum, c) =>
+      sum + (c.climateFinance.currentPercent * (c.gdp || 1)), 0) / totalGdp;
+    const weightedMaxPercent = countries.reduce((sum, c) =>
+      sum + (c.climateFinance.maxPercent * (c.gdp || 1)), 0) / totalGdp;
+    const weightedMinPercent = countries.reduce((sum, c) =>
+      sum + (c.climateFinance.minPercent * (c.gdp || 1)), 0) / totalGdp;
+    const avgDifficulty = countries.reduce((sum, c) =>
+      sum + c.climateFinance.difficulty, 0) / countries.length;
+    const avgResistance = countries.reduce((sum, c) =>
+      sum + c.climateFinance.politicalResistance, 0) / countries.length;
+
+    return {
+      name: aggregateData.name,
+      gdp: aggregateData.gdp || totalGdp,
+      climateFinance: {
+        currentPercent: weightedCurrentPercent,
+        maxPercent: weightedMaxPercent,
+        minPercent: weightedMinPercent,
+        difficulty: avgDifficulty,
+        politicalResistance: avgResistance
+      },
+      isAggregate: true,
+      countries: aggregateData.countries
+    };
+  }
+
+  return null;
+}
+
 // Start a Climate Policy Campaign in a region
 function startClimateCampaign(regionId) {
-  const countryData = CLIMATE_DATA[regionId];
-  if (!countryData || !countryData.climateFinance) {
+  const regionData = getRegionClimateData(regionId);
+  if (!regionData) {
     pushMessage("Cannot start campaign: no climate finance data for this region.", "bad");
     return false;
   }
 
-  const finance = countryData.climateFinance;
+  const finance = regionData.climateFinance;
 
   // Check if already at max
   if (finance.currentPercent >= finance.maxPercent) {
-    pushMessage(`${countryData.name} is already at maximum climate dedication (${finance.maxPercent}% of GDP).`, "bad");
+    pushMessage(`${regionData.name} is already at maximum climate dedication (${finance.maxPercent.toFixed(1)}% of GDP).`, "bad");
     return false;
   }
 
   // Check if campaign already active for this region
   if (state.activeCampaigns.some((c) => c.regionId === regionId)) {
-    pushMessage(`A Climate Policy Campaign is already active in ${countryData.name}.`, "bad");
+    pushMessage(`A Climate Policy Campaign is already active in ${regionData.name}.`, "bad");
     return false;
   }
 
   // Calculate campaign cost and duration
-  const gdpTrillions = countryData.gdp || 1;
+  const gdpTrillions = regionData.gdp || 1;
   // Apply disaster awareness modifier - regions that experienced disasters are easier to campaign
   const awarenessModifier = getDisasterAwarenessModifier(regionId);
-  const cost = gdpTrillions * GAME_CONFIG.lobbyCostFactor * finance.difficulty * awarenessModifier * 1000; // In billions
+  // Aggregate campaigns cost more due to complexity
+  const aggregateMultiplier = regionData.isAggregate ? 1.5 : 1.0;
+  const cost = gdpTrillions * GAME_CONFIG.lobbyCostFactor * finance.difficulty * awarenessModifier * aggregateMultiplier * 1000; // In billions
   const duration = Math.ceil(
-    GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier
+    GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier * aggregateMultiplier
   );
   const increaseAmount =
     GAME_CONFIG.lobbyMinIncrease +
@@ -2692,7 +2832,7 @@ function startClimateCampaign(regionId) {
 
   // Check if player can afford it
   if (state.funds < cost) {
-    pushMessage(`Cannot afford Climate Policy Campaign in ${countryData.name}. Cost: ${formatCurrency(cost)}.`, "bad");
+    pushMessage(`Cannot afford Climate Policy Campaign in ${regionData.name}. Cost: ${formatCurrency(cost)}.`, "bad");
     return false;
   }
 
@@ -2700,11 +2840,13 @@ function startClimateCampaign(regionId) {
   state.funds -= cost;
   state.activeCampaigns.push({
     regionId,
-    countryName: countryData.name,
+    countryName: regionData.name,
     monthsRemaining: duration,
     totalMonths: duration,
     increaseAmount,
     cost,
+    isAggregate: regionData.isAggregate,
+    countries: regionData.countries // Track which countries are affected for aggregate campaigns
   });
 
   // Track campaign history for achievements
@@ -2713,8 +2855,9 @@ function startClimateCampaign(regionId) {
     state.campaignHistory.push(regionId);
   }
 
+  const campaignType = regionData.isAggregate ? "Regional Climate Policy Campaign" : "Climate Policy Campaign";
   pushMessage(
-    `Climate Policy Campaign started in ${countryData.name}! Cost: ${formatCurrency(cost)}. Duration: ${duration} months. Expected increase: +${increaseAmount.toFixed(2)}% GDP.`,
+    `${campaignType} started in ${regionData.name}! Cost: ${formatCurrency(cost)}. Duration: ${duration} months. Expected increase: +${increaseAmount.toFixed(2)}% GDP.`,
     "good"
   );
 
@@ -2723,13 +2866,16 @@ function startClimateCampaign(regionId) {
 }
 
 function updateRegionTemps() {
+  if (!state?.regions) {
+    return;
+  }
   Object.keys(state.regions).forEach((regionId) => {
     state.regions[regionId].temp = state.temperature + regionOffsets[regionId];
   });
 }
 
 function selectRegion(regionId) {
-  if (!state.regions[regionId]) {
+  if (!state?.regions || !state.regions[regionId]) {
     return;
   }
   selectedRegionId = regionId;
@@ -3921,7 +4067,7 @@ function renderRegionProjects() {
 }
 
 function updateMapColors() {
-  if (!svgDoc || !svgRegions.size) {
+  if (!svgDoc || !svgRegions.size || !state?.regions) {
     return;
   }
 
@@ -4321,6 +4467,10 @@ function setGranularity(value, resetGame = false) {
   }
   const previousGranularity = currentGranularity;
   currentGranularity = value;
+  // Sync dropdown with internal state
+  if (mapSelector && mapSelector.value !== value) {
+    mapSelector.value = value;
+  }
   const mapSource = GRANULARITY_CONFIG[value].map;
   const currentSource = mapObject?.getAttribute("data");
   // Strip query params for comparison (they're used for cache busting)
@@ -4343,7 +4493,27 @@ function wireMapSelector() {
   const initialGranularity = mapSelector.value || "continents";
   setGranularity(initialGranularity);
   mapSelector.addEventListener("change", (event) => {
-    setGranularity(event.target.value, true);
+    const newValue = event.target.value;
+    const hasProgress = state && (
+      state.budget !== GAME_CONFIG.startingBudget ||
+      state.month !== 1 ||
+      state.year !== 2025 ||
+      Object.values(state.regions || {}).some(r => r.projects?.length > 0)
+    );
+
+    if (hasProgress) {
+      const confirmed = confirm(
+        "⚠️ Changing map granularity will reset your game progress.\n\n" +
+        "All projects, budget changes, and time progression will be lost.\n\n" +
+        "Are you sure you want to continue?"
+      );
+      if (!confirmed) {
+        // Revert the dropdown to current value
+        event.target.value = currentGranularity;
+        return;
+      }
+    }
+    setGranularity(newValue, true);
   });
 }
 
@@ -4456,13 +4626,18 @@ function deserializeGameState(saveData) {
     regions: JSON.parse(JSON.stringify(saveData.state.regions)),
   };
 
-  // Ensure new state properties exist
+  // Ensure new state properties exist (for backwards compatibility with old saves)
   if (!state.researchPoints) state.researchPoints = 0;
   if (!state.unlockedTechs) state.unlockedTechs = [];
   if (!state.achievements) state.achievements = [];
   if (!state.history) state.history = [];
   if (!state.tippingPointsTriggered) state.tippingPointsTriggered = [];
   if (!state.activeEvents) state.activeEvents = [];
+  if (!state.activeCampaigns) state.activeCampaigns = [];
+  if (!state.totalSpent) state.totalSpent = 0;
+  if (!state.campaignHistory) state.campaignHistory = [];
+  if (!state.activeDisasters) state.activeDisasters = [];
+  if (!state.disasterHistory) state.disasterHistory = {};
 
   // Restore selection
   selectedRegionId = saveData.selectedRegionId;
