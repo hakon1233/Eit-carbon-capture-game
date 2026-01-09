@@ -250,10 +250,45 @@ Temperature-dependent disaster system with regional vulnerability:
 
 ## User Interface
 
-### Top Bar
-- Game logo
-- Stats strip: Credits, Temperature, CO2, Date
-- Stats Info toggle button
+### Top Stats Bar
+
+Compact stats bar displaying 13 key metrics with color-coded risk indicators:
+
+| Stat | Format | Description | Color Coding |
+|------|--------|-------------|--------------|
+| Budget | `$X B` | Available climate funds | - |
+| Income | `+$X/mo` | Monthly income projection | Green (positive), Red (negative) |
+| Temp | `+X.XX°C` | Global temperature anomaly | - |
+| CO2 | `X ppm` | Atmospheric CO2 concentration | - |
+| Net CO2 | `±X.XX` | Net CO2 change per month | Green (negative), Red (positive) |
+| Feedback | `+X.XX` | Climate feedback effect | Green (0), Yellow (<0.2), Red (≥0.2) |
+| Projects | `X` | Total projects built | - |
+| RP | `X(+Y)` | Research points (+ generation rate) | - |
+| Campaigns | `X` | Active policy campaigns | - |
+| Disasters | `X` | Active natural disasters | Green (0), Yellow (1-2), Red (≥3) |
+| Tipping | `X/4` | Tipping points triggered | Green (0), Yellow (1-2), Red (≥3) |
+| Years | `X yrs` | Years remaining until 2100 | Yellow (<50), Red (<25) |
+| Date | `Mon YYYY` | Current game date | - |
+
+- **Stats Info button** - "?" button shows detailed help panel explaining all stats
+- **Click to expand** - Clicking stats bar opens detailed stats info panel
+- **Dynamic color classes** - `.stat-good`, `.stat-warning`, `.stat-bad`
+
+### Event Popup System
+
+Modal popups for important game events with visual styling:
+
+| Event Type | Icon | Border Color | Content |
+|------------|------|--------------|---------|
+| Disaster | 🌪️ | Red | Disaster name, affected region, duration, income impact |
+| Tipping Point | ⚠️ | Orange | Threshold reached, permanent effect description |
+| Research | 🔬 | Blue | Technology unlocked, benefits description |
+| Breakthrough | 💡 | Gold | Breakthrough event, permanent improvements |
+
+- **Auto-dismiss** - Popups close after 5 seconds
+- **Click to close** - Can dismiss early by clicking
+- **Stacking** - Multiple popups queue and display sequentially
+- **Animation** - Fade-in/out transitions
 
 ### Left Sidebar
 - Next Month button

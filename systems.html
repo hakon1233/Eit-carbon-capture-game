@@ -895,9 +895,9 @@ function saveGame(slot) {
               <h3>Main Layout</h3>
               <pre class="code-block">
 .game-shell
-  ├── .topbar-wrapper
-  │     ├── .topbar (stats strip)
-  │     └── .stats-info (expandable)
+  ├── .topbar (stats strip + ? button)
+  ├── #stats-info (expandable help panel)
+  ├── #popup-container (event popups)
   └── .game-screen
         ├── .map-stage (SVG map)
         └── .sidebar
@@ -909,24 +909,101 @@ function saveGame(slot) {
             </div>
 
             <div class="rules-card">
-              <h3>Key DOM Elements</h3>
+              <h3>Stats Bar Elements (13 stats)</h3>
               <table class="rules-table">
                 <thead>
                   <tr>
                     <th>ID</th>
-                    <th>Purpose</th>
+                    <th>Stat</th>
+                    <th>Color Classes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td><code>#credits</code></td><td>Budget display</td></tr>
-                  <tr><td><code>#temperature</code></td><td>Global temp display</td></tr>
-                  <tr><td><code>#co2</code></td><td>CO2 ppm display</td></tr>
-                  <tr><td><code>#date</code></td><td>Current date</td></tr>
-                  <tr><td><code>#map-object</code></td><td>SVG map container</td></tr>
-                  <tr><td><code>#selected-region</code></td><td>Selected region name</td></tr>
-                  <tr><td><code>#project-buttons</code></td><td>Available projects</td></tr>
-                  <tr><td><code>#region-projects</code></td><td>Active projects in region</td></tr>
-                  <tr><td><code>#news-log</code></td><td>Event notifications</td></tr>
+                  <tr><td><code>#credits</code></td><td>Budget ($X B)</td><td>-</td></tr>
+                  <tr><td><code>#income</code></td><td>Monthly income</td><td><code>income-up</code>, <code>income-down</code></td></tr>
+                  <tr><td><code>#temperature</code></td><td>Global temp</td><td>-</td></tr>
+                  <tr><td><code>#co2</code></td><td>CO2 ppm</td><td>-</td></tr>
+                  <tr><td><code>#net-co2</code></td><td>Net CO2/month</td><td><code>stat-good</code>, <code>stat-warning</code>, <code>stat-bad</code></td></tr>
+                  <tr><td><code>#feedback</code></td><td>Feedback effect</td><td><code>stat-good</code>, <code>stat-warning</code>, <code>stat-bad</code></td></tr>
+                  <tr><td><code>#total-projects</code></td><td>Total projects</td><td>-</td></tr>
+                  <tr><td><code>#research-points</code></td><td>RP (+rate)</td><td>-</td></tr>
+                  <tr><td><code>#campaigns</code></td><td>Active campaigns</td><td>-</td></tr>
+                  <tr><td><code>#disasters</code></td><td>Active disasters</td><td><code>stat-good</code>, <code>stat-warning</code>, <code>stat-bad</code></td></tr>
+                  <tr><td><code>#tipping-count</code></td><td>Tipping X/4</td><td><code>stat-good</code>, <code>stat-warning</code>, <code>stat-bad</code></td></tr>
+                  <tr><td><code>#years-left</code></td><td>Years remaining</td><td><code>stat-warning</code>, <code>stat-bad</code></td></tr>
+                  <tr><td><code>#date</code></td><td>Current date</td><td>-</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Stats Helper Functions</h3>
+              <pre class="code-block">
+// Calculate net CO2 rate per month
+function calculateNetCO2Rate() {
+  let rate = DIFFICULTY_SETTINGS[state.difficulty].co2Rate;
+  // Add project reductions (negative values)
+  Object.values(state.regions).forEach(region => {
+    region.projects.forEach(proj => {
+      const project = PROJECT_TYPES[proj.type || proj];
+      if (project) rate += project.co2Effect * (proj.effectMultiplier || 1);
+    });
+  });
+  // Add feedback effects
+  rate += getTotalClimateFeedback();
+  return rate;
+}
+
+// Count total projects across all regions
+function countTotalProjects() {
+  let count = 0;
+  Object.values(state.regions).forEach(r => count += r.projects.length);
+  return count;
+}
+
+// Count active disasters globally
+function countActiveDisasters() {
+  let count = 0;
+  Object.values(state.activeDisasters || {}).forEach(d => count += d.length);
+  return count;
+}
+              </pre>
+            </div>
+
+            <div class="rules-card">
+              <h3>Event Popup System</h3>
+              <p>Modal popups for important game events:</p>
+              <pre class="code-block">
+// Popup structure
+&lt;div id="popup-container"&gt;
+  &lt;div class="event-popup popup-disaster"&gt;
+    &lt;span class="popup-icon"&gt;🌪️&lt;/span&gt;
+    &lt;div class="popup-content"&gt;
+      &lt;h4&gt;Hurricane&lt;/h4&gt;
+      &lt;p&gt;Description...&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+
+// Show popup function
+function showEventPopup(type, title, description) {
+  const icons = { disaster: "🌪️", tipping: "⚠️", research: "🔬", breakthrough: "💡" };
+  // Creates popup, auto-dismisses after 5 seconds
+}
+              </pre>
+              <table class="rules-table compact">
+                <thead>
+                  <tr>
+                    <th>Type</th>
+                    <th>Icon</th>
+                    <th>Border Color</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>disaster</td><td>🌪️</td><td>Red</td></tr>
+                  <tr><td>tipping</td><td>⚠️</td><td>Orange</td></tr>
+                  <tr><td>research</td><td>🔬</td><td>Blue</td></tr>
+                  <tr><td>breakthrough</td><td>💡</td><td>Gold</td></tr>
                 </tbody>
               </table>
             </div>
@@ -942,12 +1019,27 @@ function saveGame(slot) {
                 </thead>
                 <tbody>
                   <tr><td><code>updateUI()</code></td><td>All displays after state change</td></tr>
-                  <tr><td><code>updateStatsDisplay()</code></td><td>Top bar stats</td></tr>
+                  <tr><td><code>updateStatsDisplay()</code></td><td>Top bar stats (13 elements)</td></tr>
                   <tr><td><code>updateMapColors()</code></td><td>Map visualization</td></tr>
                   <tr><td><code>renderRegionPanel()</code></td><td>Sidebar region info</td></tr>
                   <tr><td><code>renderProjectButtons()</code></td><td>Available projects</td></tr>
+                  <tr><td><code>showEventPopup()</code></td><td>Display event modal</td></tr>
                 </tbody>
               </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>CSS Color Classes</h3>
+              <pre class="code-block">
+/* Stats color coding */
+.stat-good { color: var(--region-good); }     /* Green */
+.stat-warning { color: var(--region-mild); }  /* Yellow */
+.stat-bad { color: var(--region-hot); }       /* Red */
+
+/* Income coloring */
+.income-up { color: var(--region-good); }
+.income-down { color: var(--region-hot); }
+              </pre>
             </div>
           </div>
         </details>
