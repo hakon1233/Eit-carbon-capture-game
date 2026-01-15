@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carbon Capture: Climate Overseer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="launch-screen" class="launch-screen">
+      <div class="launch-content">
+        <div class="brand">
+          <p class="eyebrow">Climate Strategy Simulator</p>
+          <h1>Carbon Capture: Climate Overseer</h1>
+          <p class="subtitle">Steer the planet away from warming by investing in carbon solutions.</p>
+        </div>
+
+        <div class="launch-grid">
+          <div class="launch-card">
+            <h2>Goal</h2>
+            <p>Reduce global temperature to +1.0°C by 2100. Avoid tipping points that trigger irreversible climate effects.</p>
+          </div>
+          <div class="launch-card">
+            <h2>Rules</h2>
+            <p>CO2 rises monthly. Build projects to reduce emissions. Research technologies. Weather random events.</p>
+          </div>
+          <div class="launch-card">
+            <h2>How to Play</h2>
+            <p>Select regions, fund projects, run campaigns, and unlock achievements as you save the climate.</p>
+          </div>
+        </div>
+
+        <div class="difficulty-selector">
+          <label for="difficulty">Difficulty</label>
+          <select id="difficulty" class="map-select">
+            <option value="tutorial">Tutorial - Learn the basics</option>
+            <option value="easy">Easy - Gentler introduction</option>
+            <option value="normal" selected>Normal - Balanced challenge</option>
+            <option value="hard">Hard - Political resistance (Realistic)</option>
+            <option value="extreme">Extreme - Against all odds</option>
+          </select>
+        </div>
+
+        <div class="launch-actions">
+          <button class="primary-button" id="start-game-btn">New Game</button>
+          <a class="ghost-button" href="game_rules.html">Game Rules</a>
+          <a class="ghost-button" href="game_mechanics.html">Game Mechanics</a>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('start-game-btn').addEventListener('click', function() {
+        const difficulty = document.getElementById('difficulty').value;
+        localStorage.setItem('gameDifficulty', difficulty);
+        window.location.href = 'game.html';
+      });
+    </script>
+  </body>
+</html>

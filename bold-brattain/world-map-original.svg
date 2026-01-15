@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 520" role="img" aria-labelledby="map-title map-desc">
+  <title id="map-title">Simplified World Map</title>
+  <desc id="map-desc">Clickable regions for the Carbon Capture game.</desc>
+  <defs>
+    <linearGradient id="ocean" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#12263a" />
+      <stop offset="100%" stop-color="#1a3652" />
+    </linearGradient>
+  </defs>
+  <rect width="1000" height="520" fill="url(#ocean)" rx="28" />
+  <g class="regions">
+    <path id="americas" class="region" d="M120 60 L260 50 L320 130 L300 200 L260 240 L240 300 L210 360 L170 450 L90 420 L70 320 L90 200 L110 120 Z" />
+    <path id="europe" class="region" d="M420 90 L520 70 L560 110 L540 150 L470 160 L430 130 Z" />
+    <path id="africa" class="region" d="M450 180 L570 190 L600 280 L560 380 L480 410 L420 330 L430 240 Z" />
+    <path id="asia" class="region" d="M560 80 L840 60 L920 140 L900 220 L780 240 L700 200 L640 200 L600 160 Z" />
+    <path id="oceania" class="region" d="M760 300 L880 310 L900 380 L820 420 L740 360 Z" />
+  </g>
+  <style>
+    .region {
+      fill: #2f4f4f;
+      stroke: #d7e3f5;
+      stroke-width: 1.5;
+      cursor: pointer;
+      transition: fill 0.2s ease, transform 0.2s ease, stroke 0.2s ease;
+      transform-origin: center;
+    }
+    .region:hover {
+      filter: brightness(1.12);
+      transform: translateY(-2px);
+    }
+    .region.selected {
+      stroke: #f7e6a5;
+      stroke-width: 3;
+    }
+  </style>
+</svg>

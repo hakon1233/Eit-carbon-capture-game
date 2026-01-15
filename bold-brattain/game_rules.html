@@ -1,0 +1,1594 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Game Rules - Carbon Capture: Climate Overseer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="rules-page">
+      <div class="rules-content">
+        <div class="rules-header">
+          <a href="index.html" class="back-link">&larr; Back to Menu</a>
+          <h1>Game Rules</h1>
+          <p class="rules-subtitle">Complete guide to playing Carbon Capture: Climate Overseer. Click any section to expand.</p>
+        </div>
+
+        <!-- Section 1: Objective -->
+        <details id="objective" class="rules-dropdown" open>
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">1</span>
+            <span class="dropdown-title">Objective & Win/Lose Conditions</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card highlight-win">
+              <h3>Victory Condition</h3>
+              <p>Reduce global temperature to <strong>&le;1.0&deg;C</strong> above pre-industrial levels at any point during the game.</p>
+              <p class="formula">Temperature must drop to 1.0&deg;C or below &rarr; You Win!</p>
+            </div>
+
+            <div class="rules-card highlight-lose">
+              <h3>Defeat Conditions</h3>
+              <ul>
+                <li><strong>Climate Catastrophe:</strong> Global temperature reaches <strong>&ge;3.0&deg;C</strong></li>
+                <li><strong>Time Limit:</strong> Year reaches <strong>2100</strong> without achieving victory</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 2: Difficulty Modes -->
+        <details id="difficulty" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">2</span>
+            <span class="dropdown-title">Difficulty Modes</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Choose Your Challenge</h3>
+              <p>Select a difficulty level on the launch screen. Each mode adjusts key game parameters:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Mode</th>
+                    <th>CO2 Rate</th>
+                    <th>Starting Budget</th>
+                    <th>Project Costs</th>
+                    <th>Random Events</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Tutorial</strong></td>
+                    <td>0.3 ppm/month</td>
+                    <td>$150 B</td>
+                    <td>-30%</td>
+                    <td>Disabled</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Easy</strong></td>
+                    <td>0.4 ppm/month</td>
+                    <td>$120 B</td>
+                    <td>-15%</td>
+                    <td>Mild</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Normal</strong></td>
+                    <td>0.5 ppm/month</td>
+                    <td>$100 B</td>
+                    <td>Normal</td>
+                    <td>Normal</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Hard</strong></td>
+                    <td>0.6 ppm/month</td>
+                    <td>$80 B</td>
+                    <td>+15%</td>
+                    <td>Harsh</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Extreme</strong></td>
+                    <td>0.7 ppm/month</td>
+                    <td>$60 B</td>
+                    <td>+30%</td>
+                    <td>Extreme</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 3: Starting Conditions -->
+        <details id="starting" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">3</span>
+            <span class="dropdown-title">Starting Conditions (Normal Mode)</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <table class="rules-table">
+              <thead>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Starting Value</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Climate Budget</td>
+                  <td><strong>$100 billion</strong></td>
+                  <td>Real-world currency for building projects</td>
+                </tr>
+                <tr>
+                  <td>CO2 Level</td>
+                  <td><strong>420 ppm</strong></td>
+                  <td>Current atmospheric CO2 concentration</td>
+                </tr>
+                <tr>
+                  <td>Temperature</td>
+                  <td><strong>+1.2&deg;C</strong></td>
+                  <td>Above pre-industrial baseline</td>
+                </tr>
+                <tr>
+                  <td>Date</td>
+                  <td><strong>January 2025</strong></td>
+                  <td>Game starts in present day</td>
+                </tr>
+                <tr>
+                  <td>Research Points</td>
+                  <td><strong>0 RP</strong></td>
+                  <td>Build Research Centers to generate RP</td>
+                </tr>
+                <tr>
+                  <td>Pre-industrial CO2</td>
+                  <td><strong>280 ppm</strong></td>
+                  <td>Baseline for temperature calculation</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <!-- Section 4: Core Mechanics -->
+        <details id="core-mechanics" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">4</span>
+            <span class="dropdown-title">Core Mechanics & Formulas</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Time System</h3>
+              <ul>
+                <li>Game advances in <strong>monthly</strong> increments</li>
+                <li>12 months = 1 year</li>
+                <li>Game spans from <strong>2025 to 2100</strong> (75 years / 900 months maximum)</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>CO2 Calculation</h3>
+              <div class="formula-box">
+                <p class="formula-label">Each month:</p>
+                <code>New CO2 = Current CO2 + Base Increase + Feedback Effects - Project Reductions</code>
+              </div>
+              <ul>
+                <li><strong>Base Increase:</strong> 0.3-0.7 ppm/month (depends on difficulty)</li>
+                <li><strong>Feedback Effects:</strong> Extra CO2 from tipping points and climate feedbacks</li>
+                <li><strong>Project Reductions:</strong> CO2 absorbed by your active projects</li>
+                <li>CO2 can never drop below <strong>280 ppm</strong> (pre-industrial minimum)</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Temperature Calculation</h3>
+              <div class="formula-box">
+                <code>Temperature = (CO2 - 280) &times; 0.008&deg;C</code>
+              </div>
+              <p><strong>Examples:</strong></p>
+              <table class="rules-table compact">
+                <thead>
+                  <tr>
+                    <th>CO2 Level</th>
+                    <th>Calculation</th>
+                    <th>Temperature</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>420 ppm</td>
+                    <td>(420 - 280) &times; 0.008</td>
+                    <td>+1.12&deg;C</td>
+                  </tr>
+                  <tr>
+                    <td>450 ppm</td>
+                    <td>(450 - 280) &times; 0.008</td>
+                    <td>+1.36&deg;C</td>
+                  </tr>
+                  <tr>
+                    <td>655 ppm</td>
+                    <td>(655 - 280) &times; 0.008</td>
+                    <td>+3.0&deg;C (LOSE)</td>
+                  </tr>
+                  <tr class="highlight-row">
+                    <td>405 ppm</td>
+                    <td>(405 - 280) &times; 0.008</td>
+                    <td>+1.0&deg;C (WIN)</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note">To win, you must reduce CO2 to approximately <strong>405 ppm</strong> or below.</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 5: Turn Sequence -->
+        <details id="turn-sequence" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">5</span>
+            <span class="dropdown-title">Monthly Turn Sequence</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <p>When you click <strong>"Next Month"</strong>, the following happens in order:</p>
+              <ol class="sequence-list">
+                <li>
+                  <span class="step-num">1</span>
+                  <span class="step-text"><strong>Time Advances:</strong> Month increments (year wraps at month 13)</span>
+                </li>
+                <li>
+                  <span class="step-num">2</span>
+                  <span class="step-text"><strong>CO2 Increases:</strong> Base increase + climate feedback effects added</span>
+                </li>
+                <li>
+                  <span class="step-num">3</span>
+                  <span class="step-text"><strong>Projects Process:</strong> Each region's projects calculate CO2 reductions and income</span>
+                </li>
+                <li>
+                  <span class="step-num">4</span>
+                  <span class="step-text"><strong>CO2 Reduced:</strong> Total project reductions subtracted from global CO2</span>
+                </li>
+                <li>
+                  <span class="step-num">5</span>
+                  <span class="step-text"><strong>Temperature Updates:</strong> Global and regional temperatures recalculated</span>
+                </li>
+                <li>
+                  <span class="step-num">6</span>
+                  <span class="step-text"><strong>Tipping Points Check:</strong> New tipping points triggered if thresholds crossed</span>
+                </li>
+                <li>
+                  <span class="step-num">7</span>
+                  <span class="step-text"><strong>Events Process:</strong> Active events tick down; new events may trigger</span>
+                </li>
+                <li>
+                  <span class="step-num">8</span>
+                  <span class="step-text"><strong>Research Points:</strong> Research Centers generate RP for technology unlocks</span>
+                </li>
+                <li>
+                  <span class="step-num">9</span>
+                  <span class="step-text"><strong>Campaigns Progress:</strong> Active campaigns advance; completed ones increase dedication</span>
+                </li>
+                <li>
+                  <span class="step-num">10</span>
+                  <span class="step-text"><strong>Income Added:</strong> Country contributions + project income (modified by events)</span>
+                </li>
+                <li>
+                  <span class="step-num">11</span>
+                  <span class="step-text"><strong>Achievements Check:</strong> New achievements unlocked if conditions met</span>
+                </li>
+                <li>
+                  <span class="step-num">12</span>
+                  <span class="step-text"><strong>Win/Lose Check:</strong> Game checks victory and defeat conditions</span>
+                </li>
+                <li>
+                  <span class="step-num">13</span>
+                  <span class="step-text"><strong>Auto-Save:</strong> Progress automatically saved to browser storage</span>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 6: Climate Tipping Points -->
+        <details id="tipping-points" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">6</span>
+            <span class="dropdown-title">Climate Tipping Points</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card highlight-lose">
+              <h3>What Are Tipping Points?</h3>
+              <p>Tipping points are <strong>irreversible climate thresholds</strong>. Once triggered, they permanently accelerate warming by adding extra CO2 each month. These represent real-world climate feedback mechanisms that scientists warn about.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Tipping Point Thresholds</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Threshold</th>
+                    <th>Name</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>+1.5&deg;C</strong></td>
+                    <td>Arctic Sea Ice Decline</td>
+                    <td>+0.05 ppm/month (reduced reflectivity)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>+2.0&deg;C</strong></td>
+                    <td>Permafrost Methane Release</td>
+                    <td>+0.1 ppm/month (ancient methane)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>+2.5&deg;C</strong></td>
+                    <td>Amazon Rainforest Dieback</td>
+                    <td>+0.08 ppm/month, forest projects 50% less effective</td>
+                  </tr>
+                  <tr>
+                    <td><strong>+2.8&deg;C</strong></td>
+                    <td>Ocean Circulation Weakening</td>
+                    <td>+0.12 ppm/month (weather disruption)</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Warning:</strong> The tipping points panel shows warnings when you're within 0.3&deg;C of a threshold!</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Feedback Loops</h3>
+              <p>In addition to tipping points, gradual feedback loops add extra warming as conditions worsen:</p>
+              <ul>
+                <li><strong>Ice-Albedo Feedback:</strong> Starts at +1.5&deg;C - melting ice reduces Earth's reflectivity</li>
+                <li><strong>Ocean Saturation:</strong> Starts at 450 ppm - warmer oceans absorb less CO2</li>
+                <li><strong>Vegetation Stress:</strong> Starts at +2.0&deg;C - heat-stressed plants absorb less carbon</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 7: Projects -->
+        <details id="projects" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">7</span>
+            <span class="dropdown-title">Projects</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Available Project Types</h3>
+              <p>All costs are in <strong>billions of USD</strong>, based on real-world infrastructure costs.</p>
+              <table class="rules-table projects-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Base Cost</th>
+                    <th>CO2 Reduction</th>
+                    <th>Income</th>
+                    <th>Special</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Reforestation</strong></td>
+                    <td>$5 B</td>
+                    <td>-2 ppm/month</td>
+                    <td>$0 B/month</td>
+                    <td>Affected by Amazon tipping point</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Solar Farm</strong></td>
+                    <td>$10 B</td>
+                    <td>-1 ppm/month</td>
+                    <td>+$2 B/month</td>
+                    <td>Enhanced by tech upgrades</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Wind Farm</strong></td>
+                    <td>$12 B</td>
+                    <td>-1 ppm/month</td>
+                    <td>+$2 B/month</td>
+                    <td>Enhanced by green hydrogen tech</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Research Center</strong></td>
+                    <td>$15 B</td>
+                    <td>0 ppm/month</td>
+                    <td>+$3 B/month</td>
+                    <td>Generates 5 RP/month</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Offshore Wind</strong></td>
+                    <td>$30 B</td>
+                    <td>-2 ppm/month</td>
+                    <td>+$3 B/month</td>
+                    <td>Enhanced by turbine optimization</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Carbon Capture</strong></td>
+                    <td>$35 B</td>
+                    <td>-4 ppm/month</td>
+                    <td>$0 B/month</td>
+                    <td>Enhanced by Direct Air Capture tech</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Nuclear Plant</strong></td>
+                    <td>$50 B</td>
+                    <td>-3 ppm/month</td>
+                    <td>+$4 B/month</td>
+                    <td>Enhanced by modular reactor tech</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Regional Effectiveness</h3>
+              <p>Each region has potential scores (0-1) for different project types:</p>
+              <div class="formula-box">
+                <p class="formula-label">Cost Multiplier:</p>
+                <code>Adjusted Cost = Base Cost &times; (2 - Potential Score)</code>
+              </div>
+              <div class="formula-box">
+                <p class="formula-label">Effect Multiplier:</p>
+                <code>Adjusted Effect = Base Effect &times; Potential Score</code>
+              </div>
+              <p><strong>Key insight:</strong> Higher potential = lower cost AND higher effectiveness (double benefit!)</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 8: Technology Tree -->
+        <details id="technology" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">8</span>
+            <span class="dropdown-title">Technology Research</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Research Points (RP)</h3>
+              <p>Build <strong>Research Centers</strong> to generate Research Points. Each Research Center produces <strong>5 RP per month</strong>. Spend RP to unlock technologies that permanently improve your projects.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Technology Tree</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Technology</th>
+                    <th>Cost</th>
+                    <th>Tier</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Advanced Photovoltaics</strong></td>
+                    <td>100 RP</td>
+                    <td>1</td>
+                    <td>Solar: +20% CO2 reduction, +15% income</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Bioengineered Trees</strong></td>
+                    <td>200 RP</td>
+                    <td>2</td>
+                    <td>Reforestation: +30% CO2 reduction</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Turbine Optimization</strong></td>
+                    <td>250 RP</td>
+                    <td>2</td>
+                    <td>Offshore Wind: -20% cost, +15% CO2</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Small Modular Reactors</strong></td>
+                    <td>500 RP</td>
+                    <td>3</td>
+                    <td>Nuclear: -25% cost, +20% income</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Green Hydrogen</strong></td>
+                    <td>750 RP</td>
+                    <td>3</td>
+                    <td>All renewables: +15% income</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Direct Air Capture</strong></td>
+                    <td>1000 RP</td>
+                    <td>4</td>
+                    <td>Carbon Capture: 2x CO2 reduction</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 9: Random Events -->
+        <details id="events" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">9</span>
+            <span class="dropdown-title">Random Events</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Event System</h3>
+              <p>Random events add unpredictability to gameplay. Each month, there's a chance for events to trigger. Events can be positive or negative and last for several months.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Event Categories</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Examples</th>
+                    <th>Typical Effects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Climate</strong></td>
+                    <td>Heat Wave, Hurricane, Drought, Flooding</td>
+                    <td>-10% to -20% income or project effectiveness</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Political</strong></td>
+                    <td>Climate Summit, Policy Shift, Fossil Lobby</td>
+                    <td>&plusmn;15-30% campaign effectiveness or income</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Economic</strong></td>
+                    <td>Recession, Economic Boom, Oil Crisis</td>
+                    <td>&plusmn;10-25% income, project costs</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Breakthrough</strong></td>
+                    <td>Solar/Battery/CCS/Fusion advances</td>
+                    <td>Permanent project improvements!</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Tip:</strong> Breakthrough events are rare but provide permanent bonuses. Events are disabled in Tutorial mode.</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 10: Natural Disasters -->
+        <details id="disasters" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">10</span>
+            <span class="dropdown-title">Natural Disasters</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Temperature-Driven Disasters</h3>
+              <p>Natural disasters occur in regions around the world, with probability scaling based on <strong>global temperature</strong>. Higher temperatures mean more frequent and severe disasters.</p>
+              <div class="formula-box">
+                <p class="formula-label">Disaster Probability:</p>
+                <code>Probability = Base Rate &times; Vulnerability &times; Temp Multiplier</code>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>Disaster Types</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Disaster</th>
+                    <th>Vulnerable Regions</th>
+                    <th>Income Impact</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Heat Wave</strong></td>
+                    <td>Middle East, South Asia, Mediterranean, Australia</td>
+                    <td>-15%</td>
+                    <td>2-3 months</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Hurricane/Cyclone</strong></td>
+                    <td>Caribbean, Gulf Coast, Southeast Asia, Pacific Islands</td>
+                    <td>-25%</td>
+                    <td>1-2 months</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Flooding</strong></td>
+                    <td>South/Southeast Asia, Europe river basins, East Africa</td>
+                    <td>-20%</td>
+                    <td>1-2 months</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Drought</strong></td>
+                    <td>Sub-Saharan Africa, Central Asia, Australia, Southwest US</td>
+                    <td>-20%</td>
+                    <td>3-6 months</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Wildfire</strong></td>
+                    <td>California, Australia, Mediterranean, Amazon</td>
+                    <td>-15%</td>
+                    <td>2-4 months</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Extreme Cold</strong></td>
+                    <td>Northern Europe, Russia, Northern US/Canada</td>
+                    <td>-10%</td>
+                    <td>1-2 months</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Awareness Effect</h3>
+              <p>Regions that experience disasters become more aware of climate change, making <strong>Climate Policy Campaigns easier</strong> in those regions:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Disaster Severity</th>
+                    <th>Awareness Boost</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Minor (10-15% income loss)</td>
+                    <td>+3%</td>
+                    <td>Campaigns 3% easier</td>
+                  </tr>
+                  <tr>
+                    <td>Moderate (20% income loss)</td>
+                    <td>+5%</td>
+                    <td>Campaigns 5% easier</td>
+                  </tr>
+                  <tr>
+                    <td>Severe (25%+ income loss)</td>
+                    <td>+8%</td>
+                    <td>Campaigns 8% easier</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Strategic tip:</strong> Focus campaigns on disaster-affected regions for better results. Regions without disasters maintain their base campaign difficulty.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Infrastructure Resilience</h3>
+              <p>Wealthier countries with better infrastructure suffer <strong>less damage</strong> from disasters. Disaster impact is modified by each region's resilience score.</p>
+              <p class="note"><strong>Note:</strong> Disasters are disabled in Tutorial mode and reduced in Easy mode.</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 11: Climate Finance -->
+        <details id="income" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">11</span>
+            <span class="dropdown-title">Climate Finance System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Real-World Climate Finance</h3>
+              <p>Income is based on each country's <strong>climate dedication</strong> - the percentage of their GDP they commit to climate action.</p>
+              <div class="formula-box">
+                <code>Monthly Income = (GDP &times; Climate %) &divide; 12</code>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Policy Campaigns</h3>
+              <p>Increase a country's climate dedication through political advocacy:</p>
+              <div class="formula-box">
+                <p class="formula-label">Campaign Cost:</p>
+                <code>Cost = GDP &times; 0.5% &times; Difficulty</code>
+              </div>
+              <div class="formula-box">
+                <p class="formula-label">Campaign Duration:</p>
+                <code>Duration = 12 months &times; Difficulty &times; Political Resistance</code>
+              </div>
+              <p class="note">Easier countries (Germany, France, Sweden) are cheaper and faster to influence than difficult ones (Saudi Arabia, Russia).</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 12: Achievements -->
+        <details id="achievements" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">12</span>
+            <span class="dropdown-title">Achievements</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Achievement System</h3>
+              <p>Earn achievements by reaching milestones and completing challenges. Achievements unlock as you play and are tracked across game sessions.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Available Achievements</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Achievement</th>
+                    <th>Requirement</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td><strong>First Steps</strong></td><td>Build your first project</td></tr>
+                  <tr><td><strong>Getting Started</strong></td><td>Build 10 projects</td></tr>
+                  <tr><td><strong>Renewable Revolution</strong></td><td>Build 50 renewable energy projects</td></tr>
+                  <tr><td><strong>Tech Leader</strong></td><td>Unlock all technologies</td></tr>
+                  <tr><td><strong>Carbon Neutral</strong></td><td>Achieve net-zero emissions</td></tr>
+                  <tr><td><strong>Climate Champion</strong></td><td>Reduce temperature below +1.5&deg;C</td></tr>
+                  <tr><td><strong>Speed Run</strong></td><td>Win before 2050</td></tr>
+                  <tr><td><strong>Against All Odds</strong></td><td>Win on Extreme difficulty</td></tr>
+                  <tr><td><strong>Global Coalition</strong></td><td>Campaign in 20+ countries</td></tr>
+                  <tr><td><strong>Research Pioneer</strong></td><td>Accumulate 500 RP</td></tr>
+                  <tr><td><strong>Forest Guardian</strong></td><td>Plant 25 reforestation projects</td></tr>
+                  <tr><td><strong>Nuclear Age</strong></td><td>Build 10 nuclear plants</td></tr>
+                  <tr><td><strong>Carbon Capture Master</strong></td><td>Build 15 CCS facilities</td></tr>
+                  <tr><td><strong>Big Spender</strong></td><td>Spend $1 trillion on projects</td></tr>
+                  <tr><td><strong>Survivor</strong></td><td>Reach 2075 without triggering tipping points</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 13: Save/Load -->
+        <details id="save-load" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">13</span>
+            <span class="dropdown-title">Save & Load System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Saving Your Progress</h3>
+              <ul>
+                <li><strong>Auto-Save:</strong> Game automatically saves after each month</li>
+                <li><strong>Manual Saves:</strong> 3 save slots for different games</li>
+                <li><strong>Continue Game:</strong> Resume from auto-save on the launch screen</li>
+                <li><strong>Export/Import:</strong> Download saves as JSON files for backup</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>What Gets Saved</h3>
+              <p>Your complete game state is preserved:</p>
+              <ul>
+                <li>Budget, CO2, temperature, and date</li>
+                <li>All projects built in each region</li>
+                <li>Active campaigns and their progress</li>
+                <li>Research points and unlocked technologies</li>
+                <li>Triggered tipping points</li>
+                <li>Unlocked achievements</li>
+                <li>Active events</li>
+                <li>Complete history for graphs</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 14: Map Features -->
+        <details id="map" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">14</span>
+            <span class="dropdown-title">Map Features</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Granularity Levels</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Regions</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Continents</td>
+                    <td>6</td>
+                    <td>North America, South America, Europe, Africa, Asia, Oceania</td>
+                  </tr>
+                  <tr>
+                    <td>Major Regions</td>
+                    <td>~15</td>
+                    <td>Northern Europe, East Asia, Sub-Saharan Africa, etc.</td>
+                  </tr>
+                  <tr>
+                    <td>Countries</td>
+                    <td>~250</td>
+                    <td>Individual nations with detailed data</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Visualization Modes</h3>
+              <ul>
+                <li><strong>Temperature:</strong> Blue (cool) &rarr; Yellow &rarr; Red (hot)</li>
+                <li><strong>Emissions:</strong> Green (low) &rarr; Yellow &rarr; Red (high CO2)</li>
+                <li><strong>Renewables:</strong> Brown (poor) &rarr; Blue &rarr; Green (excellent potential)</li>
+                <li><strong>Economy:</strong> Light &rarr; Dark Blue (GDP)</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Region Search</h3>
+              <p>Use the search bar to quickly find regions by name. Matching regions are highlighted on the map.</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 15: Stats Bar -->
+        <details id="stats-bar" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">15</span>
+            <span class="dropdown-title">Stats Bar Overview</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Top Stats Bar</h3>
+              <p>The stats bar displays 13 key metrics at a glance. Click the <strong>"?"</strong> button for detailed explanations.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Resource Stats</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th>Description</th>
+                    <th>Color Coding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Budget</strong></td>
+                    <td>Available funds for building projects and campaigns</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Income</strong></td>
+                    <td>Projected monthly income from all sources</td>
+                    <td>Green = positive, Red = negative</td>
+                  </tr>
+                  <tr>
+                    <td><strong>RP</strong></td>
+                    <td>Research Points (shows generation rate in parentheses)</td>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Stats</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th>Description</th>
+                    <th>Color Coding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Temp</strong></td>
+                    <td>Global temperature above pre-industrial levels</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>CO2</strong></td>
+                    <td>Atmospheric CO2 concentration in parts per million</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Net CO2</strong></td>
+                    <td>Monthly CO2 change (base rate - project reductions + feedback)</td>
+                    <td>Green = negative (reducing), Red = positive (increasing)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Feedback</strong></td>
+                    <td>Extra CO2 from climate feedback loops</td>
+                    <td>Green = 0, Yellow = low, Red = high (&ge;0.2)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Progress Stats</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th>Description</th>
+                    <th>Color Coding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Projects</strong></td>
+                    <td>Total projects built across all regions</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Campaigns</strong></td>
+                    <td>Active climate policy campaigns</td>
+                    <td>-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Disasters</strong></td>
+                    <td>Active natural disasters worldwide</td>
+                    <td>Green = 0, Yellow = 1-2, Red = 3+</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tipping</strong></td>
+                    <td>Tipping points triggered (irreversible!)</td>
+                    <td>Green = 0, Yellow = 1-2, Red = 3+</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Time Stats</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Stat</th>
+                    <th>Description</th>
+                    <th>Color Coding</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Years</strong></td>
+                    <td>Years remaining until 2100 deadline</td>
+                    <td>Yellow = &lt;50 years, Red = &lt;25 years</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Date</strong></td>
+                    <td>Current month and year</td>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 16: Strategy Tips -->
+        <details id="strategy" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">16</span>
+            <span class="dropdown-title">Strategy Tips</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Key Strategic Insights</h3>
+              <ul class="strategy-list">
+                <li><strong>Avoid tipping points at all costs:</strong> They're irreversible and compound the problem.</li>
+                <li><strong>Build Research Centers early:</strong> Technology upgrades provide permanent benefits.</li>
+                <li><strong>Focus on high-potential regions:</strong> Solar in Saudi Arabia gives 3x+ more value.</li>
+                <li><strong>Boost income with campaigns:</strong> Run campaigns in large, easy countries first.</li>
+                <li><strong>Balance income and reduction:</strong> Need steady income to afford powerful projects.</li>
+                <li><strong>Target 405 ppm CO2:</strong> That's the threshold for +1.0&deg;C and victory.</li>
+                <li><strong>Watch for breakthrough events:</strong> They can dramatically improve your projects.</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Recommended Build Order</h3>
+              <ol>
+                <li>Build 1-2 Research Centers for RP generation</li>
+                <li>Run campaigns in large GDP countries (USA, China, Germany)</li>
+                <li>Build Solar/Wind in high-potential regions for income</li>
+                <li>Unlock Advanced Photovoltaics (100 RP) for solar bonus</li>
+                <li>Scale up Carbon Capture in industrial regions</li>
+                <li>Rush Direct Air Capture (1000 RP) for 2x carbon removal</li>
+              </ol>
+            </div>
+
+            <div class="rules-card">
+              <h3>Math to Win (Normal Mode)</h3>
+              <p>Starting at 420 ppm, you need to reach 405 ppm (a reduction of 15 ppm).</p>
+              <p>With <strong>Direct Air Capture tech</strong> (2x), each Carbon Capture facility removes <strong>8 ppm/month</strong>!</p>
+              <ul>
+                <li>2 Carbon Capture facilities: -16 ppm/month</li>
+                <li>Minus base increase: -16 + 0.5 = <strong>-15.5 ppm/month</strong></li>
+                <li>Time to win: ~1 month once built!</li>
+              </ul>
+              <p class="note">The challenge is surviving long enough to afford and research the technology!</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 17: Climate Alliance & Diplomacy -->
+        <details id="alliance" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">17</span>
+            <span class="dropdown-title">Climate Alliance & Diplomacy</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>The Climate Alliance</h3>
+              <p>You lead a global climate coalition. Regions must <strong>join your alliance</strong> before you can use their funds or build projects there. At game start, you choose a <strong>home region</strong> that automatically joins.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Alliance Status</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Description</th>
+                    <th>Actions Available</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Allied</strong></td>
+                    <td>Region is in your coalition</td>
+                    <td>Build projects, receive income, run campaigns</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Neutral</strong></td>
+                    <td>Region not yet recruited</td>
+                    <td>Negotiate to join alliance</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Negotiating</strong></td>
+                    <td>Talks in progress</td>
+                    <td>Accept/reject demands</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Hostile</strong></td>
+                    <td>Left alliance (6 month cooldown)</td>
+                    <td>Wait for cooldown to end</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Region Happiness (0-100%)</h3>
+              <p>Allied regions have a happiness meter. Keep them happy or they may leave!</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Happiness</th>
+                    <th>Mood</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>80-100%</td>
+                    <td>Happy</td>
+                    <td>May increase their contribution</td>
+                  </tr>
+                  <tr>
+                    <td>60-79%</td>
+                    <td>Content</td>
+                    <td>Stable, no changes</td>
+                  </tr>
+                  <tr>
+                    <td>40-59%</td>
+                    <td>Concerned</td>
+                    <td>Warning messages appear</td>
+                  </tr>
+                  <tr>
+                    <td>20-39%</td>
+                    <td>Unhappy</td>
+                    <td>May reduce contribution</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>0-19%</td>
+                    <td>Critical</td>
+                    <td><strong>50% chance to leave each month!</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>What Affects Happiness</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="highlight-win">
+                    <td>Building economic projects</td>
+                    <td>+5 to +20 happiness</td>
+                  </tr>
+                  <tr class="highlight-win">
+                    <td>Fulfilling their demands</td>
+                    <td>+10 happiness</td>
+                  </tr>
+                  <tr class="highlight-win">
+                    <td>Long alliance membership</td>
+                    <td>Loyalty bonus over time</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>High carbon tax (&gt;30%)</td>
+                    <td>-2 to -10 per month</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>Breaking demand conditions</td>
+                    <td>-3 per unmet demand</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>Another ally leaving</td>
+                    <td>-10 (domino effect)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Negotiation & Demands</h3>
+              <p>When recruiting a neutral region, they present <strong>demands</strong> you must accept:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Demand Type</th>
+                    <th>Example</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Carbon Tax Limit</strong></td>
+                    <td>"Keep carbon tax below 40%"</td>
+                  </tr>
+                  <tr>
+                    <td><strong>No Nuclear</strong></td>
+                    <td>"No nuclear projects in our territory"</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Economic Projects</strong></td>
+                    <td>"Build at least 1 economic project here"</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Local Spending</strong></td>
+                    <td>"Spend at least 30% of our funds locally"</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Job Priority</strong></td>
+                    <td>"Prioritize job-creating projects"</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Warning:</strong> Breaking demand conditions makes regions unhappy!</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Economic Projects (Non-Climate)</h3>
+              <p>These projects boost GDP and happiness but don't reduce CO2:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Income</th>
+                    <th>Happiness</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Infrastructure</strong></td>
+                    <td>$30 B</td>
+                    <td>+$4.5 B/month</td>
+                    <td>+10</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Education Hub</strong></td>
+                    <td>$22.5 B</td>
+                    <td>+$3 B/month</td>
+                    <td>+15</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Healthcare System</strong></td>
+                    <td>$37.5 B</td>
+                    <td>+$3 B/month</td>
+                    <td>+20</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Trade Agreement</strong></td>
+                    <td>$15 B</td>
+                    <td>+$6 B/month</td>
+                    <td>+5</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Tourism Development</strong></td>
+                    <td>$18 B</td>
+                    <td>+$4.5 B/month</td>
+                    <td>+8</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card highlight-lose">
+              <h3>When Regions Leave</h3>
+              <p>If a region's happiness drops to critical (0-19%), they have a <strong>50% chance to leave each month</strong>.</p>
+              <ul>
+                <li>Their projects become <strong>inactive</strong> (no CO2 reduction or income)</li>
+                <li>Region becomes <strong>hostile for 6 months</strong></li>
+                <li>Other allies lose <strong>10 happiness</strong> (domino effect)</li>
+                <li>After cooldown, you can negotiate to recruit them again</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Map Visual Indicators</h3>
+              <ul>
+                <li><strong>Green glow:</strong> Allied regions</li>
+                <li><strong>Gray:</strong> Neutral regions (click to negotiate)</li>
+                <li><strong>Yellow pulse:</strong> Currently negotiating</li>
+                <li><strong>Red tint:</strong> Hostile regions (cooldown active)</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Strategy Tips</h3>
+              <ul class="strategy-list">
+                <li><strong>Start with easy allies:</strong> Some regions have lower recruitment difficulty.</li>
+                <li><strong>Keep allies happy:</strong> Build economic projects to boost happiness.</li>
+                <li><strong>Watch carbon tax:</strong> High taxes hurt regional happiness.</li>
+                <li><strong>Fulfill demands:</strong> Check demand compliance in the region panel.</li>
+                <li><strong>Prevent domino effects:</strong> If one ally leaves, others may follow!</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 18: Regional Growth -->
+        <details id="growth" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">18</span>
+            <span class="dropdown-title">Regional Growth Systems</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Dynamic World Economy</h3>
+              <p>The world economy grows dynamically over time. Each region has a <strong>development level</strong> that determines its GDP growth rate. Growing economies mean more income but also more emissions if they rely on fossil fuels.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Development Levels & GDP Growth</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Development Level</th>
+                    <th>Annual Growth</th>
+                    <th>Example Regions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Developed</strong></td>
+                    <td>+2.0%/year</td>
+                    <td>North America, Europe, Oceania</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Emerging</strong></td>
+                    <td>+4.0%/year</td>
+                    <td>East Asia, Southeast Asia, South America</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Developing</strong></td>
+                    <td>+5.5%/year</td>
+                    <td>Africa, South Asia, Central Asia</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Oil Economy</strong></td>
+                    <td>+2.5%/year</td>
+                    <td>West Asia (Gulf States)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>GDP Growth Modifiers</h3>
+              <p>Several factors can affect regional GDP growth:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="highlight-win">
+                    <td>Power Stability (supply &ge; demand)</td>
+                    <td>Normal growth</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>Power Shortage</td>
+                    <td>Reduced growth (down to -50%)</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>Active Disasters</td>
+                    <td>-10% to -25% growth</td>
+                  </tr>
+                  <tr class="highlight-lose">
+                    <td>Climate Damage (&gt;1.5&deg;C)</td>
+                    <td>-10% per 0.5&deg;C above threshold</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card highlight-lose">
+              <h3>Climate Damage to Economy</h3>
+              <p>When global temperature exceeds <strong>+1.5&deg;C</strong>, economic growth slows worldwide. For every <strong>0.5&deg;C</strong> above the threshold, GDP growth is reduced by <strong>10%</strong>.</p>
+              <div class="formula-box">
+                <p class="formula-label">Climate Penalty:</p>
+                <code>Growth Penalty = (Temperature - 1.5) &times; 20%</code>
+              </div>
+              <p class="note">At +2.5&deg;C, growth is reduced by 20%. This creates a feedback loop where climate change hurts the economy, reducing your income!</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Regional Emissions</h3>
+              <p>Each region's emissions are calculated from two sources:</p>
+              <ol>
+                <li><strong>Power Generation:</strong> Emissions from coal, gas, and other power plants</li>
+                <li><strong>Non-Power Emissions:</strong> Industry, transport, agriculture (scales with GDP)</li>
+              </ol>
+              <div class="formula-box">
+                <p class="formula-label">Power Emissions (Gt CO2 per 1000 TWh):</p>
+                <code>Coal: 0.9 | Gas: 0.4 | Other: 0.2</code>
+              </div>
+              <p class="note">Shifting from coal to renewables dramatically reduces regional emissions!</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Power Demand Growth</h3>
+              <p>Each region's power demand grows annually based on development level:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Region Type</th>
+                    <th>Demand Growth</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Developed (NA, Europe, Oceania)</td>
+                    <td>+0.5% - 1.5%/year</td>
+                  </tr>
+                  <tr>
+                    <td>Emerging (Asia, S. America)</td>
+                    <td>+3% - 5%/year</td>
+                  </tr>
+                  <tr>
+                    <td>Developing (Africa)</td>
+                    <td>+5% - 6%/year</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Important:</strong> You (the overseer) control all power infrastructure decisions. No automatic power plants are built - you must expand capacity to meet growing demand!</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Growth Trends Display</h3>
+              <p>The Power Panel shows current growth trends for the selected region:</p>
+              <ul>
+                <li><strong>Demand:</strong> Annual power demand growth rate</li>
+                <li><strong>GDP:</strong> Annual economic growth rate</li>
+                <li><strong>Emissions:</strong> Monthly change in regional emissions</li>
+              </ul>
+              <p>Green values indicate positive growth or decreasing emissions. Red emissions indicate rising pollution.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Strategic Implications</h3>
+              <ul class="strategy-list">
+                <li><strong>Developing regions grow fastest:</strong> Africa and Asia will see the biggest increases in demand and emissions.</li>
+                <li><strong>Early green investment pays off:</strong> Building renewables now prevents emission growth as GDP rises.</li>
+                <li><strong>Climate damage hurts everyone:</strong> High temperatures slow global economic growth, reducing your income.</li>
+                <li><strong>Match supply to demand:</strong> Power shortages hurt economic growth, creating a negative spiral.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 19: Carbon Balance System -->
+        <details class="rules-section" id="carbon-balance">
+          <summary><span class="section-number">19</span>Carbon Balance System</summary>
+          <div class="section-content">
+            <div class="rules-card">
+              <h3>Understanding Carbon Balance</h3>
+              <p>The Carbon Balance System tracks global CO₂ emissions and removals across all sectors. The <strong>Net CO₂</strong> stat in the top bar shows the difference between emissions and removals - this determines how fast atmospheric CO₂ rises.</p>
+              <p><strong>Click the Net CO₂ stat</strong> to open the detailed Carbon Balance popup, showing:</p>
+              <ul>
+                <li><strong>Emissions breakdown:</strong> Power, Industry, Transport, Buildings, Agriculture, and Embodied Carbon</li>
+                <li><strong>Removals breakdown:</strong> Ocean absorption, natural land sinks, your forests, and your CCS/DAC projects</li>
+                <li><strong>Net result:</strong> Total emissions minus total removals, with monthly ppm change</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Emission Sectors</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sector</th>
+                    <th>Subsectors</th>
+                    <th>How to Reduce</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Power</strong></td>
+                    <td>Coal, Gas, Oil power plants</td>
+                    <td>Build renewable/nuclear capacity, replace fossil plants</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Industry</strong></td>
+                    <td>Cement, Steel, Chemicals, Manufacturing</td>
+                    <td>Green Steel, Low-Carbon Cement, Green Hydrogen Hub projects</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Transport</strong></td>
+                    <td>Road, Aviation, Shipping, Rail</td>
+                    <td>EV Charging Network, Metro/Rail, Sustainable Aviation Fuel projects</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Buildings</strong></td>
+                    <td>Residential, Commercial heating/cooling</td>
+                    <td>Building Efficiency Program, Heat Pump Rollout projects</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Agriculture</strong></td>
+                    <td>Livestock, Crops, Land Use</td>
+                    <td>Sustainable Agriculture, Livestock Methane Capture projects</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Embodied Carbon</strong></td>
+                    <td>Manufacturing new clean tech</td>
+                    <td>Decreases over time as construction completes</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Carbon Removal</h3>
+              <p>Natural sinks absorb CO₂ from the atmosphere, but their effectiveness decreases under climate stress:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Removal Type</th>
+                    <th>Base Rate</th>
+                    <th>Saturation Effects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Ocean Absorption</strong></td>
+                    <td>~10 Gt CO₂/year</td>
+                    <td>Efficiency drops above 450 ppm and with rising temperatures</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Natural Land Sinks</strong></td>
+                    <td>~3.5 Gt CO₂/year</td>
+                    <td>Forests stressed above 2°C, major loss at Amazon tipping point</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Your Forests</strong></td>
+                    <td>From Reforestation projects</td>
+                    <td>Player-controlled, scales with project investment</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Your CCS/DAC</strong></td>
+                    <td>From Carbon Capture projects</td>
+                    <td>Player-controlled, requires power input</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Warning:</strong> As CO₂ and temperature rise, natural sinks become less effective, creating a dangerous feedback loop!</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Development Level Effects</h3>
+              <p>Different regions grow emissions at different rates based on their development stage:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Development Level</th>
+                    <th>Emission Growth</th>
+                    <th>Efficiency Gains</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Developed</strong> (North America, Europe, Oceania)</td>
+                    <td>Slower (50-60% of base rate)</td>
+                    <td>1.5%/year carbon intensity reduction</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Emerging</strong> (Parts of Asia, South America)</td>
+                    <td>Moderate (100-150% of base)</td>
+                    <td>2%/year efficiency gains</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Developing</strong> (Africa, parts of Asia)</td>
+                    <td>Rapid (150-200% of base)</td>
+                    <td>2.5%/year (technology leapfrogging)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Oil Economy</strong> (Middle East)</td>
+                    <td>Moderate (80-120% of base)</td>
+                    <td>1%/year (slower transition)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Sector Reduction Projects</h3>
+              <p>New projects target specific emission sectors. Available in the Projects menu:</p>
+              <ul>
+                <li><strong>Green Steel Plant:</strong> Reduces steel emissions by 30%</li>
+                <li><strong>Low-Carbon Cement:</strong> Reduces cement emissions by 25%</li>
+                <li><strong>Green Hydrogen Hub:</strong> Reduces chemical industry emissions by 40%</li>
+                <li><strong>EV Charging Network:</strong> Reduces road transport emissions by 15%</li>
+                <li><strong>Metro/Rail Expansion:</strong> Reduces road emissions by 10%, adds happiness</li>
+                <li><strong>Sustainable Aviation Fuel:</strong> Reduces aviation emissions by 20%</li>
+                <li><strong>Building Efficiency Program:</strong> Reduces building emissions by 15-20%</li>
+                <li><strong>Heat Pump Rollout:</strong> Reduces residential building emissions by 25%</li>
+                <li><strong>Sustainable Agriculture:</strong> Reduces crop (30%) and livestock (10%) emissions</li>
+                <li><strong>Livestock Methane Capture:</strong> Reduces livestock emissions by 25%</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Sector Policies</h3>
+              <p>Climate campaigns can implement policies affecting entire sectors:</p>
+              <ul>
+                <li><strong>Industrial Emissions Standards:</strong> Halves industry emission growth rate</li>
+                <li><strong>Vehicle Emission Standards:</strong> Reduces road transport emissions by 10%</li>
+                <li><strong>Green Building Codes:</strong> Stops building emission growth</li>
+                <li><strong>Agricultural Sustainability Standards:</strong> Reduces agriculture emissions</li>
+                <li><strong>Aviation Carbon Levy:</strong> Reduces aviation emissions</li>
+                <li><strong>Shipping Decarbonization Mandate:</strong> Reduces shipping emissions</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Strategic Implications</h3>
+              <ul class="strategy-list">
+                <li><strong>Power is the biggest lever:</strong> Decarbonizing electricity generation gives the largest emission reductions.</li>
+                <li><strong>Developing regions need attention:</strong> Rapid industrial growth can quickly increase global emissions.</li>
+                <li><strong>Protect natural sinks:</strong> Keep temperature and CO₂ low to maintain ocean and forest absorption.</li>
+                <li><strong>Combine approaches:</strong> Use projects for immediate reductions, policies for systemic change.</li>
+                <li><strong>Watch for feedback loops:</strong> High emissions → high CO₂ → reduced sink capacity → even higher CO₂.</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Footer -->
+        <div class="rules-footer">
+          <a href="index.html" class="primary-button">Back to Menu</a>
+          <a href="game_mechanics.html" class="ghost-button">Game Mechanics</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

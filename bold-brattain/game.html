@@ -1,0 +1,512 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Carbon Capture: Climate Overseer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="in-game">
+    <div class="game-shell">
+      <div class="topbar-wrapper">
+        <header class="topbar">
+          <div id="stats-strip" class="stat-strip" role="button" tabindex="0" aria-label="Game stats (click for details)">
+            <div class="stat">
+              <span class="label">Budget</span>
+              <span id="credits" class="value">$100 B</span>
+            </div>
+            <div class="stat">
+              <span class="label">Income</span>
+              <span id="income" class="value">+$0/mo</span>
+            </div>
+            <div class="stat">
+              <span class="label">Temp</span>
+              <span id="temperature" class="value">+1.20°C</span>
+            </div>
+            <div class="stat">
+              <span class="label">CO2</span>
+              <span id="co2" class="value">420 ppm</span>
+            </div>
+            <div class="stat stat-clickable" id="net-co2-stat" onclick="openCarbonBalancePopup()" title="Click for carbon breakdown">
+              <span class="label">Net CO2</span>
+              <span id="net-co2" class="value">+0.5/mo</span>
+            </div>
+            <div class="stat">
+              <span class="label">Feedback</span>
+              <span id="feedback" class="value">+0.00</span>
+            </div>
+            <div class="stat">
+              <span class="label">Projects</span>
+              <span id="total-projects" class="value">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Building</span>
+              <span id="under-construction" class="value">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">RP</span>
+              <span id="research-points" class="value">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Campaigns</span>
+              <span id="campaigns" class="value">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Disasters</span>
+              <span id="disasters" class="value">0</span>
+            </div>
+            <div class="stat">
+              <span class="label">Tipping</span>
+              <span id="tipping-count" class="value">0/4</span>
+            </div>
+            <div class="stat">
+              <span class="label">Years</span>
+              <span id="years-left" class="value">75</span>
+            </div>
+            <div class="stat">
+              <span class="label">Date</span>
+              <span id="date" class="value">Jan 2025</span>
+            </div>
+          </div>
+          <div id="header-controls" class="header-controls" style="display: none;">
+            <button id="next-month" class="primary-button small">Next Month</button>
+            <button id="restart-button" class="ghost-button small">Restart</button>
+            <a href="index.html" class="ghost-button small">Exit</a>
+          </div>
+          <button id="stats-info-toggle" class="ghost-button small">?</button>
+        </header>
+
+        <div id="stats-info" class="stats-info is-hidden">
+          <h2>Stats Guide</h2>
+          <div class="stats-guide-grid">
+            <div><strong>Budget</strong> - Funds available (billions USD)</div>
+            <div><strong>Income</strong> - Monthly income from climate finance + projects</div>
+            <div><strong>Temp</strong> - Global temperature anomaly (goal: below +1.0°C)</div>
+            <div><strong>CO2</strong> - Atmospheric CO2 concentration (ppm)</div>
+            <div><strong>Net CO2</strong> - Monthly CO2 change (green = reducing!)</div>
+            <div><strong>Feedback</strong> - Extra CO2 from climate feedback loops</div>
+            <div><strong>Projects</strong> - Total projects built worldwide</div>
+            <div><strong>RP</strong> - Research Points for unlocking technologies</div>
+            <div><strong>Campaigns</strong> - Active climate policy campaigns</div>
+            <div><strong>Disasters</strong> - Active natural disasters</div>
+            <div><strong>Tipping</strong> - Tipping points triggered (0-4)</div>
+            <div><strong>Years</strong> - Years until 2100 deadline</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="game-screen">
+        <div class="map-stage">
+          <div class="map-container">
+            <object
+              id="map-object"
+              type="image/svg+xml"
+              data="assets/maps/mapsvg-world-world.svg"
+              aria-label="World map"
+            ></object>
+          </div>
+        </div>
+
+        <aside class="sidebar">
+          <!-- Setup Mode Panel (shown during game setup) -->
+          <div id="setup-panel" class="setup-panel">
+            <h2>Game Setup</h2>
+            <div class="setup-step" id="setup-step-1">
+              <div class="step-header">
+                <span class="step-number">1</span>
+                <span class="step-title">Choose Map Granularity</span>
+              </div>
+              <p class="step-description">Select how detailed you want the map to be.</p>
+              <div class="granularity-buttons">
+                <button class="granularity-btn active" data-granularity="continents">
+                  <span class="btn-label">Continents</span>
+                  <span class="btn-detail">6 regions</span>
+                </button>
+                <button class="granularity-btn" data-granularity="major_regions">
+                  <span class="btn-label">Major Regions</span>
+                  <span class="btn-detail">15 regions</span>
+                </button>
+                <button class="granularity-btn" data-granularity="countries">
+                  <span class="btn-label">Countries</span>
+                  <span class="btn-detail">~250 regions</span>
+                </button>
+              </div>
+            </div>
+            <div class="setup-step" id="setup-step-2">
+              <div class="step-header">
+                <span class="step-number">2</span>
+                <span class="step-title">Select Starting Region</span>
+              </div>
+              <p class="step-description">Click on a region on the map to select it as your starting region. This region will join your Climate Alliance from the start.</p>
+              <div id="setup-selected-region" class="setup-selected-region">
+                <p class="no-selection">No region selected. Click on the map to choose.</p>
+              </div>
+            </div>
+            <div class="setup-actions">
+              <button id="confirm-setup-btn" class="primary-button" disabled>Start Game</button>
+              <a href="index.html" class="ghost-button">Back to Menu</a>
+            </div>
+          </div>
+
+          <!-- Game Mode Panel (shown during gameplay) -->
+          <div id="game-panel" class="game-panel" style="display: none;">
+            <!-- Game controls moved to header -->
+          </div>
+
+          <!-- Sidebar Tabs (visible during gameplay) -->
+          <div id="sidebar-tabs" class="sidebar-tabs" style="display: none;">
+            <button class="sidebar-tab active" data-tab="world">World</button>
+            <button class="sidebar-tab" data-tab="region">Region</button>
+          </div>
+
+          <!-- World Tab Content -->
+          <div id="world-tab-content" class="tab-content active">
+            <!-- Global Stats Card -->
+            <div id="global-stats-card" class="global-stats-card"></div>
+
+            <!-- Alliance Overview -->
+            <div id="alliance-overview" class="alliance-overview"></div>
+
+            <section id="tipping-points-panel" class="tipping-points-panel">
+              <div class="section-header-row">
+                <h2>Climate Tipping Points</h2>
+                <button class="section-info-btn" data-info-target="tipping-points-info" aria-label="Info about Tipping Points" aria-expanded="false"><span class="info-icon">i</span></button>
+              </div>
+              <div id="tipping-points-info" class="section-info-panel is-hidden">
+                <h4>Tipping Points</h4>
+                <p>Irreversible climate thresholds that permanently accelerate warming once crossed. Avoid these at all costs!</p>
+                <ul class="info-list">
+                  <li><strong>Arctic Ice (1.5°C)</strong> - Reduced reflectivity speeds warming</li>
+                  <li><strong>Permafrost (2.0°C)</strong> - Releases trapped methane</li>
+                  <li><strong>Amazon (2.5°C)</strong> - Forest dieback reduces CO2 absorption</li>
+                  <li><strong>Ocean Circulation (2.8°C)</strong> - Disrupts global weather</li>
+                </ul>
+                <p class="info-tip"><strong>Tip:</strong> Watch for yellow "Warning" status when approaching a threshold.</p>
+              </div>
+              <div id="tipping-points-list" class="tipping-points-list"></div>
+              <div id="feedback-status" class="feedback-status"></div>
+            </section>
+
+            <details class="tech-tree-panel">
+              <summary>
+                <span class="tech-tree-title">Technology Research</span>
+                <button class="section-info-btn" data-info-target="tech-research-info" aria-label="Info about Technology Research" aria-expanded="false"><span class="info-icon">i</span></button>
+                <span id="research-points-display" class="research-points">0 RP</span>
+              </summary>
+              <div id="tech-research-info" class="section-info-panel is-hidden">
+                <h4>Technology Research</h4>
+                <p>Build Research Centers to generate Research Points (RP). Spend RP to unlock permanent upgrades for your projects.</p>
+                <ul class="info-list">
+                  <li>Each Research Center generates 5 RP/month</li>
+                  <li>Upgrades improve CO2 reduction and efficiency</li>
+                  <li>Advanced techs unlock more powerful projects</li>
+                </ul>
+                <p class="info-tip"><strong>Tip:</strong> Prioritize Research Centers early for long-term benefits.</p>
+              </div>
+              <div class="tech-tree-content">
+                <p class="tech-tree-info">Build Research Centers to generate Research Points (RP) each month. Unlock technologies to improve your projects.</p>
+                <div id="tech-tree-list" class="tech-tree-list"></div>
+              </div>
+            </details>
+
+            <section id="active-events-panel" class="active-events-panel">
+              <div class="section-header-row">
+                <h2>Active Events</h2>
+                <button class="section-info-btn" data-info-target="events-info" aria-label="Info about Active Events" aria-expanded="false"><span class="info-icon">i</span></button>
+              </div>
+              <div id="events-info" class="section-info-panel is-hidden">
+                <h4>Random Events</h4>
+                <p>Climate, political, and economic events that affect your game. Events can be positive or negative and last several months.</p>
+                <ul class="info-list">
+                  <li><strong>Green border</strong> - Positive effects</li>
+                  <li><strong>Red border</strong> - Negative effects</li>
+                  <li><strong>Yellow border</strong> - Mixed/neutral</li>
+                </ul>
+                <p class="info-tip"><strong>Tip:</strong> Watch for rare Breakthrough events - they provide permanent bonuses!</p>
+              </div>
+              <div id="active-events-list" class="active-events-list"></div>
+            </section>
+
+            <section id="active-disasters-panel" class="active-disasters-panel">
+              <div class="section-header-row">
+                <h2>🌪️ Active Disasters</h2>
+                <button class="section-info-btn" data-info-target="disasters-info" aria-label="Info about Active Disasters" aria-expanded="false"><span class="info-icon">i</span></button>
+              </div>
+              <div id="disasters-info" class="section-info-panel is-hidden">
+                <h4>Natural Disasters</h4>
+                <p>Climate-related disasters that reduce regional income. Higher temperatures increase disaster frequency and severity.</p>
+                <ul class="info-list">
+                  <li><strong>Income reduction</strong> - Disasters reduce regional climate finance</li>
+                  <li><strong>Climate awareness</strong> - Affected regions become easier to campaign in</li>
+                  <li><strong>Duration</strong> - Disasters last 1-6 months</li>
+                </ul>
+                <p class="info-tip"><strong>Tip:</strong> Watch temperature - as it rises, disasters become more frequent!</p>
+              </div>
+              <div id="active-disasters-list" class="active-disasters-list"></div>
+            </section>
+
+            <details class="achievements-panel">
+              <summary>
+                <span class="achievements-title">Achievements</span>
+                <button class="section-info-btn" data-info-target="achievements-info" aria-label="Info about Achievements" aria-expanded="false"><span class="info-icon">i</span></button>
+                <span id="achievements-count" class="achievements-count">0/15</span>
+              </summary>
+              <div id="achievements-info" class="section-info-panel is-hidden">
+                <h4>Achievements</h4>
+                <p>Earn achievements by reaching milestones. 15 achievements available including build goals, victory conditions, and special challenges.</p>
+                <p class="info-tip"><strong>Tip:</strong> Achievements are tracked across sessions. Try "Against All Odds" - win on Extreme difficulty!</p>
+              </div>
+              <div class="achievements-content">
+                <div id="achievements-list" class="achievements-list"></div>
+              </div>
+            </details>
+
+            <section class="news-panel">
+              <div class="section-header-row">
+                <h2>Global Briefing</h2>
+                <button class="section-info-btn" data-info-target="news-info" aria-label="Info about Global Briefing" aria-expanded="false"><span class="info-icon">i</span></button>
+              </div>
+              <div id="news-info" class="section-info-panel is-hidden">
+                <h4>Global Briefing</h4>
+                <p>News log showing recent events, project completions, tipping point alerts, and game milestones.</p>
+                <ul class="info-list">
+                  <li><strong>Green items</strong> - Positive news</li>
+                  <li><strong>Red items</strong> - Warnings/problems</li>
+                  <li><strong>Yellow items</strong> - Neutral updates</li>
+                </ul>
+                <p class="info-tip"><strong>Tip:</strong> Scroll to see older messages. Critical warnings appear here first!</p>
+              </div>
+              <div id="news-log" class="news-log"></div>
+            </section>
+
+            <details class="history-graph-panel">
+              <summary>
+                <span class="history-graph-title">Climate History</span>
+                <button class="section-info-btn" data-info-target="history-info" aria-label="Info about Climate History" aria-expanded="false"><span class="info-icon">i</span></button>
+              </summary>
+              <div id="history-info" class="section-info-panel is-hidden">
+                <h4>Climate History</h4>
+                <p>Track your progress over time with three key metrics:</p>
+                <ul class="info-list">
+                  <li><strong>CO2:</strong> Target 350 ppm or lower for victory</li>
+                  <li><strong>Temperature:</strong> Keep below 1.5°C to avoid tipping points</li>
+                  <li><strong>Budget:</strong> Monitor your spending trends</li>
+                </ul>
+                <p class="info-tip"><strong>Tip:</strong> A downward CO2 trend means you're winning! Watch for inflection points.</p>
+              </div>
+              <div class="history-graph-content">
+                <div class="graph-tabs">
+                  <button class="graph-tab active" data-metric="co2">CO2</button>
+                  <button class="graph-tab" data-metric="temperature">Temperature</button>
+                  <button class="graph-tab" data-metric="funds">Budget</button>
+                </div>
+                <canvas id="history-graph" width="280" height="120"></canvas>
+                <div id="graph-stats" class="graph-stats"></div>
+              </div>
+            </details>
+          </div>
+
+          <!-- Region Tab Content -->
+          <div id="region-tab-content" class="tab-content">
+            <div class="region-search">
+            <div class="section-header-row">
+              <label class="map-label" for="region-search-input">Search Regions</label>
+              <button class="section-info-btn" data-info-target="region-search-info" aria-label="Info about Region Search" aria-expanded="false"><span class="info-icon">i</span></button>
+            </div>
+            <div id="region-search-info" class="section-info-panel is-hidden">
+              <h4>Region Search</h4>
+              <p>Type to find countries, continents, or major regions. Click a result to select and view that region on the map.</p>
+              <p class="info-tip"><strong>Tip:</strong> Search for high-potential regions like "Saudi Arabia" for solar or "Norway" for wind projects.</p>
+            </div>
+            <input type="text" id="region-search-input" class="region-search-input" placeholder="Type to search...">
+            <div id="region-search-results" class="region-search-results"></div>
+          </div>
+
+          <div class="map-tools">
+            <div class="section-header-row">
+              <label class="map-label" for="map-style">Granularity</label>
+              <button class="section-info-btn" data-info-target="granularity-info" aria-label="Info about Granularity" aria-expanded="false"><span class="info-icon">i</span></button>
+            </div>
+            <div id="granularity-info" class="section-info-panel is-hidden">
+              <h4>Map Granularity</h4>
+              <p>Choose how to divide the world: 6 continents, 15 major regions, or ~250 individual countries.</p>
+              <p class="info-tip"><strong>Tip:</strong> Use Countries view for precise project placement in high-potential areas.</p>
+            </div>
+            <select id="map-style" class="map-select">
+              <option value="continents" selected>Continents (6 regions)</option>
+              <option value="major_regions">Major Regions (15 regions)</option>
+              <option value="countries">Countries (~250 regions)</option>
+            </select>
+
+            <div class="section-header-row">
+              <label class="map-label" for="map-mode">Map View</label>
+              <button class="section-info-btn" data-info-target="map-view-info" aria-label="Info about Map View" aria-expanded="false"><span class="info-icon">i</span></button>
+            </div>
+            <div id="map-view-info" class="section-info-panel is-hidden">
+              <h4>Map Visualization</h4>
+              <p>Switch between views to analyze different data: Temperature (warming), Emissions (CO2 output), Renewables (project potential), Economy (GDP).</p>
+              <p class="info-tip"><strong>Tip:</strong> Use Renewables view to find the best locations for solar and wind projects.</p>
+            </div>
+            <select id="map-mode" class="map-select">
+              <option value="alliance" selected>Alliance</option>
+              <option value="alliance_happiness">Alliance Happiness</option>
+              <option value="temperature">Temperature</option>
+              <option value="emissions">Emissions</option>
+              <option value="renewables">Renewable Potential</option>
+              <option value="economy">Economy (GDP)</option>
+              <option value="power">Power Grid</option>
+              <option value="stability">Grid Stability</option>
+            </select>
+          </div>
+
+          <div id="map-legend" class="map-legend"></div>
+
+            <section class="action-panel">
+            <div class="section-header-row">
+              <h2>Region Actions</h2>
+              <button class="section-info-btn" data-info-target="region-actions-info" aria-label="Info about Region Actions" aria-expanded="false"><span class="info-icon">i</span></button>
+            </div>
+            <div id="region-actions-info" class="section-info-panel is-hidden">
+              <h4>Region Actions</h4>
+              <p>Select a region on the map to view details and build projects. Each region has unique characteristics:</p>
+              <ul class="info-list">
+                <li><strong>Emissions Breakdown:</strong> CO2 sources by sector</li>
+                <li><strong>Effectiveness:</strong> Star ratings show project potential</li>
+                <li><strong>Climate Finance:</strong> GDP and dedication levels</li>
+              </ul>
+              <p class="info-tip"><strong>Tip:</strong> Higher star ratings mean lower costs AND better results. Check the Renewables map view for ideal locations.</p>
+            </div>
+            <div id="selected-region" class="selected-region">Select a region to take action.</div>
+
+            <div id="region-income" class="region-income"></div>
+
+            <div id="power-panel" class="power-panel"></div>
+
+            <div id="emissions-breakdown" class="emissions-breakdown"></div>
+
+            <div id="effectiveness-panel" class="effectiveness-panel"></div>
+
+            <div id="project-buttons" class="project-buttons"></div>
+            <div id="region-projects" class="region-projects"></div>
+
+            <div id="region-fact" class="region-fact"></div>
+          </section>
+          </div><!-- End Region Tab Content -->
+        </aside>
+      </div>
+    </div>
+
+    <!-- Event Popup System -->
+    <div id="event-popup-container" class="popup-container hidden">
+      <div class="popup-overlay"></div>
+      <div id="event-popup" class="event-popup">
+        <div class="popup-header">
+          <span class="popup-icon"></span>
+          <h3 class="popup-title"></h3>
+        </div>
+        <div class="popup-body">
+          <p class="popup-description"></p>
+          <div class="popup-details"></div>
+        </div>
+        <button class="popup-dismiss">Continue</button>
+      </div>
+    </div>
+
+    <!-- Carbon Balance Popup -->
+    <div id="carbon-balance-popup" class="popup-container hidden">
+      <div class="popup-overlay" onclick="closeCarbonBalancePopup()"></div>
+      <div class="carbon-balance-dialog">
+        <div class="popup-header">
+          <h3 class="popup-title">Global Carbon Balance</h3>
+          <button class="popup-close" onclick="closeCarbonBalancePopup()">&times;</button>
+        </div>
+        <div class="popup-body">
+          <div class="carbon-section">
+            <h4>Emissions (Sources)</h4>
+            <div id="carbon-emissions-list" class="carbon-list"></div>
+            <div class="carbon-total" id="carbon-emissions-total"></div>
+          </div>
+          <div class="carbon-section">
+            <h4>Removals (Sinks)</h4>
+            <div id="carbon-removals-list" class="carbon-list"></div>
+            <div class="carbon-total" id="carbon-removals-total"></div>
+          </div>
+          <div class="carbon-section carbon-net">
+            <h4>Net Balance</h4>
+            <div id="carbon-net-balance" class="carbon-net-value"></div>
+            <div id="carbon-ppm-change" class="carbon-ppm"></div>
+          </div>
+        </div>
+        <button class="popup-dismiss" onclick="closeCarbonBalancePopup()">Close</button>
+      </div>
+    </div>
+
+    <script src="climate-data.js"></script>
+    <script src="game.js"></script>
+    <script>
+      // ===== SECTION INFO BUTTONS =====
+      (function() {
+        let currentOpenInfoPanel = null;
+
+        function initSectionInfoButtons() {
+          document.querySelectorAll('.section-info-btn').forEach(button => {
+            button.addEventListener('click', handleInfoButtonClick);
+          });
+          document.addEventListener('click', handleDocumentClick);
+          document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && currentOpenInfoPanel) {
+              closeInfoPanel(currentOpenInfoPanel);
+            }
+          });
+        }
+
+        function handleInfoButtonClick(event) {
+          event.preventDefault();
+          event.stopPropagation();
+          const button = event.currentTarget;
+          const targetId = button.dataset.infoTarget;
+          const panel = document.getElementById(targetId);
+          if (!panel) return;
+
+          const isOpen = !panel.classList.contains('is-hidden');
+          if (currentOpenInfoPanel && currentOpenInfoPanel !== panel) {
+            closeInfoPanel(currentOpenInfoPanel);
+          }
+          if (isOpen) {
+            closeInfoPanel(panel);
+          } else {
+            openInfoPanel(panel, button);
+          }
+        }
+
+        function openInfoPanel(panel, button) {
+          panel.classList.remove('is-hidden');
+          button.classList.add('active');
+          button.setAttribute('aria-expanded', 'true');
+          currentOpenInfoPanel = panel;
+          panel._triggerButton = button;
+        }
+
+        function closeInfoPanel(panel) {
+          panel.classList.add('is-hidden');
+          if (panel._triggerButton) {
+            panel._triggerButton.classList.remove('active');
+            panel._triggerButton.setAttribute('aria-expanded', 'false');
+          }
+          if (currentOpenInfoPanel === panel) {
+            currentOpenInfoPanel = null;
+          }
+        }
+
+        function handleDocumentClick(event) {
+          if (!currentOpenInfoPanel) return;
+          if (currentOpenInfoPanel.contains(event.target)) return;
+          if (event.target.closest('.section-info-btn')) return;
+          closeInfoPanel(currentOpenInfoPanel);
+        }
+
+        document.addEventListener('DOMContentLoaded', initSectionInfoButtons);
+      })();
+    </script>
+  </body>
+</html>

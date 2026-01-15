@@ -1,0 +1,3099 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Game Mechanics - Carbon Capture: Climate Overseer</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="rules-page">
+      <div class="rules-content">
+        <div class="rules-header">
+          <a href="index.html" class="back-link">&larr; Back to Menu</a>
+          <h1>Game Mechanics</h1>
+          <p class="rules-subtitle">Detailed breakdown of all game systems. Click any section to expand.</p>
+        </div>
+
+        <!-- Section 1: Climate Model -->
+        <details id="climate-model" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">1</span>
+            <span class="dropdown-title">Climate Model</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Temperature Calculation</h3>
+              <div class="formula-box">
+                <p class="formula-label">Global Temperature:</p>
+                <code>temperature = (CO2 - 280) &times; 0.008&deg;C</code>
+              </div>
+              <p>280 ppm is the pre-industrial CO2 baseline. Climate sensitivity is 0.008&deg;C per ppm.</p>
+              <table class="rules-table compact">
+                <thead>
+                  <tr>
+                    <th>CO2 (ppm)</th>
+                    <th>Temperature</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>405</td><td>+1.0&deg;C</td><td class="highlight-win">WIN</td></tr>
+                  <tr><td>420</td><td>+1.12&deg;C</td><td>Starting</td></tr>
+                  <tr><td>467</td><td>+1.5&deg;C</td><td>Tipping Point 1</td></tr>
+                  <tr><td>530</td><td>+2.0&deg;C</td><td>Tipping Point 2</td></tr>
+                  <tr><td>655</td><td>+3.0&deg;C</td><td class="highlight-lose">LOSE</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Monthly CO2 Change</h3>
+              <div class="formula-box">
+                <code>newCO2 = currentCO2 + baseIncrease + feedbackEffects - projectReductions</code>
+              </div>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Component</th>
+                    <th>Value</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Base Increase</td>
+                    <td>0.3-0.7 ppm/month</td>
+                    <td>Difficulty setting</td>
+                  </tr>
+                  <tr>
+                    <td>Feedback Effects</td>
+                    <td>Variable</td>
+                    <td>Tipping points + loops</td>
+                  </tr>
+                  <tr>
+                    <td>Project Reductions</td>
+                    <td>Sum of active projects</td>
+                    <td>Player actions</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Feedback Loops</h3>
+              <p>Gradual amplification effects that scale linearly from start to max. Unlike tipping points, these are <strong>not permanent</strong> — reducing temperature/CO₂ reduces the effect.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Feedback</th>
+                    <th>Starts</th>
+                    <th>Max At</th>
+                    <th>Max Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Ice-Albedo</strong></td>
+                    <td>+1.5&deg;C</td>
+                    <td>+3.0&deg;C</td>
+                    <td style="color: #e74c3c;"><strong>+0.05 ppm/month</strong></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Ocean Saturation</strong></td>
+                    <td>450 ppm</td>
+                    <td>550 ppm</td>
+                    <td style="color: #e74c3c;"><strong>+0.08 ppm/month</strong></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Vegetation Stress</strong></td>
+                    <td>+2.0&deg;C</td>
+                    <td>+3.0&deg;C</td>
+                    <td style="color: #e74c3c;"><strong>+0.04 ppm/month</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Feedback Loop Calculation</h3>
+              <p>Each feedback scales linearly between start and max:</p>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Formula:</strong> effect = maxEffect × (current − start) ÷ (max − start)</p>
+              </div>
+              <h4>Example: Ice-Albedo at +2.25&deg;C</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <ul style="margin: 0;">
+                  <li>Progress: (2.25 − 1.5) ÷ (3.0 − 1.5) = 0.75 ÷ 1.5 = <strong>0.5</strong></li>
+                  <li>Effect: 0.05 × 0.5 = <strong>+0.025 ppm/month</strong></li>
+                </ul>
+              </div>
+              <h4>Combined Maximum</h4>
+              <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="font-size: 1.1rem;">
+                  If all 3 feedbacks are at max: <strong style="color: #e74c3c;">+0.17 ppm/month</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>Regional Temperature</h3>
+              <div class="formula-box">
+                <code>regionalTemp = globalTemp &times; regionalMultiplier</code>
+              </div>
+              <p>Regional multipliers account for differential warming (e.g., Arctic warms faster).</p>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 2: Project System -->
+        <details id="projects" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">2</span>
+            <span class="dropdown-title">Project System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Project Types</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Base Cost</th>
+                    <th>CO2 Reduction</th>
+                    <th>Income</th>
+                    <th>Potential Key</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Reforestation</td><td>$5 B</td><td>-2 ppm</td><td>$0</td><td>forest</td></tr>
+                  <tr><td>Solar Farm</td><td>$10 B</td><td>-1 ppm</td><td>+$2 B</td><td>solar</td></tr>
+                  <tr><td>Wind Farm</td><td>$12 B</td><td>-1 ppm</td><td>+$2 B</td><td>wind</td></tr>
+                  <tr><td>Research Center</td><td>$15 B</td><td>0</td><td>+$3 B</td><td>N/A</td></tr>
+                  <tr><td>Offshore Wind</td><td>$30 B</td><td>-2 ppm</td><td>+$3 B</td><td>wind</td></tr>
+                  <tr><td>Carbon Capture</td><td>$35 B</td><td>-4 ppm</td><td>$0</td><td>carbonCapture</td></tr>
+                  <tr><td>Nuclear Plant</td><td>$50 B</td><td>-3 ppm</td><td>+$4 B</td><td>N/A</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Regional Effectiveness</h3>
+              <p>Each region has <code>potential</code> scores (0-1) that modify project costs and effects:</p>
+              <div class="formula-box">
+                <p class="formula-label">Adjusted Cost:</p>
+                <code>cost = baseCost &times; (2 - potentialScore)</code>
+              </div>
+              <div class="formula-box">
+                <p class="formula-label">Adjusted Effect:</p>
+                <code>effect = baseEffect &times; potentialScore</code>
+              </div>
+              <p><strong>Example:</strong> Solar in Saudi Arabia (potential 0.95):</p>
+              <ul>
+                <li>Cost: $10B &times; (2 - 0.95) = <strong>$10.5B</strong></li>
+                <li>Effect: 1 ppm &times; 0.95 = <strong>0.95 ppm reduction</strong></li>
+              </ul>
+              <p>Solar in Norway (potential 0.3):</p>
+              <ul>
+                <li>Cost: $10B &times; (2 - 0.3) = <strong>$17B</strong></li>
+                <li>Effect: 1 ppm &times; 0.3 = <strong>0.3 ppm reduction</strong></li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Technology Multipliers</h3>
+              <p>Unlocked technologies modify base project stats:</p>
+              <pre class="code-block">
+effectiveEffect = baseEffect * potentialScore * techMultiplier
+effectiveCost = baseCost * (2 - potentialScore) * techCostMultiplier
+              </pre>
+            </div>
+
+            <div class="rules-card">
+              <h3>Electrification Projects</h3>
+              <p>Electrification projects shift emissions from transport/buildings to the power grid, enabling deeper decarbonization.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Sector Reduction</th>
+                    <th>Power Demand Increase</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>EV Charging Network</td>
+                    <td>$25B</td>
+                    <td>Transport −15%</td>
+                    <td>+5%</td>
+                  </tr>
+                  <tr>
+                    <td>Heat Pump Program</td>
+                    <td>$15B</td>
+                    <td>Buildings −20%</td>
+                    <td>+8%</td>
+                  </tr>
+                  <tr>
+                    <td>Industrial Electrification</td>
+                    <td>$40B</td>
+                    <td>Industry −10%</td>
+                    <td>+10%</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p><strong>Strategy:</strong> Build clean power first (solar, wind, nuclear), then electrify to maximize emissions reduction. Electrifying with a dirty grid just shifts emissions to power generation.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Sector Reduction Progress</h3>
+              <p>When viewing a region, the emissions breakdown shows player reduction progress with a green indicator (↓X%).</p>
+              <ul>
+                <li><strong>Multiple projects stack multiplicatively</strong> — two 15% reductions = 72% remaining (0.85 × 0.85)</li>
+                <li><strong>Sector-specific floors:</strong> Power 0%, Industry/Transport 5%, Buildings 2%, Agriculture 10%</li>
+                <li>Reductions are permanent once applied</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 3: Income System -->
+        <details id="income" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">3</span>
+            <span class="dropdown-title">Income System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Monthly Income Calculation</h3>
+              <div class="formula-box">
+                <code>monthlyIncome = (GDP &times; climateDedication%) / 12</code>
+              </div>
+              <p>Each country contributes based on their GDP and climate dedication percentage.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Dedication Parameters</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Description</th>
+                    <th>Typical Range</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>currentPercent</code></td>
+                    <td>Current % of GDP dedicated</td>
+                    <td>0.5% - 3%</td>
+                  </tr>
+                  <tr>
+                    <td><code>maxPercent</code></td>
+                    <td>Maximum achievable %</td>
+                    <td>3% - 7%</td>
+                  </tr>
+                  <tr>
+                    <td><code>minPercent</code></td>
+                    <td>Minimum floor %</td>
+                    <td>0.3% - 1%</td>
+                  </tr>
+                  <tr>
+                    <td><code>difficulty</code></td>
+                    <td>Political difficulty multiplier</td>
+                    <td>0.2 - 1.0</td>
+                  </tr>
+                  <tr>
+                    <td><code>politicalResistance</code></td>
+                    <td>Campaign time multiplier</td>
+                    <td>0.2 - 1.0</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Climate Policy Campaigns</h3>
+              <p>Campaigns increase a country's <code>currentPercent</code>:</p>
+              <div class="formula-box">
+                <p class="formula-label">Campaign Cost:</p>
+                <code>cost = GDP &times; 0.5% &times; difficulty</code>
+              </div>
+              <div class="formula-box">
+                <p class="formula-label">Campaign Duration:</p>
+                <code>months = 12 &times; difficulty &times; politicalResistance</code>
+              </div>
+              <div class="formula-box">
+                <p class="formula-label">Dedication Increase:</p>
+                <code>increase = 0.3% per successful campaign</code>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>Income Sources</h3>
+              <ol>
+                <li><strong>Country Contributions:</strong> GDP &times; dedication %</li>
+                <li><strong>Project Income:</strong> Active projects (Solar, Wind, Nuclear)</li>
+                <li><strong>Event Modifiers:</strong> Can boost or reduce income temporarily</li>
+              </ol>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 4: Event System -->
+        <details id="events" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">4</span>
+            <span class="dropdown-title">Event System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Event Categories</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Examples</th>
+                    <th>Effects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Climate</td>
+                    <td>Heat Wave, Hurricane, Drought</td>
+                    <td>-10% to -20% income/effectiveness</td>
+                  </tr>
+                  <tr>
+                    <td>Political</td>
+                    <td>Climate Summit, Policy Shift</td>
+                    <td>&plusmn;15-30% campaign effectiveness</td>
+                  </tr>
+                  <tr>
+                    <td>Economic</td>
+                    <td>Recession, Economic Boom</td>
+                    <td>&plusmn;10-25% income, costs</td>
+                  </tr>
+                  <tr>
+                    <td>Breakthrough</td>
+                    <td>Solar/Battery advances</td>
+                    <td>Permanent project improvements</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Event Properties</h3>
+              <p>Each event has the following characteristics:</p>
+              <ul>
+                <li><strong>Duration:</strong> How many months the event lasts</li>
+                <li><strong>Probability:</strong> Chance of triggering each month (e.g., 5%)</li>
+                <li><strong>Effects:</strong> Income multipliers, project efficiency changes</li>
+                <li><strong>Conditions:</strong> Requirements to trigger (e.g., minimum temperature)</li>
+              </ul>
+              <p><strong>Example:</strong> A Severe Heat Wave has a 5% monthly chance above 1.5°C, lasts 3 months, reduces income by 10% and project efficiency by 15%.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Event Processing</h3>
+              <ol>
+                <li>Check if conditions are met (temperature, date, etc.)</li>
+                <li>Roll probability each month</li>
+                <li>If triggered, apply effects for duration</li>
+                <li>Decrement duration each month until 0</li>
+                <li>Remove event when expired</li>
+              </ol>
+            </div>
+
+            <div class="rules-card">
+              <h3>Natural Disasters</h3>
+              <p>Regional disasters that scale with temperature rise. As global warming increases, disasters become more frequent and severe.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Disaster</th>
+                    <th>Temp Scaling</th>
+                    <th>Income Impact</th>
+                    <th>Duration</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>🌡️ Heat Wave</td><td>High (2.5&times;)</td><td>-15%</td><td>2-3 months</td></tr>
+                  <tr><td>🌀 Hurricane</td><td>High (2.0&times;)</td><td>-25%</td><td>1-2 months</td></tr>
+                  <tr><td>🌊 Flooding</td><td>Medium (1.8&times;)</td><td>-20%</td><td>1-2 months</td></tr>
+                  <tr><td>☀️ Drought</td><td>Very High (3.0&times;)</td><td>-20%</td><td>3-6 months</td></tr>
+                  <tr><td>🔥 Wildfire</td><td>High (2.8&times;)</td><td>-15%</td><td>2-4 months</td></tr>
+                  <tr><td>❄️ Cold Snap</td><td>Low (1.2&times;)</td><td>-10%</td><td>1-2 months</td></tr>
+                  <tr><td>🌋 Volcanic Eruption</td><td>None (geological)</td><td>-20% + CO2</td><td>1-3 months</td></tr>
+                </tbody>
+              </table>
+              <p><strong>Vulnerability:</strong> Each region has different vulnerability scores (0-1) for each disaster type. Low resilience amplifies damage.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Volcanic Eruptions &amp; CO2</h3>
+              <p>Unlike climate disasters, volcanic eruptions are geological events that release CO2 directly into the atmosphere:</p>
+              <ul>
+                <li><strong>CO2 Emission:</strong> ~0.5 GT CO2 per eruption (+1.06 ppm)</li>
+                <li><strong>Not Temperature-Dependent:</strong> Random occurrence based on regional vulnerability</li>
+                <li><strong>Regions at Risk:</strong> Asia (Pacific Ring of Fire), South America (Andes), Oceania</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Alliance Effects from Disasters</h3>
+              <p>Climate disasters affect regions differently based on their alliance membership:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Region Status</th>
+                    <th>Effect</th>
+                    <th>Magnitude</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>In Alliance</strong></td>
+                    <td>Happiness Boost</td>
+                    <td>+1 to +5 (based on severity)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Not in Alliance</strong></td>
+                    <td>Interest Boost</td>
+                    <td>+2 to +10 (based on severity)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Neighboring (not in Alliance)</strong></td>
+                    <td>Interest Boost</td>
+                    <td>+1 to +5 (half of direct)</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p><strong>Rationale:</strong> Alliance members feel validated in their climate commitment after experiencing disasters. Non-members become more interested in joining as they witness climate impacts firsthand.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Disaster Awareness</h3>
+              <p>Regions that experience disasters develop increased climate awareness:</p>
+              <ul>
+                <li><strong>Awareness Boost:</strong> +3% (minor), +5% (moderate), +8% (severe)</li>
+                <li><strong>Campaign Effect:</strong> Easier climate campaigns in disaster-affected regions</li>
+                <li><strong>Awareness Decay:</strong> -1% per year if no new disasters (memory fades)</li>
+                <li><strong>Maximum Cap:</strong> 40% awareness boost</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 5: Technology Tree -->
+        <details id="technology" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">5</span>
+            <span class="dropdown-title">Technology Tree</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Research Points (RP)</h3>
+              <p>Generated by Research Centers: <strong>5 RP per month</strong> per center.</p>
+              <p>Spend RP to unlock technologies that permanently improve projects.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Technology Properties</h3>
+              <p>Each technology has:</p>
+              <ul>
+                <li><strong>Cost:</strong> Research Points (RP) required to unlock</li>
+                <li><strong>Tier:</strong> Research tier (higher tiers may require prerequisites)</li>
+                <li><strong>Effects:</strong> Multipliers applied to specific project types</li>
+                <li><strong>Prerequisites:</strong> Other technologies that must be unlocked first</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Technology List</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Technology</th>
+                    <th>Cost</th>
+                    <th>Tier</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Advanced Photovoltaics</td><td>100 RP</td><td>1</td><td>Solar: +20% CO2, +15% income</td></tr>
+                  <tr><td>Bioengineered Trees</td><td>200 RP</td><td>2</td><td>Reforestation: +30% CO2</td></tr>
+                  <tr><td>Turbine Optimization</td><td>250 RP</td><td>2</td><td>Offshore Wind: -20% cost</td></tr>
+                  <tr><td>Small Modular Reactors</td><td>500 RP</td><td>3</td><td>Nuclear: -25% cost, +20% income</td></tr>
+                  <tr><td>Green Hydrogen</td><td>750 RP</td><td>3</td><td>All renewables: +15% income</td></tr>
+                  <tr><td>Direct Air Capture</td><td>1000 RP</td><td>4</td><td>Carbon Capture: 2x CO2 reduction</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 6: Tipping Points -->
+        <details id="tipping-points" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">6</span>
+            <span class="dropdown-title">Tipping Points</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card highlight-lose">
+              <h3>Irreversible Climate Thresholds</h3>
+              <p>Once triggered, tipping points <strong>permanently</strong> add CO₂ each month. They cannot be reversed. Each tipping point is checked during the monthly update.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Tipping Point Thresholds</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Threshold</th>
+                    <th>Name</th>
+                    <th>CO₂ Effect</th>
+                    <th>Additional Effects</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #f1c40f;"><strong>+1.4&deg;C</strong></td>
+                    <td>Arctic Sea Ice Decline</td>
+                    <td style="color: #e74c3c;"><strong>+0.08 ppm/month</strong></td>
+                    <td>Reduced Earth reflectivity accelerates warming</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #e67e22;"><strong>+1.7&deg;C</strong></td>
+                    <td>Permafrost Methane Release</td>
+                    <td style="color: #e74c3c;"><strong>+0.15 ppm/month</strong></td>
+                    <td>Ancient methane stores released</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>+2.1&deg;C</strong></td>
+                    <td>Amazon Rainforest Dieback</td>
+                    <td style="color: #e74c3c;"><strong>+0.12 ppm/month</strong></td>
+                    <td>Forest projects −50%, Land sink −50%</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #c0392b;"><strong>+2.4&deg;C</strong></td>
+                    <td>Ocean Circulation Weakening</td>
+                    <td style="color: #e74c3c;"><strong>+0.18 ppm/month</strong></td>
+                    <td>Ocean absorption −30%, weather disrupted</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Cumulative Effect</h3>
+              <p>If all 4 tipping points trigger, the combined monthly CO₂ addition is:</p>
+              <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="font-size: 1.3rem; color: #e74c3c;">
+                  <strong>0.08 + 0.15 + 0.12 + 0.18 = +0.53 ppm/month</strong>
+                </div>
+                <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                  That's +6.4 ppm/year from tipping points alone!
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>How Tipping Points Are Checked</h3>
+              <ol>
+                <li>Each month, <strong>checkTippingPoints()</strong> runs during the game loop</li>
+                <li>For each tipping point not yet triggered, checks if <strong>state.temperature ≥ threshold</strong></li>
+                <li>If triggered, the tipping point ID is added to <strong>state.tippingPointsTriggered</strong></li>
+                <li>A dramatic popup warns the player</li>
+                <li>The CO₂ modifier is permanently applied each month via <strong>getTippingPointCO2Modifier()</strong></li>
+              </ol>
+            </div>
+
+            <div class="rules-card">
+              <h3>Special Effect Details</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Tipping Point</th>
+                    <th>Effect</th>
+                    <th>Mechanism</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Amazon Dieback</td>
+                    <td>Forest effectiveness −50%</td>
+                    <td><strong>getForestEffectivenessModifier()</strong> returns 0.5</td>
+                  </tr>
+                  <tr>
+                    <td>Amazon Dieback</td>
+                    <td>Land sink −50%</td>
+                    <td><strong>calculateLandAbsorption()</strong> multiplies by 0.5</td>
+                  </tr>
+                  <tr>
+                    <td>Ocean Circulation</td>
+                    <td>Ocean absorption −30%</td>
+                    <td><strong>getOceanAbsorptionModifier()</strong> returns 0.7</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 7: Alliance System -->
+        <details id="alliance-system" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">7</span>
+            <span class="dropdown-title">Alliance System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Overview</h3>
+              <p>The alliance system adds a diplomatic layer where regions must join the player's climate coalition before their resources become available. Regions have <strong>interest</strong> (non-allied) or <strong>happiness</strong> (allied) that affects negotiation success and retention.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Alliance Status Types</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Status</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Allied</td><td>Member of your climate coalition, contributes income</td></tr>
+                  <tr><td>Neutral</td><td>Not yet approached, can be invited to negotiate</td></tr>
+                  <tr><td>Negotiating</td><td>Currently in negotiation phase</td></tr>
+                  <tr><td>Hostile</td><td>Recently rejected or left, 6-month cooldown before re-approach</td></tr>
+                </tbody>
+              </table>
+              <p><strong>Cooldowns:</strong> 6 months after rejection/leaving, 3 months between negotiation attempts.</p>
+            </div>
+
+            <!-- INTEREST SYSTEM -->
+            <div class="rules-card highlight-win">
+              <h3>Interest System (Non-Allied Regions)</h3>
+              <p><strong>Interest</strong> (0-100) represents how interested a non-allied region is in joining the climate coalition. Higher interest = higher negotiation success and lower costs.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Interest Thresholds</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Interest Level</th>
+                    <th>Value</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Very High</td><td>80+</td><td>May spontaneously request to join</td></tr>
+                  <tr><td>High</td><td>60-79</td><td>Good negotiation chances</td></tr>
+                  <tr><td>Moderate</td><td>40-59</td><td>Neutral stance</td></tr>
+                  <tr><td>Low</td><td>20-39</td><td>Skeptical, higher costs</td></tr>
+                  <tr><td>Very Low</td><td>0-19</td><td>Resistant to joining</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Interest Calculation Factors</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>Effect</th>
+                    <th>Rationale</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Global Temperature</td>
+                    <td>+2 per 0.1&deg;C above 1.5&deg;C</td>
+                    <td>Climate urgency</td>
+                  </tr>
+                  <tr>
+                    <td>Alliance Size</td>
+                    <td>+1 per ally above 3</td>
+                    <td>Bandwagon effect</td>
+                  </tr>
+                  <tr>
+                    <td>Neighbor in Alliance</td>
+                    <td>+3 per allied neighbor</td>
+                    <td>Regional influence</td>
+                  </tr>
+                  <tr>
+                    <td>Player Success</td>
+                    <td>+2 if CO2 decreasing, -2 if increasing</td>
+                    <td>Credibility</td>
+                  </tr>
+                  <tr>
+                    <td>Recent Disasters</td>
+                    <td>+5 if disaster in region</td>
+                    <td>Climate awareness</td>
+                  </tr>
+                  <tr>
+                    <td>Economic Opportunity</td>
+                    <td>Based on potential GDP boost</td>
+                    <td>Self-interest</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- NEGOTIATION SYSTEM -->
+            <div class="rules-card highlight-win">
+              <h3>Negotiation System</h3>
+              <p>When negotiating with a neutral region, the player sets <strong>terms</strong> and pays a <strong>cost</strong>. Success depends on interest level and term strictness.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Negotiation Cost</h3>
+              <div class="formula-box">
+                <code>cost = GDP &times; 0.001 &times; interestMultiplier</code>
+              </div>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Interest Level</th>
+                    <th>Cost Multiplier</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Very High (80+)</td><td>0.5x (cheaper)</td></tr>
+                  <tr><td>High (60-79)</td><td>0.7x</td></tr>
+                  <tr><td>Moderate (40-59)</td><td>1.0x</td></tr>
+                  <tr><td>Low (20-39)</td><td>1.2x</td></tr>
+                  <tr><td>Very Low (&lt;20)</td><td>1.5x (expensive)</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Cooldown System</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Trigger</th>
+                    <th>Cooldown</th>
+                    <th>UI Indication</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>After approaching (any outcome)</td>
+                    <td>3 months</td>
+                    <td>Button shows "Cooldown: X mo"</td>
+                  </tr>
+                  <tr>
+                    <td>After rejection (hostile)</td>
+                    <td>6 months</td>
+                    <td>Status shows "Hostile"</td>
+                  </tr>
+                  <tr>
+                    <td>After region leaves</td>
+                    <td>6 months</td>
+                    <td>Status shows "Hostile"</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Negotiable Terms</h3>
+              <p>Player sets these terms via sliders. Higher terms = lower success chance but better compliance later.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Term</th>
+                    <th>Range</th>
+                    <th>Default</th>
+                    <th>Success Penalty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Carbon Reduction Commitment</td>
+                    <td>0.5% - 3.0% of GDP</td>
+                    <td>1.0%</td>
+                    <td>-8% per 0.5% above default</td>
+                  </tr>
+                  <tr>
+                    <td>Renewable Energy Target</td>
+                    <td>20% - 80%</td>
+                    <td>40%</td>
+                    <td>-5% per 10% above default</td>
+                  </tr>
+                  <tr>
+                    <td>CCS/DAC Requirement</td>
+                    <td>0 - 5 projects</td>
+                    <td>0</td>
+                    <td>-10% per project above 0</td>
+                  </tr>
+                  <tr>
+                    <td>Minimum Carbon Tax</td>
+                    <td>0% - 50%</td>
+                    <td>10%</td>
+                    <td>-3% per 5% above default</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Success Probability</h3>
+              <div class="formula-box">
+                <code>baseChance = interest &times; 0.8</code>
+                <br>
+                <code>termsPenalty = sum of all term impacts</code>
+                <br>
+                <code>finalChance = max(10, baseChance - termsPenalty)</code>
+              </div>
+              <p><strong>Example:</strong> Interest 70, terms at default:</p>
+              <ul>
+                <li>Base chance: 70 &times; 0.8 = <strong>56%</strong></li>
+                <li>Terms penalty: 0 (all at default)</li>
+                <li>Final chance: <strong>56%</strong></li>
+              </ul>
+            </div>
+
+            <!-- TERM COMPLIANCE -->
+            <div class="rules-card highlight-win">
+              <h3>Term Compliance System</h3>
+              <p>Each month, allied regions are checked for compliance with their accepted terms. Non-compliance reduces happiness.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Compliance Checking</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Term</th>
+                    <th>Compliance Check</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Carbon Commitment</td>
+                    <td>CO2 reduction &ge; (GDP &times; commitment%) &div; 100</td>
+                  </tr>
+                  <tr>
+                    <td>Renewable Target</td>
+                    <td>Renewable % of power &ge; target %</td>
+                  </tr>
+                  <tr>
+                    <td>CCS Requirement</td>
+                    <td>Carbon capture projects &ge; required count</td>
+                  </tr>
+                  <tr>
+                    <td>Carbon Tax</td>
+                    <td>Region carbon tax &ge; minimum %</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p><strong>Penalty:</strong> -3 happiness per month per failed term</p>
+            </div>
+
+            <!-- HAPPINESS SYSTEM -->
+            <div class="rules-card highlight-win">
+              <h3>Happiness System (Allied Regions)</h3>
+              <p><strong>Happiness</strong> (0-100) determines if allied regions stay in the coalition. Low happiness leads to regions leaving.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Happiness Thresholds</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Range</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Happy</td><td>80-100</td><td>May increase contribution</td></tr>
+                  <tr><td>Content</td><td>60-79</td><td>Stable membership</td></tr>
+                  <tr><td>Concerned</td><td>40-59</td><td>Warning messages appear</td></tr>
+                  <tr><td>Unhappy</td><td>20-39</td><td>May reduce contribution</td></tr>
+                  <tr><td>Critical</td><td>0-19</td><td>50% chance to leave per month</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Happiness Factors</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>Effect</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Loyalty Bonus</td>
+                    <td>+0.5/month after 12 months</td>
+                    <td>Reward for long membership</td>
+                  </tr>
+                  <tr>
+                    <td>Alliance Size</td>
+                    <td>+2 if 4+ allies</td>
+                    <td>"Safety in numbers"</td>
+                  </tr>
+                  <tr>
+                    <td>Home Region</td>
+                    <td>+1/month</td>
+                    <td>Extra loyalty for starting region</td>
+                  </tr>
+                  <tr>
+                    <td>High Carbon Tax</td>
+                    <td>-(tax-30) &times; 0.2 if tax &gt; 30%</td>
+                    <td>Economic burden</td>
+                  </tr>
+                  <tr>
+                    <td>Low Local Spending</td>
+                    <td>-5 if &lt; 30% spent in region</td>
+                    <td>"Not investing in us"</td>
+                  </tr>
+                  <tr>
+                    <td>Unmet Demands</td>
+                    <td>-3 per broken demand</td>
+                    <td>Promise violations</td>
+                  </tr>
+                  <tr>
+                    <td>Term Non-Compliance</td>
+                    <td>-3 per failed term</td>
+                    <td>Not meeting commitments</td>
+                  </tr>
+                  <tr>
+                    <td>Power Grid Issues</td>
+                    <td>-2 to -8 based on shortage</td>
+                    <td>Infrastructure failure</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Equal Contribution Factor (CO2/GDP)</h3>
+              <p>Regions compare their carbon intensity improvement to the alliance average. If they're "pulling more weight" than others, they become unhappy.</p>
+              <div class="formula-box">
+                <p class="formula-label">Carbon Intensity Improvement:</p>
+                <code>improvement = (baseIntensity - currentIntensity) / baseIntensity</code>
+                <br><br>
+                <p class="formula-label">Performance Ratio:</p>
+                <code>ratio = regionImprovement / allianceAvgImprovement</code>
+              </div>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Performance Ratio</th>
+                    <th>Happiness Effect</th>
+                    <th>Meaning</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>&lt; 0.5</td><td>-8/month</td><td>Way below average (slacking)</td></tr>
+                  <tr><td>0.5 - 0.8</td><td>-3/month</td><td>Below average</td></tr>
+                  <tr><td>0.8 - 1.2</td><td>0</td><td>Normal range</td></tr>
+                  <tr><td>&gt; 1.2</td><td>+3/month</td><td>Above average (carrying burden)</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Global Temperature Penalty</h3>
+              <p>As global temperature rises above 1.5&deg;C, all allied regions lose happiness (doom factor).</p>
+              <div class="formula-box">
+                <code>tempPenalty = max(0, (temperature - 1.5) &times; 5)</code>
+              </div>
+              <table class="rules-table compact">
+                <thead>
+                  <tr>
+                    <th>Temperature</th>
+                    <th>Penalty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>1.5&deg;C</td><td>0</td></tr>
+                  <tr><td>2.0&deg;C</td><td>-2.5/month</td></tr>
+                  <tr><td>2.5&deg;C</td><td>-5/month</td></tr>
+                  <tr><td>3.0&deg;C</td><td>-7.5/month</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Grievance Tracking</h3>
+              <p>Regions track specific complaints that are displayed in the UI. Common grievances include:</p>
+              <ul>
+                <li>High carbon tax rates</li>
+                <li>Low local investment percentage</li>
+                <li>Failed compliance terms (e.g., renewable targets)</li>
+                <li>Below-average CO2/GDP compared to other allies</li>
+              </ul>
+            </div>
+
+            <!-- SPONTANEOUS JOINING -->
+            <div class="rules-card highlight-win">
+              <h3>Spontaneous Joining</h3>
+              <p>Neutral regions with very high interest may spontaneously request to join the alliance.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Spontaneous Join Mechanics</h3>
+              <ul>
+                <li><strong>Trigger:</strong> Interest &ge; 80 for neutral regions</li>
+                <li><strong>Probability:</strong> 5% per month</li>
+                <li><strong>Player Choice:</strong> Accept or Decline popup</li>
+                <li><strong>If Accepted:</strong> Joins with default terms, happiness = 75</li>
+                <li><strong>If Declined:</strong> Interest -15, stays neutral</li>
+              </ul>
+            </div>
+
+            <!-- REGION LEAVING -->
+            <div class="rules-card">
+              <h3>Region Leaving</h3>
+              <p>When a region's happiness drops to critical levels (0-19), there is a 50% chance per month that they will leave the alliance. The home region can never leave.</p>
+              <p><strong>Domino Effect:</strong> When any region leaves, all remaining allies lose 15 happiness points due to coalition instability.</p>
+            </div>
+
+            <!-- INCOME & BUILDING -->
+            <div class="rules-card">
+              <h3>Income Gating</h3>
+              <p>Income is gated by alliance status:</p>
+              <ul>
+                <li><strong>Climate Finance:</strong> Only allied regions contribute GDP-based income</li>
+                <li><strong>Project Income:</strong> Only projects in allied regions generate income</li>
+                <li><strong>Contribution Modifier:</strong> Allied regions may have modified contribution rates based on their GDP contribution setting</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Project Building Restrictions</h3>
+              <p>You can only build projects in regions that are allied with you. Attempting to build in non-allied regions will be blocked.</p>
+            </div>
+
+            <!-- NEGOTIATION FLOW -->
+            <div class="rules-card">
+              <h3>Full Negotiation Flow</h3>
+              <ol class="sequence-list">
+                <li><span class="step-num">1</span><span class="step-text"><strong>Check Cooldown:</strong> Verify region is not on cooldown</span></li>
+                <li><span class="step-num">2</span><span class="step-text"><strong>Check Funds:</strong> Verify player can afford cost</span></li>
+                <li><span class="step-num">3</span><span class="step-text"><strong>Start:</strong> Sets status to NEGOTIATING, deducts cost</span></li>
+                <li><span class="step-num">4</span><span class="step-text"><strong>Set Terms:</strong> Player adjusts 4 term sliders</span></li>
+                <li><span class="step-num">5</span><span class="step-text"><strong>Generate Demands:</strong> Region creates their demand list</span></li>
+                <li><span class="step-num">6</span><span class="step-text"><strong>Submit:</strong> Roll for success based on interest and terms</span></li>
+                <li><span class="step-num">7a</span><span class="step-text"><strong>Success:</strong> Status → ALLIED, terms stored, happiness = 70</span></li>
+                <li><span class="step-num">7b</span><span class="step-text"><strong>Failure:</strong> Status → HOSTILE for 6 months</span></li>
+              </ol>
+            </div>
+
+            <!-- MONTHLY UPDATE -->
+            <div class="rules-card">
+              <h3>Monthly Alliance Update</h3>
+              <p>Each month, the alliance system processes:</p>
+              <ol>
+                <li>Check hostile cooldowns, reset to neutral if expired</li>
+                <li>Update membership duration for allied regions</li>
+                <li>Update interest for neutral regions</li>
+                <li>Update happiness for allied regions</li>
+                <li>Check term compliance for allied regions</li>
+                <li>Check equal contribution (CO2/GDP) factors</li>
+                <li>Apply global temperature penalty</li>
+                <li>Process regions that are leaving</li>
+                <li>Check for spontaneous join requests</li>
+                <li>Calculate income only from allied regions</li>
+              </ol>
+            </div>
+
+            <!-- DEMAND TYPES -->
+            <div class="rules-card">
+              <h3>Demand Types</h3>
+              <p>Regions may request various demands during negotiation:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Demand</th>
+                    <th>Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Carbon Tax Limit</td><td>Keep carbon tax below a specified percentage</td></tr>
+                  <tr><td>No Nuclear</td><td>Refrain from building nuclear projects in the region</td></tr>
+                  <tr><td>Economic Projects</td><td>Build a minimum number of economic development projects</td></tr>
+                  <tr><td>Local Spending</td><td>Spend a percentage of funds locally in the region</td></tr>
+                  <tr><td>Job Priority</td><td>Prioritize projects that create jobs</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- DIPLOMATIC DATA -->
+            <div class="rules-card">
+              <h3>Regional Diplomacy</h3>
+              <p>Each region has diplomatic characteristics:</p>
+              <ul>
+                <li><strong>Join Difficulty:</strong> How hard the region is to recruit (1-10 scale)</li>
+                <li><strong>Base Demands:</strong> Default demands the region will request</li>
+                <li><strong>Personality:</strong> Cooperative, demanding, or isolationist</li>
+              </ul>
+            </div>
+
+            <!-- ECONOMIC PROJECTS -->
+            <div class="rules-card">
+              <h3>Economic Projects</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Income</th>
+                    <th>Happiness</th>
+                    <th>Category</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>infrastructure</td><td>$30 B</td><td>+$4.5 B</td><td>+10</td><td>economic</td></tr>
+                  <tr><td>education</td><td>$22.5 B</td><td>+$3 B</td><td>+15</td><td>economic</td></tr>
+                  <tr><td>healthcare</td><td>$37.5 B</td><td>+$3 B</td><td>+20</td><td>economic</td></tr>
+                  <tr><td>trade</td><td>$15 B</td><td>+$6 B</td><td>+5</td><td>economic</td></tr>
+                  <tr><td>tourism</td><td>$18 B</td><td>+$4.5 B</td><td>+8</td><td>economic</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 8: Growth Systems -->
+        <details id="growth-systems" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">8</span>
+            <span class="dropdown-title">Growth Systems</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Overview</h3>
+              <p>Regional growth systems simulate dynamic GDP growth, emissions changes, and power demand increases over time.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>GDP Growth Rates</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Development Level</th>
+                    <th>Annual Growth</th>
+                    <th>Examples</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Developed</td><td>2%</td><td>USA, Europe, Japan</td></tr>
+                  <tr><td>Emerging</td><td>4%</td><td>China, Brazil, SE Asia</td></tr>
+                  <tr><td>Developing</td><td>5.5%</td><td>Africa, South Asia</td></tr>
+                  <tr><td>Oil Economy</td><td>2.5%</td><td>Gulf States</td></tr>
+                </tbody>
+              </table>
+              <p><strong>Climate Impact:</strong> GDP growth is penalized when temperature exceeds 1.5°C, with -10% growth rate per 0.5°C above the threshold.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Development Level Assignment</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Level</th>
+                    <th>Regions (Aggregates)</th>
+                    <th>Major Regions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><code>developed</code></td>
+                    <td>north_america, europe, oceania</td>
+                    <td>northern_europe, western_europe, southern_europe</td>
+                  </tr>
+                  <tr>
+                    <td><code>emerging</code></td>
+                    <td>asia, south_america</td>
+                    <td>east_asia, southeast_asia, eastern_europe</td>
+                  </tr>
+                  <tr>
+                    <td><code>developing</code></td>
+                    <td>africa</td>
+                    <td>north_africa, sub_saharan_africa, central_asia, south_asia, central_america_caribbean</td>
+                  </tr>
+                  <tr>
+                    <td><code>oilEconomy</code></td>
+                    <td>-</td>
+                    <td>west_asia</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Region Tracking</h3>
+              <p>Each region tracks:</p>
+              <ul>
+                <li><strong>Economy:</strong> Current GDP, starting GDP reference, annual growth rate</li>
+                <li><strong>Emissions:</strong> Current emissions, baseline emissions, monthly trend</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>GDP Growth Modifiers</h3>
+              <p>Monthly GDP growth is affected by:</p>
+              <ul>
+                <li><strong>Power Stability:</strong> Insufficient power supply reduces growth (50-100% based on supply ratio)</li>
+                <li><strong>Disasters:</strong> Active disasters reduce growth by their income impact</li>
+                <li><strong>Climate Damage:</strong> Above 1.5°C, each 0.5°C reduces growth by 10%</li>
+              </ul>
+              <p>Growth modifiers are clamped between 50% and 150% of base growth.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Emissions Calculation</h3>
+              <p>Regional emissions come from two sources:</p>
+              <ul>
+                <li><strong>Power Generation:</strong> Based on coal, gas, and other fossil capacity with different emission rates per TWh</li>
+                <li><strong>Non-Power Sectors:</strong> Scale with GDP relative to starting GDP (approximately 56% of baseline emissions)</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Growth Trends Display</h3>
+              <p>The region panel shows growth trends:</p>
+              <ul>
+                <li><strong>Demand:</strong> Annual power demand growth rate</li>
+                <li><strong>GDP:</strong> Annual GDP growth rate</li>
+                <li><strong>Emissions:</strong> Monthly emissions trend (green if decreasing, red if increasing)</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Balance Notes</h3>
+              <ul>
+                <li><strong>GDP caps:</strong> Growth modifier clamped to 50%-150% of base rate</li>
+                <li><strong>Climate damage:</strong> 10% penalty per 0.5°C above 1.5°C</li>
+                <li><strong>Power demand:</strong> Already implemented (0.5-6%/yr by region)</li>
+                <li><strong>No NPC building:</strong> Player controls all infrastructure decisions</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 9: Construction System -->
+        <details id="construction-system" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">9</span>
+            <span class="dropdown-title">Construction System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+            <div class="rules-card">
+              <h3>Overview</h3>
+              <p>Projects take realistic construction times to complete. Power projects can either add new capacity or replace existing fossil fuel capacity.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Construction Times</h3>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Construction Time</th>
+                    <th>Category</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Utility Solar Farm</td><td>9 months</td><td>Power</td><td>Quick to deploy</td></tr>
+                  <tr><td>Wind Farm (Onshore)</td><td>15 months</td><td>Power</td><td>1-2 years typical</td></tr>
+                  <tr><td>Offshore Wind</td><td>30 months</td><td>Power</td><td>Complex marine installation</td></tr>
+                  <tr><td>Nuclear Power Plant</td><td>84 months (7 years)</td><td>Power</td><td>Long regulatory and build time</td></tr>
+                  <tr><td>Natural Gas Plant</td><td>24 months</td><td>Power</td><td>Moderate complexity</td></tr>
+                  <tr><td>Coal Power Plant</td><td>48 months</td><td>Power</td><td>Large-scale construction</td></tr>
+                  <tr><td>Hydroelectric Dam</td><td>60 months (5 years)</td><td>Power</td><td>Major infrastructure project</td></tr>
+                  <tr><td>Geothermal Plant</td><td>36 months</td><td>Power</td><td>Drilling and plant construction</td></tr>
+                  <tr><td>Battery Storage</td><td>9 months</td><td>Power</td><td>Modular installation</td></tr>
+                  <tr><td>Carbon Capture Facility</td><td>30 months</td><td>Climate</td><td>Industrial scale CCS</td></tr>
+                  <tr><td>Reforestation Program</td><td>4 months</td><td>Climate</td><td>Planting phase only</td></tr>
+                  <tr><td>Research Center</td><td>18 months</td><td>Climate</td><td>Facility construction</td></tr>
+                  <tr><td>Infrastructure</td><td>24 months</td><td>Economic</td><td>Roads, utilities</td></tr>
+                  <tr><td>Education Program</td><td>12 months</td><td>Economic</td><td>Institution setup</td></tr>
+                  <tr><td>Healthcare System</td><td>18 months</td><td>Economic</td><td>Facility deployment</td></tr>
+                  <tr><td>Trade Agreement</td><td>6 months</td><td>Economic</td><td>Negotiation period</td></tr>
+                  <tr><td>Tourism Development</td><td>12 months</td><td>Economic</td><td>Infrastructure build-out</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Build Modes (Power Projects)</h3>
+              <p>When building power projects with capacity (GW), players choose between two modes:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Mode</th>
+                    <th>Description</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Add Capacity</strong></td>
+                    <td>Add new clean power to the grid</td>
+                    <td>Increases total generation capacity. Fossil plants continue operating.</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Replace Fossil</strong></td>
+                    <td>Retire coal or gas when complete</td>
+                    <td>Reduces regional emissions when construction finishes. Fossil runs until replacement is ready.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Construction Tracking</h3>
+              <p>Each project under construction tracks:</p>
+              <ul>
+                <li>Region where it's being built</li>
+                <li>Project type and effectiveness multiplier</li>
+                <li>Total construction time and time remaining</li>
+                <li>Build mode: Add new capacity or Replace fossil capacity</li>
+                <li>For replacements: the type and amount of fossil capacity being retired</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>Monthly Processing</h3>
+              <p>Each month, all projects under construction have their remaining time reduced. When construction completes, the project becomes active and starts generating effects. Regions track how much coal and gas capacity has been retired.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Emissions Impact (Replace Mode)</h3>
+              <p>When fossil capacity is retired through replacement projects, emissions are permanently reduced. Retired coal and gas capacity is tracked separately and subtracted from the region's total fossil emissions calculation.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>UI Elements</h3>
+              <ul>
+                <li><strong>Stats bar:</strong> "Building: X" shows count of projects under construction</li>
+                <li><strong>Project buttons:</strong> Show construction time (e.g., "Solar Farm ($15B, 9 mo)")</li>
+                <li><strong>Region panel:</strong> "Under Construction" section with progress bars</li>
+                <li><strong>Build dialog:</strong> For power projects, shows Add/Replace options</li>
+              </ul>
+            </div>
+          </div>
+        </details>
+
+        <!-- Section 10: Carbon Atmosphere System -->
+        <details id="carbon-atmosphere" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">10</span>
+            <span class="dropdown-title">Carbon Atmosphere System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+
+            <!-- 10.1 SYSTEM OVERVIEW -->
+            <div class="rules-card">
+              <h3>10.1 System Overview</h3>
+              <p>The Carbon Atmosphere System calculates the global carbon balance each month, determining how fast atmospheric CO₂ rises or falls. It runs automatically every game month during the <strong>nextMonth()</strong> function.</p>
+
+              <h4>Core Formula</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+                  <strong>Net Emissions</strong> = Total Emissions − Total Removals
+                </div>
+                <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">
+                  <strong>Monthly PPM Change</strong> = (Net Emissions ÷ 12) × 0.128
+                </div>
+                <div style="font-size: 0.9rem; color: #aaa;">
+                  The factor 0.128 converts Gt CO₂/year to ppm/month (~2.3 ppm per Gt annually ÷ 12)
+                </div>
+              </div>
+
+              <h4>Visual Flow</h4>
+              <div style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 1rem 0;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <div style="background: #e74c3c; padding: 0.5rem 1rem; border-radius: 4px; min-width: 100px;">
+                    <strong>EMISSIONS</strong><br>
+                    <small>6 sources</small>
+                  </div>
+                  <div style="font-size: 1.5rem;">−</div>
+                  <div style="background: #27ae60; padding: 0.5rem 1rem; border-radius: 4px; min-width: 100px;">
+                    <strong>REMOVALS</strong><br>
+                    <small>4 sinks</small>
+                  </div>
+                  <div style="font-size: 1.5rem;">=</div>
+                  <div style="background: #f39c12; padding: 0.5rem 1rem; border-radius: 4px; min-width: 100px;">
+                    <strong>NET CO₂</strong><br>
+                    <small>Gt/year</small>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #9b59b6; padding: 0.5rem 1rem; border-radius: 4px; min-width: 100px;">
+                    <strong>PPM Δ</strong><br>
+                    <small>per month</small>
+                  </div>
+                </div>
+              </div>
+
+              <h4>Execution Order (Each Month)</h4>
+              <ol>
+                <li><strong>updateAllSectorEmissions()</strong> — Updates industry, transport, buildings, agriculture for all regions</li>
+                <li><strong>calculateCarbonBalance()</strong> — Sums all emissions and removals, computes net</li>
+                <li><strong>state.co2 += ppmChange</strong> — Applies the change to atmospheric CO₂</li>
+              </ol>
+            </div>
+
+            <!-- 10.2 EMISSION SOURCES -->
+            <div class="rules-card">
+              <h3>10.2 Emission Sources (6 Categories)</h3>
+              <p>Emissions come from 6 sources. <strong>Each source is calculated separately for every region</strong>, then all regional values are summed to get the global total. Power is calculated from each region's grid; other sectors use regional baseline values that grow over time based on that region's development level.</p>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <div style="background: #3498db; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.9rem;">Region 1</div>
+                  <div>+</div>
+                  <div style="background: #3498db; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.9rem;">Region 2</div>
+                  <div>+</div>
+                  <div style="background: #3498db; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.9rem;">...</div>
+                  <div>+</div>
+                  <div style="background: #3498db; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.9rem;">Region 15</div>
+                  <div>=</div>
+                  <div style="background: #e74c3c; padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.9rem;"><strong>Global Total</strong></div>
+                </div>
+                <div style="font-size: 0.85rem; color: #aaa; margin-top: 0.5rem;">Each sector calculated per region → summed for world total</div>
+              </div>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Source</th>
+                    <th>How Calculated</th>
+                    <th>Player Control</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Power Generation</strong></td>
+                    <td>From fossil fuel TWh × emission factors (Coal: 0.9, Gas: 0.4, Oil: 0.65 kg CO₂/kWh)</td>
+                    <td>Direct — build renewables, replace fossil plants</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Industry</strong></td>
+                    <td>Baseline × growth × efficiency × reduction multiplier</td>
+                    <td>Projects (Green Steel, Cement, Hydrogen) and policies</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Transport</strong></td>
+                    <td>Baseline × growth × efficiency × reduction multiplier</td>
+                    <td>Projects (EV, Rail, Aviation Fuel) and policies</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Buildings</strong></td>
+                    <td>Baseline × growth × efficiency × reduction multiplier</td>
+                    <td>Projects (Retrofit, Heat Pumps) and policies</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Agriculture</strong></td>
+                    <td>Baseline × growth × efficiency × reduction multiplier</td>
+                    <td>Projects (Methane Capture, Agroforestry) and policies</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Embodied Carbon</strong></td>
+                    <td>Sum of (project type factor × capacity ÷ construction months) × 12</td>
+                    <td>Unavoidable during construction; disappears when complete</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Initial Global Sector Emissions (Sum of All Regions)</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sector</th>
+                    <th>Global Baseline</th>
+                    <th>Subsector Breakdown</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Industry</strong></td>
+                    <td>~5.5 Gt/year</td>
+                    <td>Cement (13%), Steel (20%), Chemicals (27%), Other (40%)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Transport</strong></td>
+                    <td>~6.5 Gt/year</td>
+                    <td>Road (72%), Aviation (14%), Shipping (9%), Rail (5%)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Buildings</strong></td>
+                    <td>~2.5 Gt/year</td>
+                    <td>Residential (64%), Commercial (36%)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Agriculture</strong></td>
+                    <td>~3.8 Gt/year</td>
+                    <td>Livestock (44%), Crops (28%), Land Use (28%)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 10.3 REGIONAL BASELINE EMISSIONS -->
+            <div class="rules-card">
+              <h3>10.3 Regional Baseline Emissions</h3>
+              <p>Each region has different starting emissions based on real-world data. Values are in <strong>Gt CO₂/year</strong>.</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Region</th>
+                    <th>Dev Level</th>
+                    <th>Industry</th>
+                    <th>Transport</th>
+                    <th>Buildings</th>
+                    <th>Agriculture</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>North America</strong></td>
+                    <td>Developed</td>
+                    <td>1.50</td>
+                    <td>2.20</td>
+                    <td>0.80</td>
+                    <td>1.00</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Europe</strong></td>
+                    <td>Developed</td>
+                    <td>1.20</td>
+                    <td>1.10</td>
+                    <td>0.70</td>
+                    <td>0.50</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Asia</strong></td>
+                    <td>Emerging</td>
+                    <td>2.00</td>
+                    <td>2.00</td>
+                    <td>0.60</td>
+                    <td>1.30</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Africa</strong></td>
+                    <td>Developing</td>
+                    <td>0.35</td>
+                    <td>0.40</td>
+                    <td>0.18</td>
+                    <td>0.55</td>
+                  </tr>
+                  <tr>
+                    <td><strong>South America</strong></td>
+                    <td>Emerging</td>
+                    <td>0.45</td>
+                    <td>0.55</td>
+                    <td>0.20</td>
+                    <td>0.80</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Oceania</strong></td>
+                    <td>Developed</td>
+                    <td>0.15</td>
+                    <td>0.12</td>
+                    <td>0.05</td>
+                    <td>0.10</td>
+                  </tr>
+                </tbody>
+              </table>
+              <p class="note"><strong>Note:</strong> Asia has the fastest absolute growth due to industrialization. Africa has the fastest relative growth rate.</p>
+            </div>
+
+            <!-- 10.4 SECTOR EMISSION CALCULATION -->
+            <div class="rules-card">
+              <h3>10.4 Sector Emission Calculation Formula</h3>
+              <p>Each month, sector emissions are recalculated using this formula:</p>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="font-size: 1.1rem;">
+                  <strong>Current Emissions</strong> = Baseline × (1 + EffectiveGrowth)<sup>years</sup> × (1 − Efficiency)<sup>years</sup> × ReductionMultiplier
+                </div>
+              </div>
+
+              <h4>Where:</h4>
+              <ul>
+                <li><strong>Baseline</strong> — Starting emission value for the sector (from climate-data.js)</li>
+                <li><strong>EffectiveGrowth</strong> — Base growth rate × development modifier (see 10.5)</li>
+                <li><strong>Efficiency</strong> — Annual efficiency improvement rate (see 10.6)</li>
+                <li><strong>Years</strong> — Time elapsed since game start (monthsElapsed ÷ 12)</li>
+                <li><strong>ReductionMultiplier</strong> — Player reductions from projects/policies (starts at 1.0)</li>
+              </ul>
+
+              <h4>Example Calculation</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p><strong>North America Industry after 5 years:</strong></p>
+                <ul style="margin: 0.5rem 0;">
+                  <li>Baseline: 1.50 Gt/year</li>
+                  <li>Base growth: 2.5%/year × 0.5 (developed) = 1.25%/year</li>
+                  <li>Efficiency: 1.5%/year (developed)</li>
+                  <li>No player projects yet: multiplier = 1.0</li>
+                </ul>
+                <p style="margin-top: 0.5rem;">
+                  <strong>Result:</strong> 1.50 × (1.0125)<sup>5</sup> × (0.985)<sup>5</sup> × 1.0 = 1.50 × 1.064 × 0.927 = <strong>1.48 Gt/year</strong>
+                </p>
+                <p style="color: #27ae60; margin: 0;">(Slight decrease because efficiency gains outpace slow growth in developed regions)</p>
+              </div>
+            </div>
+
+            <!-- 10.5 GROWTH RATES -->
+            <div class="rules-card">
+              <h3>10.5 Sector Growth Rates</h3>
+              <p>Each sector has a base annual growth rate, modified by the region's development level:</p>
+
+              <h4>Base Growth Rates</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sector</th>
+                    <th>Base Rate</th>
+                    <th>Rationale</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Industry</strong></td>
+                    <td>2.5%/year</td>
+                    <td>Manufacturing and construction demand grows with GDP</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Transport</strong></td>
+                    <td>3.0%/year</td>
+                    <td>Fastest growing sector — more cars, flights, shipping</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Buildings</strong></td>
+                    <td>2.0%/year</td>
+                    <td>Urbanization and energy demand for heating/cooling</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Agriculture</strong></td>
+                    <td>1.5%/year</td>
+                    <td>Slowest growing — food demand less elastic</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Development Level Modifiers</h4>
+              <p>The base rate is multiplied by these factors depending on region development:</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Dev Level</th>
+                    <th>Industry</th>
+                    <th>Transport</th>
+                    <th>Buildings</th>
+                    <th>Agriculture</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Developed</strong></td>
+                    <td>×0.5</td>
+                    <td>×0.6</td>
+                    <td>×0.4</td>
+                    <td>×0.3</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Emerging</strong></td>
+                    <td>×1.2</td>
+                    <td>×1.5</td>
+                    <td>×1.0</td>
+                    <td>×0.8</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Developing</strong></td>
+                    <td>×1.8</td>
+                    <td>×2.0</td>
+                    <td>×1.5</td>
+                    <td>×1.0</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Oil Economy</strong></td>
+                    <td>×1.0</td>
+                    <td>×1.2</td>
+                    <td>×0.8</td>
+                    <td>×0.5</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Effective Growth Rate Examples</h4>
+              <ul>
+                <li><strong>Africa Transport:</strong> 3.0% × 2.0 = <strong>6.0%/year</strong> (rapid motorization)</li>
+                <li><strong>Europe Industry:</strong> 2.5% × 0.5 = <strong>1.25%/year</strong> (mature economy)</li>
+                <li><strong>Asia Transport:</strong> 3.0% × 1.5 = <strong>4.5%/year</strong> (car boom)</li>
+              </ul>
+            </div>
+
+            <!-- 10.6 EFFICIENCY IMPROVEMENTS -->
+            <div class="rules-card">
+              <h3>10.6 Automatic Efficiency Improvements</h3>
+              <p>All regions automatically reduce carbon intensity over time (emissions per unit of economic activity). This represents technological progress without player intervention.</p>
+
+              <table>
+                <thead>
+                  <tr>
+                    <th>Development Level</th>
+                    <th>Regions</th>
+                    <th>Annual Rate</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Developed</strong></td>
+                    <td>North America, Europe, Oceania</td>
+                    <td>1.5%/year</td>
+                    <td>Emissions × 0.985 each year</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Emerging</strong></td>
+                    <td>Asia, South America</td>
+                    <td>2.0%/year</td>
+                    <td>Emissions × 0.98 each year</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Developing</strong></td>
+                    <td>Africa</td>
+                    <td>2.5%/year</td>
+                    <td>Emissions × 0.975 each year</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Oil Economy</strong></td>
+                    <td>Middle East (subset)</td>
+                    <td>1.0%/year</td>
+                    <td>Emissions × 0.99 each year</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Net Growth vs Net Decline</h4>
+              <p>Whether emissions grow or shrink depends on if growth outpaces efficiency:</p>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem;">
+                  <strong style="color: #e74c3c;">EMISSIONS GROW</strong>
+                  <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">When effective growth &gt; efficiency</p>
+                  <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;"><em>Example: Africa Transport</em><br>Growth 6% &gt; Efficiency 2.5%<br>Net: +3.5%/year</p>
+                </div>
+                <div style="background: rgba(39, 174, 96, 0.2); border: 1px solid #27ae60; border-radius: 8px; padding: 1rem;">
+                  <strong style="color: #27ae60;">EMISSIONS SHRINK</strong>
+                  <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">When efficiency &gt; effective growth</p>
+                  <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;"><em>Example: Europe Agriculture</em><br>Growth 0.45% &lt; Efficiency 1.5%<br>Net: −1.05%/year</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 10.7 CARBON REMOVAL SINKS -->
+            <div class="rules-card">
+              <h3>10.7 Carbon Removal Sinks</h3>
+              <p>Four sinks remove CO₂ from the atmosphere. Natural sinks have saturation effects that reduce their effectiveness under climate stress.</p>
+
+              <h4>Sink Overview</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Sink</th>
+                    <th>Base Rate</th>
+                    <th>Minimum</th>
+                    <th>Controlled By</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Ocean Absorption</strong></td>
+                    <td>10.0 Gt/year</td>
+                    <td>5.0 Gt (50%)</td>
+                    <td>CO₂ level and temperature</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Natural Land</strong></td>
+                    <td>3.5 Gt/year</td>
+                    <td>1.05 Gt (30%)</td>
+                    <td>Temperature and Amazon tipping point</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Player Forests</strong></td>
+                    <td>Variable</td>
+                    <td>0</td>
+                    <td>Reforestation projects built</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Player CCS/DAC</strong></td>
+                    <td>Variable</td>
+                    <td>0</td>
+                    <td>Carbon capture projects built</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 10.8 OCEAN SINK SATURATION -->
+            <div class="rules-card">
+              <h3>10.8 Ocean Sink Saturation Mechanics</h3>
+              <p>Ocean absorption decreases as CO₂ and temperature rise. Two penalties stack multiplicatively.</p>
+
+              <h4>CO₂ Saturation Penalty</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <ul style="margin: 0;">
+                  <li><strong>Threshold:</strong> 450 ppm</li>
+                  <li><strong>Penalty:</strong> −2% effectiveness per 10 ppm above threshold</li>
+                  <li><strong>Floor:</strong> Cannot drop below 50% effectiveness</li>
+                </ul>
+                <p style="margin: 1rem 0 0 0;"><strong>Formula:</strong> If CO₂ &gt; 450: penalty = ((CO₂ − 450) ÷ 10) × 0.02</p>
+              </div>
+
+              <h4>Temperature Penalty</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <ul style="margin: 0;">
+                  <li><strong>Threshold:</strong> 1.5°C above pre-industrial</li>
+                  <li><strong>Penalty:</strong> −5% effectiveness per 0.5°C above threshold</li>
+                  <li><strong>Floor:</strong> Cannot drop below 60% from temperature alone</li>
+                </ul>
+                <p style="margin: 1rem 0 0 0;"><strong>Formula:</strong> If temp &gt; 1.5: penalty = ((temp − 1.5) ÷ 0.5) × 0.05</p>
+              </div>
+
+              <h4>Example Calculation</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p><strong>At 500 ppm and 2.5°C:</strong></p>
+                <ul>
+                  <li>CO₂ penalty: (500−450)÷10 × 0.02 = 0.10 (10% reduction)</li>
+                  <li>Temp penalty: (2.5−1.5)÷0.5 × 0.05 = 0.20 (20% reduction)</li>
+                  <li>Combined: 10.0 × (1−0.10) × (1−0.20) = 10.0 × 0.90 × 0.80 = <strong>7.2 Gt/year</strong></li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- 10.9 LAND SINK SATURATION -->
+            <div class="rules-card">
+              <h3>10.9 Land Sink Saturation Mechanics</h3>
+              <p>Land sinks (forests, vegetation) become stressed at high CO₂ and temperatures, and can collapse if Amazon tips.</p>
+
+              <h4>CO₂ Saturation Penalty</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <ul style="margin: 0;">
+                  <li><strong>Threshold:</strong> 500 ppm (higher than ocean's 450 ppm)</li>
+                  <li><strong>Penalty:</strong> −1.5% effectiveness per 10 ppm above threshold</li>
+                  <li><strong>Floor:</strong> Cannot drop below 50% effectiveness from CO₂ alone</li>
+                </ul>
+                <p style="margin: 1rem 0 0 0;"><strong>Formula:</strong> If CO₂ &gt; 500: penalty = ((CO₂ − 500) ÷ 10) × 0.015</p>
+              </div>
+
+              <h4>Temperature Stress Penalty</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <ul style="margin: 0;">
+                  <li><strong>Threshold:</strong> 2.0°C above pre-industrial</li>
+                  <li><strong>Penalty:</strong> −10% effectiveness per 0.5°C above threshold</li>
+                  <li><strong>Floor:</strong> Cannot drop below 30% effectiveness</li>
+                </ul>
+                <p style="margin: 1rem 0 0 0;"><strong>Formula:</strong> If temp &gt; 2.0: penalty = ((temp − 2.0) ÷ 0.5) × 0.10</p>
+              </div>
+
+              <h4>Amazon Dieback Penalty</h4>
+              <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>If Amazon tipping point triggered:</strong> −50% to land sink effectiveness</p>
+                <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem;">This is applied after temperature stress, so combined effects can be severe.</p>
+              </div>
+
+              <h4>Example Calculation</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p><strong>At 3.0°C with Amazon intact:</strong></p>
+                <ul>
+                  <li>Temp penalty: (3.0−2.0)÷0.5 × 0.10 = 0.20 (20% reduction)</li>
+                  <li>Result: 3.5 × (1−0.20) = <strong>2.8 Gt/year</strong></li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>At 3.0°C with Amazon collapsed:</strong></p>
+                <ul>
+                  <li>Temp penalty: 20% reduction</li>
+                  <li>Amazon penalty: 50% reduction</li>
+                  <li>Result: 3.5 × 0.80 × 0.50 = <strong>1.4 Gt/year</strong></li>
+                </ul>
+              </div>
+            </div>
+
+            <!-- 10.10 PLAYER REDUCTION MULTIPLIER -->
+            <div class="rules-card">
+              <h3>10.10 Player Reduction Multiplier</h3>
+              <p>When players build sector projects, they reduce emissions via a <strong>reductionMultiplier</strong> stored on each sector. Multiple reductions stack multiplicatively.</p>
+
+              <h4>Stacking Formula</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="font-size: 1.1rem;">
+                  <strong>New Multiplier</strong> = Current Multiplier × (1 − Project Reduction)
+                </div>
+              </div>
+
+              <h4>Example: Building Two Projects</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <ol>
+                  <li><strong>Start:</strong> Steel subsector multiplier = 1.0 (100% emissions)</li>
+                  <li><strong>Build Green Steel (15% reduction):</strong> 1.0 × (1 − 0.15) = <strong>0.85</strong></li>
+                  <li><strong>Build another (15% reduction):</strong> 0.85 × (1 − 0.15) = <strong>0.7225</strong></li>
+                </ol>
+                <p style="margin: 1rem 0 0 0;"><strong>Total reduction:</strong> 27.75% (not 30% from simple addition)</p>
+              </div>
+
+              <h4>Why Multiplicative?</h4>
+              <p>This prevents players from achieving 100%+ reductions and models diminishing returns — the first reduction is easiest, subsequent ones harder.</p>
+            </div>
+
+            <!-- 10.11 SECTOR PROJECTS -->
+            <div class="rules-card">
+              <h3>10.11 Sector Reduction Projects</h3>
+              <p>Projects reduce emissions in specific subsectors. Values are from the actual game implementation.</p>
+
+              <h4>Industry Sector Projects</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Build Time</th>
+                    <th>Subsector</th>
+                    <th>Reduction</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Green Steel Plant</strong></td>
+                    <td>$350B RP</td>
+                    <td>36 months</td>
+                    <td>Steel</td>
+                    <td>−15%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Low-Carbon Cement</strong></td>
+                    <td>$250B RP</td>
+                    <td>24 months</td>
+                    <td>Cement</td>
+                    <td>−12%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Industrial Efficiency</strong></td>
+                    <td>$180B RP</td>
+                    <td>12 months</td>
+                    <td>Other, Chemicals</td>
+                    <td>−8%, −5%</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Transport Sector Projects</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Build Time</th>
+                    <th>Subsector</th>
+                    <th>Reduction</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Metro/Rail Expansion</strong></td>
+                    <td>$450B RP</td>
+                    <td>48 months</td>
+                    <td>Road</td>
+                    <td>−8%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Sustainable Aviation Fuel</strong></td>
+                    <td>$280B RP</td>
+                    <td>24 months</td>
+                    <td>Aviation</td>
+                    <td>−15%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Electric Freight</strong></td>
+                    <td>$320B RP</td>
+                    <td>30 months</td>
+                    <td>Road</td>
+                    <td>−10%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Green Shipping Hub</strong></td>
+                    <td>$380B RP</td>
+                    <td>36 months</td>
+                    <td>Shipping</td>
+                    <td>−12%</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Buildings Sector Projects</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Build Time</th>
+                    <th>Subsector</th>
+                    <th>Reduction</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Building Retrofit Program</strong></td>
+                    <td>$200B RP</td>
+                    <td>18 months</td>
+                    <td>Residential, Commercial</td>
+                    <td>−10%, −8%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Heat Pump Rollout</strong></td>
+                    <td>$150B RP</td>
+                    <td>12 months</td>
+                    <td>Residential</td>
+                    <td>−12%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Green Building Standards</strong></td>
+                    <td>$220B RP</td>
+                    <td>18 months</td>
+                    <td>Commercial</td>
+                    <td>−15%</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Agriculture Sector Projects</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Cost</th>
+                    <th>Build Time</th>
+                    <th>Subsector</th>
+                    <th>Reduction</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Livestock Methane Capture</strong></td>
+                    <td>$120B RP</td>
+                    <td>9 months</td>
+                    <td>Livestock</td>
+                    <td>−15%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Precision Agriculture</strong></td>
+                    <td>$140B RP</td>
+                    <td>12 months</td>
+                    <td>Crops</td>
+                    <td>−12%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Agroforestry Program</strong></td>
+                    <td>$160B RP</td>
+                    <td>24 months</td>
+                    <td>Land Use, Crops</td>
+                    <td>−20%, −5%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 10.12 EMBODIED CARBON -->
+            <div class="rules-card">
+              <h3>10.12 Embodied Carbon</h3>
+              <p>Building clean energy infrastructure creates temporary emissions from manufacturing materials, mining, and construction. These emissions are spread across the construction period.</p>
+
+              <h4>Embodied Carbon Factors (Per GW of Capacity)</h4>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Technology</th>
+                    <th>Factor</th>
+                    <th>Real-World Basis</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Solar PV</strong></td>
+                    <td>1.5 Mt CO₂/GW</td>
+                    <td>Silicon refining, panel manufacturing</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Onshore Wind</strong></td>
+                    <td>0.8 Mt CO₂/GW</td>
+                    <td>Steel tower, concrete foundation</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Offshore Wind</strong></td>
+                    <td>1.0 Mt CO₂/GW</td>
+                    <td>More steel, underwater cables</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Nuclear</strong></td>
+                    <td>2.0 Mt CO₂/GW</td>
+                    <td>Massive concrete and steel requirements</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Hydropower</strong></td>
+                    <td>3.0 Mt CO₂/GW</td>
+                    <td>Dam construction (cement-intensive)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Geothermal</strong></td>
+                    <td>1.2 Mt CO₂/GW</td>
+                    <td>Drilling and piping</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Battery Storage</strong></td>
+                    <td>50 kt CO₂/GWh</td>
+                    <td>Lithium mining, cell manufacturing</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Calculation Method</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p><strong>Monthly Embodied Rate</strong> = (Factor × Capacity) ÷ Total Construction Months × 12</p>
+                <p style="margin-top: 0.5rem;"><em>Example: 10 GW solar over 18 months</em></p>
+                <ul>
+                  <li>Total embodied: 1.5 Mt × 10 = 15 Mt = 0.015 Gt</li>
+                  <li>Monthly: 0.015 ÷ 18 = 0.00083 Gt/month</li>
+                  <li>Annualized: 0.00083 × 12 = <strong>0.01 Gt/year</strong> added to emissions during construction</li>
+                </ul>
+              </div>
+              <p class="note"><strong>Important:</strong> Embodied carbon disappears completely when construction finishes. It's a temporary penalty for building clean infrastructure.</p>
+            </div>
+
+            <!-- 10.13 PPM CONVERSION -->
+            <div class="rules-card">
+              <h3>10.13 Gt CO₂ to PPM Conversion</h3>
+              <p>The final step converts net emissions (Gt CO₂/year) to monthly atmospheric PPM change.</p>
+
+              <h4>Conversion Factor</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <div style="font-size: 1.1rem;">
+                  <strong>EMISSIONS_TO_PPM_FACTOR</strong> = 0.128
+                </div>
+                <p style="margin: 0.5rem 0 0 0; color: #aaa;">Based on ~2.3 ppm per Gt CO₂ annually, divided by 12 months</p>
+              </div>
+
+              <h4>Formula</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p><strong>Monthly PPM Change</strong> = (Net Emissions Gt/year ÷ 12) × 0.128</p>
+              </div>
+
+              <h4>Example</h4>
+              <ul>
+                <li>Net emissions: 28 Gt/year</li>
+                <li>Monthly: 28 ÷ 12 = 2.33 Gt/month</li>
+                <li>PPM change: 2.33 × 0.128 = <strong>+0.30 ppm/month</strong></li>
+                <li>Annual: +3.6 ppm/year</li>
+              </ul>
+
+              <h4>Real-World Comparison</h4>
+              <p>Current real-world CO₂ increase is about 2.5 ppm/year. The game starts higher due to continued fossil fuel use, but player actions can reduce this toward zero or even negative.</p>
+            </div>
+
+            <!-- 10.14 UI: CARBON BALANCE POPUP -->
+            <div class="rules-card">
+              <h3>10.14 UI: Carbon Balance Popup</h3>
+              <p>Click the <strong>Net CO₂</strong> stat in the top bar to open the Carbon Balance popup.</p>
+
+              <h4>Popup Structure</h4>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+                <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem;">
+                  <strong style="color: #e74c3c;">EMISSIONS (Gt/year)</strong>
+                  <ul style="margin: 0.5rem 0 0 0; padding-left: 1.2rem; font-size: 0.9rem;">
+                    <li><strong>⬛ Coal Power</strong> — ~1000g CO₂/kWh (highest emitter)</li>
+                    <li><strong>🔥 Gas Power</strong> — ~450g CO₂/kWh (transition fuel)</li>
+                    <li>Industry — cement, steel, chemicals, other</li>
+                    <li>Transport — road, aviation, shipping, rail</li>
+                    <li>Buildings — residential, commercial</li>
+                    <li>Agriculture — livestock, crops, land use</li>
+                    <li>Embodied — from construction projects</li>
+                  </ul>
+                </div>
+                <div style="background: rgba(39, 174, 96, 0.2); border: 1px solid #27ae60; border-radius: 8px; padding: 1rem;">
+                  <strong style="color: #27ae60;">REMOVALS (Gt/year)</strong>
+                  <ul style="margin: 0.5rem 0 0 0; padding-left: 1.2rem; font-size: 0.9rem;">
+                    <li>Ocean Absorption — with saturation status</li>
+                    <li>Natural Land — forests, vegetation</li>
+                    <li>Your Forests — reforestation projects</li>
+                    <li>Your CCS/DAC — carbon capture projects</li>
+                  </ul>
+                </div>
+              </div>
+
+              <h4>Bottom Summary</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0; text-align: center;">
+                <strong>NET: +XX.X Gt/year → +X.XX ppm/month</strong>
+              </div>
+              <p>The popup updates automatically each month when <strong>updateUI()</strong> is called.</p>
+            </div>
+
+            <!-- 10.15 KEY FILES -->
+            <div class="rules-card">
+              <h3>10.15 Key Files and Functions</h3>
+              <table>
+                <thead>
+                  <tr>
+                    <th>File</th>
+                    <th>Key Elements</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>game.js</strong></td>
+                    <td>
+                      Constants: SECTOR_GROWTH_RATES, DEVELOPMENT_GROWTH_MODIFIERS, EFFICIENCY_IMPROVEMENT, NATURAL_SINK_CONFIG, EMBODIED_CARBON, EMISSIONS_TO_PPM_FACTOR<br>
+                      Functions: initializeSectorEmissions(), updateSectorEmissions(), updateAllSectorEmissions(), calculateOceanAbsorption(), calculateLandAbsorption(), getOceanAbsorptionModifier(), getForestEffectivenessModifier(), getOceanSaturationLevel(), getLandSaturationLevel(), calculatePlayerForestRemoval(), calculatePlayerCCSRemoval(), calculateEmbodiedCarbon(), calculateGlobalPowerEmissions(), calculateCarbonBalance(), getCarbonBalance(), applySectorReduction(), getSectorReductionMultiplier()
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>climate-data.js</strong></td>
+                    <td>
+                      Regional sectorEmissions baselines (per region)<br>
+                      Sector projects with sectorReduction properties<br>
+                      SECTOR_POLICIES definitions
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>game.html</strong></td>
+                    <td>
+                      Carbon balance popup container (#carbon-balance-popup)<br>
+                      Emissions and removals section divs
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>style.css</strong></td>
+                    <td>
+                      .carbon-balance-dialog styling<br>
+                      .stat-clickable for Net CO₂ hover effect
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </details>
+
+        <!-- Section 11: Power Grid System -->
+        <details id="power-grid" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">11</span>
+            <span class="dropdown-title">Power Grid System</span>
+          </summary>
+          <div class="rules-dropdown-content">
+
+            <div class="rules-card">
+              <h3>11.1 Overview</h3>
+              <p>Each region has a power grid with supply, demand, stability, and pricing. Power issues affect regional GDP and happiness. The system is updated each month.</p>
+              <div style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 1rem 0;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                  <div style="background: #3498db; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Demand</strong><br><small>GW needed</small>
+                  </div>
+                  <div style="font-size: 1.5rem;">vs</div>
+                  <div style="background: #27ae60; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Supply</strong><br><small>GW available</small>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #f39c12; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Stability</strong><br><small>0-100 scale</small>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #9b59b6; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Price</strong><br><small>$/kWh</small>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>11.2 Power Demand</h3>
+              <p>Each region has a base demand in GW that grows over time based on GDP growth.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Base Demand</strong></td>
+                    <td>From climate data (region-specific GW)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Annual Growth</strong></td>
+                    <td>~2% per year (linked to GDP growth)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Seasonal Variation</strong></td>
+                    <td>+10% in peak months (Jan-Feb, Jul-Aug for northern; Jun-Jul, Dec-Jan for southern)</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>11.3 Power Supply</h3>
+              <p>Supply comes from existing infrastructure plus player-built projects. Split into categories:</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Category</th>
+                    <th>Sources</th>
+                    <th>Grid Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>Variable</strong></td>
+                    <td>Solar, Wind, Offshore Wind</td>
+                    <td>Causes instability above 30%</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #27ae60;"><strong>Baseload</strong></td>
+                    <td>Nuclear, Hydro, Coal, Gas, Geothermal</td>
+                    <td>Adds stability bonus</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #3498db;"><strong>Storage</strong></td>
+                    <td>Battery Storage, Pumped Hydro</td>
+                    <td>Mitigates variable instability</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>11.4 Grid Stability Calculation</h3>
+              <p>Stability is a 0-100 scale calculated each month based on grid composition.</p>
+
+              <h4>Stability Thresholds</h4>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Range</th>
+                    <th>Status</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>0-30</strong></td>
+                    <td>Critical</td>
+                    <td>Blackout risk, major GDP/happiness penalty</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f39c12;"><strong>30-50</strong></td>
+                    <td>Warning</td>
+                    <td>Unstable, moderate penalties</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f1c40f;"><strong>50-70</strong></td>
+                    <td>Acceptable</td>
+                    <td>No major issues</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #27ae60;"><strong>70-90</strong></td>
+                    <td>Good</td>
+                    <td>Stable grid</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #2ecc71;"><strong>90-100</strong></td>
+                    <td>Excellent</td>
+                    <td>Happiness bonus</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Stability Formula</h4>
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Base:</strong> 100</p>
+                <p style="margin: 0.5rem 0; color: #e74c3c;"><strong>Variable Penalty:</strong> Subtract variableShare × 60 (linear scale, no threshold)</p>
+                <p style="margin: 0.5rem 0; color: #27ae60;"><strong>Storage Mitigation:</strong> Add min(storageRatio × 40, variableShare × 80)</p>
+                <p style="margin: 0.5rem 0; color: #3498db;"><strong>Baseload Bonus:</strong> Add baseloadShare × 25</p>
+                <p style="margin: 0.5rem 0; color: #e74c3c;"><strong>Shortfall Penalty:</strong> If supply &lt; demand, subtract shortfallRatio × 40</p>
+              </div>
+
+              <h4>Example Calculations</h4>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Scenario</th>
+                    <th>Stability</th>
+                    <th>Notes</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>100% baseload (nuclear/hydro)</td>
+                    <td style="color: #2ecc71;"><strong>100</strong></td>
+                    <td>Traditional grid, very stable</td>
+                  </tr>
+                  <tr>
+                    <td>70% variable, 30% baseload, no storage</td>
+                    <td style="color: #f1c40f;"><strong>65</strong></td>
+                    <td>Acceptable, but needs attention</td>
+                  </tr>
+                  <tr>
+                    <td>70% variable + good storage (0.8 ratio)</td>
+                    <td style="color: #2ecc71;"><strong>95</strong></td>
+                    <td>Excellent with storage investment</td>
+                  </tr>
+                  <tr>
+                    <td>100% variable + massive storage (2.0 ratio)</td>
+                    <td style="color: #2ecc71;"><strong>100</strong></td>
+                    <td>Achievable green grid!</td>
+                  </tr>
+                  <tr>
+                    <td>100% variable, no storage</td>
+                    <td style="color: #f39c12;"><strong>40</strong></td>
+                    <td>Warning - needs storage!</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="background: rgba(39, 174, 96, 0.2); border: 1px solid #27ae60; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Key Insight:</strong> 100% renewable grids ARE achievable with sufficient energy storage investment!</p>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>11.5 Electricity Pricing</h3>
+              <p>Price is determined based on supply/demand balance.</p>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Price Range</th>
+                    <th>Status</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #27ae60;"><strong>&lt; $0.08/kWh</strong></td>
+                    <td>Cheap</td>
+                    <td>Happiness bonus if supply &gt; 120%</td>
+                  </tr>
+                  <tr>
+                    <td><strong>$0.12/kWh</strong></td>
+                    <td>Normal (Base)</td>
+                    <td>No effect</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f39c12;"><strong>&gt; $0.20/kWh</strong></td>
+                    <td>Expensive</td>
+                    <td>Happiness penalty starts</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>&gt; $0.30/kWh</strong></td>
+                    <td>Crisis</td>
+                    <td>Major GDP impact</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Price Modifiers</h4>
+              <ul>
+                <li><strong>Shortage:</strong> Price increases exponentially when supply &lt; demand</li>
+                <li><strong>Surplus:</strong> Price decreases when supply &gt; 120% of demand</li>
+                <li><strong>Instability:</strong> Low stability increases prices</li>
+                <li><strong>Renewable Bonus:</strong> High renewable share reduces price by up to 15%</li>
+              </ul>
+            </div>
+
+            <div class="rules-card">
+              <h3>11.6 GDP Impact from Power</h3>
+              <p>Power issues directly affect regional income.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Issue</th>
+                    <th>GDP Penalty</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Supply Shortfall</strong></td>
+                    <td>Up to −50% (proportional to shortfall)</td>
+                  </tr>
+                  <tr>
+                    <td><strong>High Price (&gt;$0.15/kWh)</strong></td>
+                    <td>−10% per $0.10 above threshold</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Grid Instability</strong></td>
+                    <td>Up to −30% (proportional to instability)</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>GDP Modifier Floor:</strong> Cannot drop below 0.5 (50% of normal income)</p>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>11.7 Happiness Impact from Power</h3>
+              <p>Power quality affects regional happiness. Stability reflects both grid reliability and price volatility from variable renewables.</p>
+
+              <h4>Stability-Based Happiness</h4>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Stability</th>
+                    <th>Status</th>
+                    <th>Happiness</th>
+                    <th>Reason</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #2ecc71;"><strong>90-100</strong></td>
+                    <td>Excellent</td>
+                    <td style="color: #27ae60;"><strong>+2</strong></td>
+                    <td>Business confidence, reliable power</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #27ae60;"><strong>70-89</strong></td>
+                    <td>Good</td>
+                    <td>0</td>
+                    <td>Normal operations</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f1c40f;"><strong>50-69</strong></td>
+                    <td>Acceptable</td>
+                    <td style="color: #e74c3c;">−2</td>
+                    <td>Some price spikes, minor complaints</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f39c12;"><strong>30-49</strong></td>
+                    <td>Warning</td>
+                    <td style="color: #e74c3c;"><strong>−5</strong></td>
+                    <td>Frequent issues, business uncertainty</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>0-29</strong></td>
+                    <td>Critical</td>
+                    <td style="color: #e74c3c;"><strong>−10</strong></td>
+                    <td>Blackout risk, businesses leaving</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <h4>Other Factors</h4>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Condition</th>
+                    <th>Happiness Change</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>High prices (&gt;$0.20/kWh)</td>
+                    <td style="color: #e74c3c;">Up to −10</td>
+                  </tr>
+                  <tr>
+                    <td>Supply shortfall (&lt;90% of demand)</td>
+                    <td style="color: #e74c3c;">Proportional penalty</td>
+                  </tr>
+                  <tr>
+                    <td>Abundant cheap power (supply &gt;120%, price &lt;$0.08)</td>
+                    <td style="color: #27ae60;"><strong>+5</strong></td>
+                  </tr>
+                  <tr>
+                    <td>Majority renewable (&gt;50% variable)</td>
+                    <td style="color: #27ae60;"><strong>+3</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </details>
+
+        <!-- Section 12: Climate Economic Impact -->
+        <details id="climate-economy" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">12</span>
+            <span class="dropdown-title">Climate Economic Impact</span>
+          </summary>
+          <div class="rules-dropdown-content">
+
+            <div class="rules-card">
+              <h3>12.1 Overview</h3>
+              <p>As global temperature rises, economies are damaged. This affects regional GDP growth rates, reducing income over time.</p>
+              <div style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 1rem 0;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                  <div style="background: #e74c3c; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>+Temperature</strong>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #f39c12; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>−GDP Growth</strong>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #9b59b6; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>−Income</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>12.2 Climate GDP Penalty</h3>
+              <p>Regional GDP growth is reduced when global temperature exceeds +1.5°C.</p>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Threshold:</strong> +1.5°C above pre-industrial</p>
+                <p style="margin: 0.5rem 0;"><strong>Penalty Rate:</strong> −10% GDP growth per °C above threshold</p>
+                <p style="margin: 0;"><strong>Formula:</strong> GDP modifier = 1 − ((temperature − 1.5) × 0.1)</p>
+              </div>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Temperature</th>
+                    <th>GDP Growth Penalty</th>
+                    <th>Example Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #27ae60;"><strong>≤ +1.5°C</strong></td>
+                    <td>None</td>
+                    <td>Full growth rate</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f1c40f;"><strong>+2.0°C</strong></td>
+                    <td>−5%</td>
+                    <td>3% growth → 2.85% growth</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f39c12;"><strong>+2.5°C</strong></td>
+                    <td>−10%</td>
+                    <td>3% growth → 2.7% growth</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>+3.0°C</strong></td>
+                    <td>−15%</td>
+                    <td>3% growth → 2.55% growth</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>12.3 Compounding Effect</h3>
+              <p>The GDP penalty applies to <strong>growth rate</strong>, not absolute GDP. Over time, reduced growth compounds:</p>
+
+              <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <h4 style="margin-top: 0;">Example: 30 Years at +2.5°C (10% growth penalty)</h4>
+                <ul style="margin-bottom: 0;">
+                  <li><strong>Without penalty:</strong> $10T → $10T × 1.03³⁰ = $24.3T</li>
+                  <li><strong>With 10% penalty:</strong> $10T → $10T × 1.027³⁰ = $22.2T</li>
+                  <li><strong>Loss:</strong> $2.1 trillion (8.6% less than potential)</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>12.4 Combined Economic Factors</h3>
+              <p>GDP growth is affected by multiple factors that stack multiplicatively:</p>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Factor</th>
+                    <th>Source</th>
+                    <th>Range</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Base Growth Rate</strong></td>
+                    <td>Development level</td>
+                    <td>1-5% per year</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Power Grid Modifier</strong></td>
+                    <td>Grid stability & pricing</td>
+                    <td>0.5 - 1.0</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Disaster Modifier</strong></td>
+                    <td>Active disasters</td>
+                    <td>0.5 - 1.0</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Climate Modifier</strong></td>
+                    <td>Temperature penalty</td>
+                    <td>0.5 - 1.0</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="background: rgba(0,0,0,0.3); border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Effective Growth Rate</strong> = Base Rate × Power Mod × Disaster Mod × Climate Mod</p>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>12.5 Income Impact</h3>
+              <p>Lower GDP means lower climate finance income (GDP × climate dedication %):</p>
+
+              <ul>
+                <li>Base income calculation: <strong>(GDP × climatePercent ÷ 100) ÷ 12 × 1000</strong> = $/month</li>
+                <li>Power grid modifier applied to income</li>
+                <li>Disaster modifier applied to income</li>
+                <li>Alliance happiness affects GDP contribution</li>
+              </ul>
+
+              <div style="background: rgba(155, 89, 182, 0.2); border: 1px solid #9b59b6; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Strategic Implication:</strong> Keeping temperature below +1.5°C protects long-term economic growth, which provides more income for climate projects.</p>
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+        <!-- Section 13: Player Action Consequences -->
+        <details id="action-consequences" class="rules-dropdown">
+          <summary class="rules-dropdown-header">
+            <span class="dropdown-number">13</span>
+            <span class="dropdown-title">Player Action Consequences</span>
+          </summary>
+          <div class="rules-dropdown-content">
+
+            <div class="rules-card">
+              <h3>13.1 Overview</h3>
+              <p>Every action you take has cascading effects across the game systems. Understanding these cause-and-effect chains helps you make strategic decisions.</p>
+              <div style="text-align: center; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px; margin: 1rem 0;">
+                <div style="display: flex; justify-content: center; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                  <div style="background: #3498db; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Player Action</strong>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #f39c12; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Power Grid</strong>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #9b59b6; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Economy</strong>
+                  </div>
+                  <div style="font-size: 1.5rem;">→</div>
+                  <div style="background: #27ae60; padding: 0.5rem 1rem; border-radius: 4px;">
+                    <strong>Happiness</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.2 Building Power Plants</h3>
+              <p>When you build a power generation project, multiple systems are affected:</p>
+
+              <h4>Variable Renewables (Solar, Wind, Offshore Wind)</h4>
+              <div style="background: rgba(243, 156, 18, 0.15); border: 1px solid #f39c12; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>Immediate Effects:</strong></p>
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                  <li><span style="color: #27ae60;">✓</span> Power supply increases (+0.3 to +0.8 GW per project)</li>
+                  <li><span style="color: #27ae60;">✓</span> Demand met percentage improves</li>
+                  <li><span style="color: #27ae60;">✓</span> CO₂ emissions reduced (clean energy)</li>
+                  <li><span style="color: #e74c3c;">✗</span> Grid stability decreases (variable penalty)</li>
+                  <li><span style="color: #e74c3c;">✗</span> Price volatility increases without storage</li>
+                </ul>
+                <p style="margin: 0.5rem 0 0 0;"><strong>Cascade:</strong> Lower stability → higher prices → GDP penalty → less income → happiness drops</p>
+              </div>
+
+              <h4>Baseload Power (Nuclear, Hydro, Geothermal)</h4>
+              <div style="background: rgba(39, 174, 96, 0.15); border: 1px solid #27ae60; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>Immediate Effects:</strong></p>
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                  <li><span style="color: #27ae60;">✓</span> Power supply increases (+0.3 to +1.2 GW per project)</li>
+                  <li><span style="color: #27ae60;">✓</span> Grid stability increases (baseload bonus)</li>
+                  <li><span style="color: #27ae60;">✓</span> Price stability improves</li>
+                  <li><span style="color: #27ae60;">✓</span> CO₂ emissions reduced (except fossil baseload)</li>
+                </ul>
+                <p style="margin: 0.5rem 0 0 0;"><strong>Cascade:</strong> Higher stability → stable prices → business confidence → GDP grows → happiness increases</p>
+              </div>
+
+              <h4>Fossil Fuel Plants (Coal, Gas) - "Replace" Mode</h4>
+              <div style="background: rgba(231, 76, 60, 0.15); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>When Replacing Existing Fossil:</strong></p>
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                  <li><span style="color: #27ae60;">✓</span> CO₂ emissions dramatically reduced</li>
+                  <li><span style="color: #e74c3c;">✗</span> Power supply decreases (removing capacity)</li>
+                  <li><span style="color: #e74c3c;">✗</span> May cause supply shortfall if not careful</li>
+                </ul>
+                <p style="margin: 0.5rem 0 0 0;"><strong>Strategy:</strong> Build replacement clean capacity BEFORE retiring fossil plants</p>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.3 Building Energy Storage</h3>
+              <p>Storage projects (batteries, pumped hydro) have powerful stabilizing effects:</p>
+
+              <div style="background: rgba(52, 152, 219, 0.15); border: 1px solid #3498db; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0 0 0.5rem 0;"><strong>Immediate Effects:</strong></p>
+                <ul style="margin: 0; padding-left: 1.5rem;">
+                  <li><span style="color: #27ae60;">✓</span> Mitigates variable renewable instability</li>
+                  <li><span style="color: #27ae60;">✓</span> Grid stability increases significantly</li>
+                  <li><span style="color: #27ae60;">✓</span> Price volatility decreases</li>
+                  <li><span style="color: #27ae60;">✓</span> Enables higher renewable penetration</li>
+                </ul>
+              </div>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Storage Ratio</th>
+                    <th>Stability Mitigation</th>
+                    <th>Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>0.0 (no storage)</td>
+                    <td>+0</td>
+                    <td>Full variable penalty applies</td>
+                  </tr>
+                  <tr>
+                    <td>0.5</td>
+                    <td>+20</td>
+                    <td>Partial mitigation</td>
+                  </tr>
+                  <tr>
+                    <td>1.0</td>
+                    <td>+40</td>
+                    <td>Good mitigation</td>
+                  </tr>
+                  <tr>
+                    <td>2.0+</td>
+                    <td>+80 (max)</td>
+                    <td>Full mitigation - 100% renewable viable</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p style="margin-top: 1rem;"><strong>Cascade:</strong> More storage → stable renewables → stable prices → business confidence → GDP grows → more income for more projects</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.4 Supply vs Demand Balance</h3>
+              <p>The ratio of power supply to demand drives multiple consequences:</p>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Supply Ratio</th>
+                    <th>Status</th>
+                    <th>Consequences</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="color: #e74c3c;"><strong>&lt;80%</strong></td>
+                    <td>Severe Shortfall</td>
+                    <td>Major GDP penalty, happiness plummets, blackout risk</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #f39c12;"><strong>80-99%</strong></td>
+                    <td>Shortfall</td>
+                    <td>GDP penalty, happiness drops, prices spike</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #27ae60;"><strong>100-120%</strong></td>
+                    <td>Balanced</td>
+                    <td>Normal operations, stable prices</td>
+                  </tr>
+                  <tr>
+                    <td style="color: #2ecc71;"><strong>&gt;120%</strong></td>
+                    <td>Surplus</td>
+                    <td>Lower prices, happiness bonus if cheap</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="background: rgba(231, 76, 60, 0.2); border: 1px solid #e74c3c; border-radius: 8px; padding: 1rem; margin: 1rem 0;">
+                <p style="margin: 0;"><strong>Warning:</strong> Demand grows ~2% annually. A balanced grid today becomes a shortfall in 5 years without new capacity!</p>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.5 Stability Chain Reactions</h3>
+              <p>Grid stability triggers a cascade of economic and social effects:</p>
+
+              <div style="display: grid; gap: 1rem; margin: 1rem 0;">
+                <div style="background: rgba(46, 204, 113, 0.15); border-left: 4px solid #2ecc71; padding: 1rem; border-radius: 0 8px 8px 0;">
+                  <p style="margin: 0; font-weight: bold; color: #2ecc71;">High Stability (90-100)</p>
+                  <p style="margin: 0.5rem 0 0 0;">Stable prices → Business confidence → Investment increases → GDP grows → More tax income → Happiness +2 → Alliance happiness improves</p>
+                </div>
+
+                <div style="background: rgba(241, 196, 15, 0.15); border-left: 4px solid #f1c40f; padding: 1rem; border-radius: 0 8px 8px 0;">
+                  <p style="margin: 0; font-weight: bold; color: #f1c40f;">Medium Stability (50-69)</p>
+                  <p style="margin: 0.5rem 0 0 0;">Some price spikes → Minor complaints → Slight GDP drag → Happiness -2 → Alliance concerns</p>
+                </div>
+
+                <div style="background: rgba(231, 76, 60, 0.15); border-left: 4px solid #e74c3c; padding: 1rem; border-radius: 0 8px 8px 0;">
+                  <p style="margin: 0; font-weight: bold; color: #e74c3c;">Low Stability (&lt;30)</p>
+                  <p style="margin: 0.5rem 0 0 0;">Blackouts → Businesses leave → GDP -30% → Mass unhappiness → Happiness -10 → Alliance may leave → Campaign effectiveness drops</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.6 Example Scenarios</h3>
+
+              <h4>Scenario A: Rapid Solar Expansion (Without Storage)</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 0.5rem 0;">
+                <p style="margin: 0;"><strong>Action:</strong> Build 10 solar farms in Europe</p>
+                <p style="margin: 0.5rem 0;"><strong>Immediate:</strong> +5 GW variable supply, CO₂ emissions drop</p>
+                <p style="margin: 0.5rem 0;"><strong>Problem:</strong> Variable share jumps to 60%, stability drops to 55</p>
+                <p style="margin: 0.5rem 0;"><strong>Cascade:</strong> Price volatility → GDP -5% → Happiness -2 → Alliance unhappy</p>
+                <p style="margin: 0; color: #f39c12;"><strong>Lesson:</strong> Build storage alongside renewables!</p>
+              </div>
+
+              <h4>Scenario B: Balanced Green Transition</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 0.5rem 0;">
+                <p style="margin: 0;"><strong>Action:</strong> Build 6 solar + 4 battery storage + 2 nuclear</p>
+                <p style="margin: 0.5rem 0;"><strong>Immediate:</strong> +5 GW supply, storage ratio 0.8, baseload support</p>
+                <p style="margin: 0.5rem 0;"><strong>Result:</strong> Variable share 50%, but stability stays at 85</p>
+                <p style="margin: 0.5rem 0;"><strong>Cascade:</strong> Stable prices → GDP maintains → Happiness stable → Alliance happy</p>
+                <p style="margin: 0; color: #27ae60;"><strong>Lesson:</strong> Diversified approach maintains stability!</p>
+              </div>
+
+              <h4>Scenario C: Aggressive Fossil Retirement</h4>
+              <div style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 1rem; margin: 0.5rem 0;">
+                <p style="margin: 0;"><strong>Action:</strong> Retire all coal plants immediately</p>
+                <p style="margin: 0.5rem 0;"><strong>Immediate:</strong> -8 GW baseload supply, CO₂ emissions drop dramatically</p>
+                <p style="margin: 0.5rem 0;"><strong>Problem:</strong> Supply falls to 70% of demand</p>
+                <p style="margin: 0.5rem 0;"><strong>Cascade:</strong> Shortfall → Prices spike → GDP -25% → Happiness -10 → Crisis</p>
+                <p style="margin: 0; color: #e74c3c;"><strong>Lesson:</strong> Build replacement capacity FIRST!</p>
+              </div>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.7 Strategic Planning Checklist</h3>
+              <p>Before taking major actions, consider:</p>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Question</th>
+                    <th>Why It Matters</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>Will this affect supply/demand balance?</td>
+                    <td>Shortfalls cause GDP and happiness penalties</td>
+                  </tr>
+                  <tr>
+                    <td>How will this change my variable share?</td>
+                    <td>High variable without storage = instability</td>
+                  </tr>
+                  <tr>
+                    <td>Do I have enough storage?</td>
+                    <td>Storage mitigates renewable intermittency</td>
+                  </tr>
+                  <tr>
+                    <td>What's the stability impact?</td>
+                    <td>Stability affects prices, GDP, and happiness</td>
+                  </tr>
+                  <tr>
+                    <td>Can I afford the construction time?</td>
+                    <td>Large projects take months to complete</td>
+                  </tr>
+                  <tr>
+                    <td>Will demand grow before completion?</td>
+                    <td>Plan 2-5 years ahead for growing demand</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>13.8 Quick Reference: Action Effects</h3>
+
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Action</th>
+                    <th>Supply</th>
+                    <th>Stability</th>
+                    <th>Emissions</th>
+                    <th>Happiness</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Build Solar/Wind</strong></td>
+                    <td style="color: #27ae60;">↑</td>
+                    <td style="color: #e74c3c;">↓</td>
+                    <td style="color: #27ae60;">↓↓</td>
+                    <td style="color: #f39c12;">→</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Build Nuclear</strong></td>
+                    <td style="color: #27ae60;">↑↑</td>
+                    <td style="color: #27ae60;">↑</td>
+                    <td style="color: #27ae60;">↓↓</td>
+                    <td style="color: #27ae60;">↑</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Build Storage</strong></td>
+                    <td style="color: #f39c12;">→</td>
+                    <td style="color: #27ae60;">↑↑</td>
+                    <td style="color: #f39c12;">→</td>
+                    <td style="color: #27ae60;">↑</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Retire Coal</strong></td>
+                    <td style="color: #e74c3c;">↓↓</td>
+                    <td style="color: #e74c3c;">↓</td>
+                    <td style="color: #27ae60;">↓↓↓</td>
+                    <td style="color: #e74c3c;">↓</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Build Hydro</strong></td>
+                    <td style="color: #27ae60;">↑</td>
+                    <td style="color: #27ae60;">↑</td>
+                    <td style="color: #27ae60;">↓↓</td>
+                    <td style="color: #27ae60;">↑</td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <div style="margin-top: 1rem; padding: 0.5rem; background: rgba(0,0,0,0.2); border-radius: 4px; font-size: 0.9em;">
+                <strong>Legend:</strong> ↑↑ = Strong increase, ↑ = Increase, → = Neutral, ↓ = Decrease, ↓↓ = Strong decrease
+              </div>
+            </div>
+
+          </div>
+        </details>
+
+        <!-- Footer -->
+        <div class="rules-footer">
+          <a href="index.html" class="primary-button">Back to Menu</a>
+          <a href="game_rules.html" class="ghost-button">Game Rules</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
