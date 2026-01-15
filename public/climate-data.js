@@ -297,11 +297,33 @@ const MAJOR_REGIONS = {
   // AFRICA
   north_africa: {
     name: "North Africa",
+    developmentLevel: "developing",
     continent: "africa",
     countries: ["DZ", "EG", "LY", "MA", "SD", "TN", "EH"],
+    power: {
+      baseDemandGW: 45,        // Real 2024: ~350 TWh / 8760 hrs ≈ 40 GW average
+      demandGrowthRate: 0.04,  // 4% annual growth (developing economies)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 14,              // 4% - minimal coal (Morocco)
+        gas: 245,              // 70% - Egypt, Algeria gas dominant
+        nuclear: 0,            // 0% - no nuclear yet (Egypt building)
+        hydro: 35,             // 10% - Egypt Aswan, Morocco
+        wind: 28,              // 8% - Morocco world leader
+        solar: 21,             // 6% - Morocco Noor, Egypt Benban
+        other: 7,              // 2% - oil, diesel
+      },
+      potentialGW: {
+        solar: 2000,           // Sahara Desert excellent
+        wind: 400,             // Morocco Atlantic coast
+        hydro: 50,             // Nile, limited remaining
+        geothermal: 20,        // Limited
+        nuclear: 30,           // Egypt Dabaa under construction
+      },
+    },
   },
   sub_saharan_africa: {
     name: "Sub-Saharan Africa",
+    developmentLevel: "developing",
     continent: "africa",
     countries: [
       "AO", "BJ", "BW", "BF", "BI", "CM", "CV", "CF", "TD", "KM",
@@ -310,71 +332,302 @@ const MAJOR_REGIONS = {
       "MU", "MZ", "NA", "NE", "NG", "RW", "ST", "SN", "SC", "SL",
       "SO", "ZA", "SS", "TZ", "TG", "UG", "ZM", "ZW",
     ],
+    power: {
+      baseDemandGW: 65,        // Real 2024: ~550 TWh / 8760 hrs ≈ 63 GW average
+      demandGrowthRate: 0.06,  // 6% annual growth (fastest globally)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 256,             // 47% - South Africa Eskom coal
+        gas: 25,               // 5% - Nigeria gas plants
+        nuclear: 18,           // 3% - South Africa Koeberg only
+        hydro: 145,            // 26% - DRC Inga, Ethiopia GERD
+        wind: 17,              // 3% - South Africa, Kenya
+        solar: 42,             // 8% - growing across continent
+        other: 47,             // 8% - diesel generators widespread
+      },
+      potentialGW: {
+        solar: 1000,           // Best solar resource in world
+        wind: 400,             // East Africa highlands, SA coast
+        hydro: 350,            // Congo River massive untapped
+        geothermal: 80,        // East African Rift
+        nuclear: 10,           // Limited infrastructure
+      },
+    },
   },
 
   // ASIA
   west_asia: {
     name: "West Asia",
+    developmentLevel: "oilEconomy",
     continent: "asia",
     countries: [
       "AM", "AZ", "BH", "CY", "GE", "IQ", "IL", "IR", "JO", "KW", "LB",
       "OM", "PS", "QA", "SA", "SY", "TR", "AE", "YE",
     ],
+    power: {
+      baseDemandGW: 180,       // Real 2024: ~1,400 TWh / 8760 hrs ≈ 160 GW average
+      demandGrowthRate: 0.035, // 3.5% annual growth (oil economies diversifying)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 98,              // 7% - Turkey, Israel coal plants
+        gas: 1050,             // 75% - dominant fuel (Saudi, UAE, Iran)
+        nuclear: 42,           // 3% - UAE Barakah, Iran Bushehr
+        hydro: 112,            // 8% - Turkey major hydro
+        wind: 56,              // 4% - Turkey, Saudi Arabia
+        solar: 28,             // 2% - UAE, Saudi growing fast
+        other: 14,             // 1% - oil-fired plants
+      },
+      potentialGW: {
+        solar: 1500,           // Arabian Desert excellent
+        wind: 600,             // Turkey, Red Sea coast
+        hydro: 100,            // Turkey mostly developed
+        geothermal: 30,        // Turkey has some
+        nuclear: 80,           // UAE expanding, Saudi planned
+      },
+    },
   },
   central_asia: {
     name: "Central Asia",
+    developmentLevel: "developing",
     continent: "asia",
     countries: ["KZ", "KG", "TJ", "TM", "UZ"],
+    power: {
+      baseDemandGW: 35,        // Real 2024: ~270 TWh / 8760 hrs ≈ 31 GW average
+      demandGrowthRate: 0.03,  // 3% annual growth
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 81,              // 30% - Kazakhstan coal dominant
+        gas: 108,              // 40% - Turkmenistan, Uzbekistan gas
+        nuclear: 0,            // 0% - Kazakhstan planning nuclear
+        hydro: 68,             // 25% - Tajikistan, Kyrgyzstan hydro
+        wind: 5,               // 2% - Kazakhstan wind growing
+        solar: 5,              // 2% - starting to develop
+        other: 3,              // 1% - oil
+      },
+      potentialGW: {
+        solar: 300,            // Good solar in steppes
+        wind: 400,             // Kazakhstan excellent wind
+        hydro: 150,            // Mountain rivers
+        geothermal: 10,        // Limited
+        nuclear: 20,           // Kazakhstan considering
+      },
+    },
   },
   south_asia: {
     name: "South Asia",
+    developmentLevel: "developing",
     continent: "asia",
     countries: ["AF", "BD", "BT", "IN", "MV", "NP", "PK", "LK"],
+    power: {
+      baseDemandGW: 350,       // Real 2024: ~2,500 TWh / 8760 hrs ≈ 285 GW average
+      demandGrowthRate: 0.055, // 5.5% annual growth (India driving)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 1625,            // 65% - India 75% coal, Pakistan coal
+        gas: 175,              // 7% - Bangladesh, Pakistan gas
+        nuclear: 75,           // 3% - India, Pakistan reactors
+        hydro: 250,            // 10% - India, Bhutan, Nepal
+        wind: 175,             // 7% - India wind leader
+        solar: 175,            // 7% - India solar fastest growing
+        other: 25,             // 1% - biomass, diesel
+      },
+      potentialGW: {
+        solar: 2000,           // India Rajasthan, Pakistan Sindh
+        wind: 800,             // India Tamil Nadu, Gujarat coast
+        hydro: 200,            // Himalayas remaining potential
+        geothermal: 30,        // Limited
+        nuclear: 100,          // India expanding rapidly
+      },
+    },
   },
   east_asia: {
     name: "East Asia",
+    developmentLevel: "emerging",
     continent: "asia",
     countries: ["CN", "JP", "KP", "KR", "MN", "TW", "HK", "MO"],
+    power: {
+      baseDemandGW: 1600,      // Real 2024: ~12,000 TWh / 8760 hrs ≈ 1,370 GW average
+      demandGrowthRate: 0.04,  // 4% annual growth (China driving)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 6000,            // 50% - China 58% coal dominant
+        gas: 960,              // 8% - Japan LNG, Korea gas
+        nuclear: 720,          // 6% - China, Japan, Korea
+        hydro: 1680,           // 14% - China Three Gorges
+        wind: 1080,            // 9% - China 40% of global wind
+        solar: 1320,           // 11% - China adding 200GW/year
+        other: 240,            // 2% - biomass, geothermal
+      },
+      potentialGW: {
+        solar: 3000,           // China Gobi, western provinces
+        wind: 2000,            // China coast, Mongolia steppes
+        hydro: 300,            // China remaining
+        geothermal: 100,       // Japan volcanic
+        nuclear: 200,          // China expanding rapidly
+      },
+    },
   },
   southeast_asia: {
     name: "Southeast Asia",
+    developmentLevel: "emerging",
     continent: "asia",
     countries: ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
+    power: {
+      baseDemandGW: 130,       // Real 2024: ~1,000 TWh / 8760 hrs ≈ 114 GW average
+      demandGrowthRate: 0.05,  // 5% annual growth (rapid industrialization)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 450,             // 45% - Indonesia, Vietnam coal heavy
+        gas: 280,              // 28% - Thailand, Malaysia gas
+        nuclear: 0,            // 0% - none yet (Vietnam cancelled)
+        hydro: 150,            // 15% - Vietnam, Laos, Myanmar
+        wind: 20,              // 2% - Vietnam wind growing
+        solar: 70,             // 7% - Vietnam, Thailand solar
+        other: 30,             // 3% - geothermal (Indonesia, Philippines)
+      },
+      potentialGW: {
+        solar: 800,            // Equatorial excellent
+        wind: 300,             // Vietnam, Thailand coast
+        hydro: 150,            // Mekong River basin
+        geothermal: 150,       // Indonesia, Philippines volcanic
+        nuclear: 30,           // Political resistance
+      },
+    },
   },
 
   // EUROPE
   northern_europe: {
     name: "Northern Europe",
+    developmentLevel: "developed",
     continent: "europe",
     countries: ["DK", "EE", "FI", "IS", "IE", "LV", "LT", "NO", "SE", "GB"],
+    power: {
+      baseDemandGW: 80,        // Real 2024: ~600 TWh / 8760 hrs ≈ 68 GW average
+      demandGrowthRate: 0.01,  // 1% annual growth (mature, electrification)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 18,              // 3% - UK phasing out, Poland imports
+        gas: 120,              // 20% - UK dominant gas user
+        nuclear: 84,           // 14% - UK, Finland, Sweden
+        hydro: 180,            // 30% - Norway 98% hydro, Sweden
+        wind: 156,             // 26% - Denmark leader, UK offshore
+        solar: 30,             // 5% - UK, limited northern sun
+        other: 12,             // 2% - biomass (Finland), geothermal (Iceland)
+      },
+      potentialGW: {
+        solar: 100,            // Limited due to latitude
+        wind: 400,             // North Sea excellent offshore
+        hydro: 50,             // Norway, Sweden mostly developed
+        geothermal: 20,        // Iceland excellent
+        nuclear: 40,           // UK expanding, Finland new
+      },
+    },
   },
   western_europe: {
     name: "Western Europe",
+    developmentLevel: "developed",
     continent: "europe",
     countries: ["AT", "BE", "FR", "DE", "LI", "LU", "MC", "NL", "CH"],
+    power: {
+      baseDemandGW: 130,       // Real 2024: ~1,000 TWh / 8760 hrs ≈ 114 GW average
+      demandGrowthRate: 0.005, // 0.5% annual growth (mature, efficient)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 80,              // 8% - Germany lignite, phasing out
+        gas: 100,              // 10% - Netherlands, Belgium gas
+        nuclear: 420,          // 42% - France 70% nuclear dominant
+        hydro: 100,            // 10% - Switzerland, Austria Alps
+        wind: 200,             // 20% - Germany, Netherlands leaders
+        solar: 90,             // 9% - Germany solar leader
+        other: 10,             // 1% - biomass
+      },
+      potentialGW: {
+        solar: 150,            // Germany, France rooftop
+        wind: 250,             // North Sea, onshore Germany
+        hydro: 80,             // Alps mostly developed
+        geothermal: 10,        // Limited
+        nuclear: 60,           // France maintaining, Germany exited
+      },
+    },
   },
   southern_europe: {
     name: "Southern Europe",
+    developmentLevel: "developed",
     continent: "europe",
     countries: [
       "AL", "AD", "BA", "HR", "GR", "IT", "MT", "ME", "MK", "PT",
       "SM", "RS", "SI", "ES", "VA", "XK",
     ],
+    power: {
+      baseDemandGW: 90,        // Real 2024: ~700 TWh / 8760 hrs ≈ 80 GW average
+      demandGrowthRate: 0.008, // 0.8% annual growth
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 42,              // 6% - Greece, Serbia coal
+        gas: 210,              // 30% - Italy gas dominant
+        nuclear: 0,            // 0% - Italy exited, Spain phasing
+        hydro: 105,            // 15% - Spain, Italy, Portugal
+        wind: 175,             // 25% - Spain wind leader
+        solar: 154,            // 22% - Spain, Italy excellent solar
+        other: 14,             // 2% - geothermal (Italy), biomass
+      },
+      potentialGW: {
+        solar: 300,            // Best in Europe (Spain, Italy, Greece)
+        wind: 200,             // Spain excellent, offshore
+        hydro: 50,             // Limited remaining
+        geothermal: 20,        // Italy volcanic
+        nuclear: 20,           // Political opposition
+      },
+    },
   },
   eastern_europe: {
     name: "Eastern Europe",
+    developmentLevel: "emerging",
     continent: "europe",
     countries: ["BY", "BG", "CZ", "HU", "MD", "PL", "RO", "RU", "SK", "UA"],
+    power: {
+      baseDemandGW: 230,       // Real 2024: ~1,700 TWh / 8760 hrs ≈ 194 GW average
+      demandGrowthRate: 0.01,  // 1% annual growth (Russia stable)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 300,             // 18% - Poland 70% coal, Russia coal
+        gas: 680,              // 40% - Russia gas dominant
+        nuclear: 416,          // 24% - Russia, Ukraine, Czech
+        hydro: 175,            // 10% - Russia hydro
+        wind: 60,              // 4% - Poland, Romania growing
+        solar: 35,             // 2% - Poland, Hungary growing
+        other: 34,             // 2% - biomass, waste
+      },
+      potentialGW: {
+        solar: 200,            // Southern Poland, Romania
+        wind: 300,             // Poland Baltic, Russia
+        hydro: 100,            // Russia Siberia remaining
+        geothermal: 20,        // Limited
+        nuclear: 80,           // Russia expanding, Poland planned
+      },
+    },
   },
 
   // AMERICAS
   north_america: {
     name: "North America",
+    developmentLevel: "developed",
     continent: "north_america",
     countries: ["CA", "US", "MX", "GL"],
+    power: {
+      baseDemandGW: 550,       // Real 2024: ~4,800 TWh / 8760 hrs ≈ 548 GW average
+      demandGrowthRate: 0.018, // 1.8% annual growth (data centers, EVs)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 768,             // 16% - US declining, Mexico
+        gas: 1920,             // 40% - US gas dominant
+        nuclear: 864,          // 18% - US 94 reactors
+        hydro: 480,            // 10% - Canada hydropower
+        wind: 528,             // 11% - US wind corridor
+        solar: 288,            // 6% - US Southwest, Mexico
+        other: 52,             // 1% - geothermal, biomass
+      },
+      potentialGW: {
+        solar: 3000,           // US Southwest, Mexico
+        wind: 2000,            // US Great Plains
+        hydro: 200,            // Canada remaining
+        geothermal: 50,        // US West, Mexico
+        nuclear: 150,          // US SMRs potential
+      },
+    },
   },
   central_america_caribbean: {
     name: "Central America & Caribbean",
+    developmentLevel: "developing",
     continent: "north_america",
     countries: [
       "AI", "AG", "AW", "BS", "BB", "BZ", "BM", "VG", "KY", "CR",
@@ -382,24 +635,86 @@ const MAJOR_REGIONS = {
       "JM", "MQ", "NI", "PA", "PR", "KN", "LC", "MF", "VC", "SX",
       "TT", "TC", "VI",
     ],
+    power: {
+      baseDemandGW: 15,        // Real 2024: ~100 TWh / 8760 hrs ≈ 11 GW average
+      demandGrowthRate: 0.03,  // 3% annual growth
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 3,               // 3% - minimal coal
+        gas: 35,               // 35% - Trinidad gas, Cuba
+        nuclear: 0,            // 0% - no nuclear
+        hydro: 20,             // 20% - Costa Rica, Guatemala
+        wind: 8,               // 8% - Costa Rica, Caribbean islands
+        solar: 12,             // 12% - growing across region
+        other: 22,             // 22% - oil/diesel islands, geothermal Costa Rica
+      },
+      potentialGW: {
+        solar: 200,            // Excellent Caribbean sun
+        wind: 100,             // Trade winds
+        hydro: 50,             // Central American rivers
+        geothermal: 40,        // Costa Rica, Guatemala volcanic
+        nuclear: 0,            // Not practical for small grids
+      },
+    },
   },
   south_america: {
     name: "South America",
+    developmentLevel: "emerging",
     continent: "south_america",
     countries: [
       "AR", "BO", "BR", "CL", "CO", "EC", "FK", "GF", "GY", "PY",
       "PE", "SR", "UY", "VE",
     ],
+    power: {
+      baseDemandGW: 190,       // Real 2024: ~1,550 TWh / 8760 hrs ≈ 177 GW average
+      demandGrowthRate: 0.03,  // 3% annual growth
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 78,              // 5% - minimal coal
+        gas: 233,              // 15% - Argentina, Colombia gas
+        nuclear: 47,           // 3% - Argentina, Brazil
+        hydro: 930,            // 60% - Brazil Itaipu dominates
+        wind: 155,             // 10% - Brazil, Chile wind
+        solar: 93,             // 6% - Chile Atacama, Brazil
+        other: 14,             // 1% - biomass (sugarcane)
+      },
+      potentialGW: {
+        solar: 1500,           // Chile Atacama best in world
+        wind: 1200,            // Patagonia, Brazil coast
+        hydro: 300,            // Amazon basin remaining
+        geothermal: 80,        // Andes volcanic
+        nuclear: 40,           // Limited interest
+      },
+    },
   },
 
   // OCEANIA
   oceania: {
     name: "Oceania",
+    developmentLevel: "developed",
     continent: "oceania",
     countries: [
       "AU", "FJ", "PF", "GU", "KI", "MH", "FM", "NR", "NC", "NZ",
       "PW", "PG", "WS", "SB", "TO", "TV", "VU",
     ],
+    power: {
+      baseDemandGW: 55,        // Real 2024: ~340 TWh / 8760 hrs ≈ 39 GW average
+      demandGrowthRate: 0.02,  // 2% annual growth (data centers, EVs)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 122,             // 36% - Australia coal declining
+        gas: 68,               // 20% - Australia gas peakers
+        nuclear: 0,            // 0% - banned in Australia
+        hydro: 51,             // 15% - NZ, Tasmania, Snowy
+        wind: 51,              // 15% - Australia, NZ south
+        solar: 41,             // 12% - Australia rooftop boom
+        other: 7,              // 2% - NZ geothermal, biomass
+      },
+      potentialGW: {
+        solar: 1000,           // Australian outback excellent
+        wind: 500,             // Southern coast, offshore
+        hydro: 40,             // Snowy 2.0, NZ limited
+        geothermal: 20,        // New Zealand
+        nuclear: 0,            // Banned in Australia
+      },
+    },
   },
 };
 
@@ -2982,6 +3297,7 @@ const COUNTRY_DATA = {
 const REGION_AGGREGATES = {
   north_america: {
     name: "North America",
+    developmentLevel: "developed",
     countries: ["usa", "canada", "mexico"],
     gdp: 28.9, // trillion USD (sum of USA + Canada + Mexico)
     baseIncome: 15, // credits per month
@@ -2998,9 +3314,72 @@ const REGION_AGGREGATES = {
       forest: 0.70,
       carbonCapture: 0.75,
     },
+    diplomatic: {
+      joinDifficulty: 4,
+      baseDemands: ["carbonTaxLimit", "economicProjects"],
+      personality: "demanding",
+      description: "Wealthy and influential, but demands economic benefits",
+    },
+    power: {
+      baseDemandGW: 550,       // Real 2024: ~4,800 TWh / 8760 hrs ≈ 548 GW average
+      demandGrowthRate: 0.018, // IEA projection: 1.8% annual (data centers, EVs)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 770,             // 16% - declining from coal plants
+        gas: 1920,             // 40% - dominant source in USA
+        nuclear: 865,          // 18% - USA has 94 operating reactors
+        hydro: 480,            // 10% - Canada dominates
+        wind: 530,             // 11% - growing fast
+        solar: 290,            // 6% - fastest growing
+        other: 45,             // 1% - biomass, geothermal
+      },
+      potentialGW: {
+        solar: 3000,           // Excellent in SW USA, Mexico (NREL estimates)
+        wind: 2000,            // Central USA, offshore Atlantic
+        hydro: 200,            // Mostly developed (Canada)
+        geothermal: 50,        // California, Mexico
+        nuclear: 150,          // Expansion possible with SMRs
+      },
+    },
+    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    sectorEmissions: {
+      industry: {
+        baseline: 1.5,         // Gt CO2/year - mature industrial base
+        subsectors: {
+          cement: 0.12,        // 8% - mostly imports now
+          steel: 0.25,         // 17% - declining domestic production
+          chemicals: 0.45,     // 30% - petrochemicals, plastics
+          other: 0.68,         // 45% - manufacturing, processing
+        },
+      },
+      transport: {
+        baseline: 2.2,         // Gt CO2/year - car-dependent culture
+        subsectors: {
+          road: 1.65,          // 75% - SUVs, trucks dominant
+          aviation: 0.35,      // 16% - high domestic flight usage
+          shipping: 0.15,      // 7% - ports, freight
+          rail: 0.05,          // 2% - minimal rail usage
+        },
+      },
+      buildings: {
+        baseline: 0.8,         // Gt CO2/year - heating/cooling
+        subsectors: {
+          residential: 0.50,   // 63% - large homes, heating
+          commercial: 0.30,    // 37% - offices, retail
+        },
+      },
+      agriculture: {
+        baseline: 1.0,         // Gt CO2/year - intensive farming
+        subsectors: {
+          livestock: 0.50,     // 50% - beef cattle, dairy
+          crops: 0.35,         // 35% - corn, soybeans, fertilizers
+          landUse: 0.15,       // 15% - minimal deforestation
+        },
+      },
+    },
   },
   south_america: {
     name: "South America",
+    developmentLevel: "emerging",
     countries: ["brazil", "argentina"],
     gdp: 2.5, // trillion USD
     baseIncome: 4,
@@ -3017,9 +3396,72 @@ const REGION_AGGREGATES = {
       forest: 0.90,
       carbonCapture: 0.45,
     },
+    diplomatic: {
+      joinDifficulty: 5,
+      baseDemands: ["localSpending", "jobPriority"],
+      personality: "cooperative",
+      description: "Values environmental protection, needs local investment",
+    },
+    power: {
+      baseDemandGW: 190,       // Real 2024: ~1,550 TWh / 8760 hrs ≈ 177 GW average
+      demandGrowthRate: 0.03,  // IEA projection: 3% annual (growing economies)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 78,              // 5% - minimal, mostly Brazil
+        gas: 232,              // 15% - Argentina thermal plants
+        nuclear: 47,           // 3% - Argentina, Brazil
+        hydro: 930,            // 60% - Brazil dominates (Itaipu, etc.)
+        wind: 155,             // 10% - growing fast in Brazil
+        solar: 93,             // 6% - Chile Atacama, Brazil
+        other: 15,             // 1% - biomass (sugarcane)
+      },
+      potentialGW: {
+        solar: 1500,           // Chile Atacama (best in world), Brazil
+        wind: 1200,            // Patagonia, Brazil coast
+        hydro: 300,            // Amazon basin remaining potential
+        geothermal: 80,        // Andes volcanic regions
+        nuclear: 40,           // Limited political interest
+      },
+    },
+    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    sectorEmissions: {
+      industry: {
+        baseline: 0.45,        // Gt CO2/year - growing industrial sector
+        subsectors: {
+          cement: 0.08,        // 18% - construction boom
+          steel: 0.12,         // 27% - Brazil steel industry
+          chemicals: 0.10,     // 22% - petrochemicals
+          other: 0.15,         // 33% - mining, food processing
+        },
+      },
+      transport: {
+        baseline: 0.55,        // Gt CO2/year - growing car ownership
+        subsectors: {
+          road: 0.40,          // 73% - cars, trucks, buses
+          aviation: 0.08,      // 15% - domestic flights
+          shipping: 0.05,      // 9% - Amazon river, ports
+          rail: 0.02,          // 3% - limited rail
+        },
+      },
+      buildings: {
+        baseline: 0.20,        // Gt CO2/year - mild climate helps
+        subsectors: {
+          residential: 0.12,   // 60% - mostly cooling needs
+          commercial: 0.08,    // 40% - urban centers
+        },
+      },
+      agriculture: {
+        baseline: 0.80,        // Gt CO2/year - significant land use
+        subsectors: {
+          livestock: 0.35,     // 44% - cattle ranching (Amazon)
+          crops: 0.15,         // 19% - soybeans, sugar cane
+          landUse: 0.30,       // 37% - deforestation pressure
+        },
+      },
+    },
   },
   europe: {
     name: "Europe",
+    developmentLevel: "developed",
     countries: ["germany", "uk", "france", "italy", "poland", "russia", "spain", "netherlands", "sweden", "norway"],
     gdp: 17.9, // trillion USD
     baseIncome: 12,
@@ -3036,9 +3478,72 @@ const REGION_AGGREGATES = {
       forest: 0.55,
       carbonCapture: 0.65,
     },
+    diplomatic: {
+      joinDifficulty: 3,
+      baseDemands: ["carbonTaxLimit"],
+      personality: "cooperative",
+      description: "Climate leader, eager to join but wants fair policies",
+    },
+    power: {
+      baseDemandGW: 450,       // Real 2024: ~4,000 TWh / 8760 hrs ≈ 457 GW average
+      demandGrowthRate: 0.008, // IEA projection: 0.8% (efficiency gains, stable pop)
+      currentMixTWh: {         // Real 2024 generation by source (EU + UK + Russia)
+        coal: 440,             // 11% - phasing out in EU, stable in Poland
+        gas: 640,              // 16% - declining post-Russia crisis
+        nuclear: 920,          // 23% - France dominates (70% nuclear)
+        hydro: 560,            // 14% - Norway, Sweden, Alps
+        wind: 640,             // 16% - North Sea, Germany, Spain
+        solar: 320,            // 8% - Germany, Spain, Italy
+        other: 480,            // 12% - biomass, geothermal, waste
+      },
+      potentialGW: {
+        solar: 500,            // Southern Europe (Spain, Italy, Greece)
+        wind: 800,             // North Sea offshore, Baltic
+        hydro: 250,            // Mostly developed
+        geothermal: 40,        // Iceland, Italy
+        nuclear: 120,          // Political constraints in Germany
+      },
+    },
+    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    sectorEmissions: {
+      industry: {
+        baseline: 1.20,        // Gt CO2/year - diverse industrial base
+        subsectors: {
+          cement: 0.15,        // 13% - Germany, Italy production
+          steel: 0.22,         // 18% - Germany, Poland, UK
+          chemicals: 0.35,     // 29% - Germany BASF, petrochemicals
+          other: 0.48,         // 40% - manufacturing, processing
+        },
+      },
+      transport: {
+        baseline: 1.10,        // Gt CO2/year - good public transit
+        subsectors: {
+          road: 0.75,          // 68% - cars, freight trucks
+          aviation: 0.20,      // 18% - intra-Europe flights
+          shipping: 0.10,      // 9% - Mediterranean, North Sea
+          rail: 0.05,          // 5% - extensive rail network
+        },
+      },
+      buildings: {
+        baseline: 0.70,        // Gt CO2/year - heating dominant
+        subsectors: {
+          residential: 0.45,   // 64% - heating old buildings
+          commercial: 0.25,    // 36% - offices, retail
+        },
+      },
+      agriculture: {
+        baseline: 0.50,        // Gt CO2/year - efficient farming
+        subsectors: {
+          livestock: 0.25,     // 50% - dairy, beef
+          crops: 0.18,         // 36% - wheat, vegetables
+          landUse: 0.07,       // 14% - stable land use
+        },
+      },
+    },
   },
   africa: {
     name: "Africa",
+    developmentLevel: "developing",
     countries: ["south_africa", "egypt", "nigeria"],
     gdp: 1.2, // trillion USD (subset)
     baseIncome: 2,
@@ -3055,9 +3560,72 @@ const REGION_AGGREGATES = {
       forest: 0.45,
       carbonCapture: 0.50,
     },
+    diplomatic: {
+      joinDifficulty: 6,
+      baseDemands: ["localSpending", "economicProjects", "jobPriority"],
+      personality: "demanding",
+      description: "Needs development investment, skeptical of climate costs",
+    },
+    power: {
+      baseDemandGW: 110,       // Real 2024: ~900 TWh / 8760 hrs ≈ 103 GW average
+      demandGrowthRate: 0.055, // IEA projection: 5.5% (fastest growing)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 270,             // 30% - South Africa coal dominant
+        gas: 270,              // 30% - Egypt, Nigeria gas plants
+        nuclear: 18,           // 2% - South Africa Koeberg only
+        hydro: 180,            // 20% - DRC, Ethiopia, Egypt
+        wind: 45,              // 5% - Morocco, Egypt, South Africa
+        solar: 63,             // 7% - growing fast across continent
+        other: 54,             // 6% - diesel generators, biomass
+      },
+      potentialGW: {
+        solar: 3000,           // Sahara Desert (best solar in world)
+        wind: 800,             // North Africa coast, highlands
+        hydro: 400,            // Congo River, Nile, Niger
+        geothermal: 100,       // East African Rift Valley
+        nuclear: 30,           // Very limited infrastructure
+      },
+    },
+    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    sectorEmissions: {
+      industry: {
+        baseline: 0.35,        // Gt CO2/year - early industrialization
+        subsectors: {
+          cement: 0.10,        // 29% - rapid construction
+          steel: 0.08,         // 23% - growing demand
+          chemicals: 0.05,     // 14% - fertilizers
+          other: 0.12,         // 34% - mining, light industry
+        },
+      },
+      transport: {
+        baseline: 0.40,        // Gt CO2/year - growing motorization
+        subsectors: {
+          road: 0.30,          // 75% - cars, minibuses, trucks
+          aviation: 0.05,      // 13% - limited aviation
+          shipping: 0.04,      // 10% - ports
+          rail: 0.01,          // 2% - limited rail
+        },
+      },
+      buildings: {
+        baseline: 0.18,        // Gt CO2/year - mostly cooking/heating
+        subsectors: {
+          residential: 0.13,   // 72% - biomass cooking, kerosene
+          commercial: 0.05,    // 28% - urban centers
+        },
+      },
+      agriculture: {
+        baseline: 0.55,        // Gt CO2/year - land use significant
+        subsectors: {
+          livestock: 0.20,     // 36% - cattle, goats
+          crops: 0.12,         // 22% - subsistence farming
+          landUse: 0.23,       // 42% - deforestation, expansion
+        },
+      },
+    },
   },
   asia: {
     name: "Asia",
+    developmentLevel: "emerging",
     countries: ["china", "india", "japan", "south_korea", "indonesia", "saudi_arabia", "iran", "uae"],
     gdp: 31.6, // trillion USD
     baseIncome: 18,
@@ -3074,9 +3642,72 @@ const REGION_AGGREGATES = {
       forest: 0.55,
       carbonCapture: 0.70,
     },
+    diplomatic: {
+      joinDifficulty: 7,
+      baseDemands: ["carbonTaxLimit", "noNuclear", "economicProjects"],
+      personality: "isolationist",
+      description: "Complex politics, prioritizes sovereignty and industry",
+    },
+    power: {
+      baseDemandGW: 2100,      // Real 2024: ~16,500 TWh / 8760 hrs ≈ 1,884 GW average
+      demandGrowthRate: 0.045, // IEA projection: 4.5% (China+India growth)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 8250,            // 50% - China 58%, India 75% coal
+        gas: 2475,             // 15% - Middle East, Japan LNG
+        nuclear: 825,          // 5% - China expanding, Japan restarting
+        hydro: 2145,           // 13% - China Three Gorges, Mekong
+        wind: 1155,            // 7% - China 40% of global wind
+        solar: 1320,           // 8% - China adding 200GW/year
+        other: 330,            // 2% - biomass, geothermal
+      },
+      potentialGW: {
+        solar: 5000,           // China, India, Middle East deserts
+        wind: 3000,            // China coast, India, offshore Japan
+        hydro: 600,            // Some remaining in SE Asia
+        geothermal: 150,       // Indonesia, Japan, Philippines
+        nuclear: 300,          // China expanding rapidly (50+ reactors)
+      },
+    },
+    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    sectorEmissions: {
+      industry: {
+        baseline: 10.5,        // Gt CO2/year - world's factory
+        subsectors: {
+          cement: 2.80,        // 27% - China 55% of global cement
+          steel: 3.50,         // 33% - China 50% of global steel
+          chemicals: 2.10,     // 20% - petrochemicals, fertilizers
+          other: 2.10,         // 20% - manufacturing, processing
+        },
+      },
+      transport: {
+        baseline: 4.20,        // Gt CO2/year - rapid motorization
+        subsectors: {
+          road: 3.00,          // 71% - cars, trucks growing fast
+          aviation: 0.55,      // 13% - China domestic, Middle East hubs
+          shipping: 0.50,      // 12% - global shipping dominance
+          rail: 0.15,          // 4% - China high-speed rail
+        },
+      },
+      buildings: {
+        baseline: 2.20,        // Gt CO2/year - heating in north, cooling in south
+        subsectors: {
+          residential: 1.40,   // 64% - urbanization, heating
+          commercial: 0.80,    // 36% - massive urban development
+        },
+      },
+      agriculture: {
+        baseline: 2.30,        // Gt CO2/year - rice paddies, livestock
+        subsectors: {
+          livestock: 1.00,     // 43% - pigs, cattle, poultry
+          crops: 0.90,         // 39% - rice (methane), fertilizers
+          landUse: 0.40,       // 18% - SE Asia deforestation
+        },
+      },
+    },
   },
   oceania: {
     name: "Oceania",
+    developmentLevel: "developed",
     countries: ["australia"],
     gdp: 1.7, // trillion USD
     baseIncome: 3,
@@ -3092,6 +3723,68 @@ const REGION_AGGREGATES = {
       wind: 0.85,
       forest: 0.50,
       carbonCapture: 0.75,
+    },
+    diplomatic: {
+      joinDifficulty: 4,
+      baseDemands: ["localSpending"],
+      personality: "cooperative",
+      description: "Climate-aware, wants to ensure local benefits",
+    },
+    power: {
+      baseDemandGW: 55,        // Real 2024: ~300 TWh / 8760 hrs ≈ 34 GW average
+      demandGrowthRate: 0.02,  // IEA projection: 2% (data centers, EVs)
+      currentMixTWh: {         // Real 2024 generation by source
+        coal: 120,             // 40% - declining fast, closing plants
+        gas: 60,               // 20% - peaker plants
+        nuclear: 0,            // 0% - banned in Australia
+        hydro: 21,             // 7% - Tasmania, Snowy scheme
+        wind: 45,              // 15% - growing south coast
+        solar: 48,             // 16% - rooftop solar boom
+        other: 6,              // 2% - biomass, diesel
+      },
+      potentialGW: {
+        solar: 1000,           // Excellent across Australian outback
+        wind: 500,             // Southern coast, offshore
+        hydro: 40,             // Mostly developed (Snowy 2.0)
+        geothermal: 20,        // New Zealand, limited Australia
+        nuclear: 0,            // Currently banned in Australia
+      },
+    },
+    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    sectorEmissions: {
+      industry: {
+        baseline: 0.18,        // Gt CO2/year - mining, processing
+        subsectors: {
+          cement: 0.02,        // 11% - local production
+          steel: 0.04,         // 22% - iron ore processing
+          chemicals: 0.05,     // 28% - LNG processing
+          other: 0.07,         // 39% - aluminum, mining
+        },
+      },
+      transport: {
+        baseline: 0.12,        // Gt CO2/year - long distances
+        subsectors: {
+          road: 0.08,          // 67% - cars, road trains
+          aviation: 0.025,     // 21% - necessary for distances
+          shipping: 0.01,      // 8% - exports
+          rail: 0.005,         // 4% - mining railways
+        },
+      },
+      buildings: {
+        baseline: 0.06,        // Gt CO2/year - mild climate
+        subsectors: {
+          residential: 0.04,   // 67% - cooling needs
+          commercial: 0.02,    // 33% - urban centers
+        },
+      },
+      agriculture: {
+        baseline: 0.10,        // Gt CO2/year - extensive grazing
+        subsectors: {
+          livestock: 0.06,     // 60% - beef, sheep
+          crops: 0.025,        // 25% - wheat, grains
+          landUse: 0.015,      // 15% - land clearing
+        },
+      },
     },
   },
 };
@@ -3224,6 +3917,311 @@ const ADVANCED_PROJECT_TYPES = {
     requires: { research: 4, solarUtility: 3, windOnshore: 3 },
     description: "AI-optimized grid improves renewable integration.",
     tier: "advanced",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // SECTOR REDUCTION PROJECTS
+  // These projects reduce emissions in specific non-power sectors
+  // ═══════════════════════════════════════════════════════════════
+
+  // INDUSTRY SECTOR
+  greenSteel: {
+    label: "Green Steel Plant",
+    baseCost: 350,
+    baseCo2Reduction: 4,
+    income: 2,
+    potentialKey: null,
+    buildTime: 36,
+    requires: { research: 5, greenHydrogen: 1 },
+    description: "Hydrogen-based steelmaking eliminates coal from steel production.",
+    tier: "advanced",
+    category: "industry",
+    sectorReduction: { industry: { steel: 0.15 } },  // 15% reduction in steel emissions
+  },
+  lowCarbonCement: {
+    label: "Low-Carbon Cement",
+    baseCost: 250,
+    baseCo2Reduction: 3,
+    income: 1,
+    potentialKey: null,
+    buildTime: 24,
+    requires: { research: 4, carbonCapture: 1 },
+    description: "Novel cement chemistry and carbon capture reduce emissions by 60%.",
+    tier: "advanced",
+    category: "industry",
+    sectorReduction: { industry: { cement: 0.12 } },  // 12% reduction in cement emissions
+  },
+  industrialEfficiency: {
+    label: "Industrial Efficiency",
+    baseCost: 180,
+    baseCo2Reduction: 2,
+    income: 2,
+    potentialKey: null,
+    buildTime: 12,
+    requires: { research: 3 },
+    description: "Electrification and waste heat recovery in manufacturing.",
+    tier: "intermediate",
+    category: "industry",
+    sectorReduction: { industry: { other: 0.08, chemicals: 0.05 } },
+  },
+
+  // TRANSPORT SECTOR
+  publicTransit: {
+    label: "Metro/Rail Expansion",
+    baseCost: 450,
+    baseCo2Reduction: 3,
+    income: 2,
+    potentialKey: null,
+    buildTime: 48,
+    requires: { research: 3 },
+    description: "Electric mass transit reduces car dependency and emissions.",
+    tier: "intermediate",
+    category: "transport",
+    sectorReduction: { transport: { road: 0.08 } },
+    happiness: 10,
+  },
+  sustainableAviation: {
+    label: "Sustainable Aviation Fuel",
+    baseCost: 280,
+    baseCo2Reduction: 2,
+    income: 1,
+    potentialKey: null,
+    buildTime: 24,
+    requires: { research: 5, greenHydrogen: 1 },
+    description: "Bio-based and synthetic fuels for cleaner air travel.",
+    tier: "advanced",
+    category: "transport",
+    sectorReduction: { transport: { aviation: 0.15 } },
+  },
+  electricFreight: {
+    label: "Electric Freight",
+    baseCost: 320,
+    baseCo2Reduction: 3,
+    income: 1,
+    potentialKey: null,
+    buildTime: 30,
+    requires: { evInfrastructure: 2, greenHydrogen: 1 },
+    description: "Electric and hydrogen trucks for goods transport.",
+    tier: "advanced",
+    category: "transport",
+    sectorReduction: { transport: { road: 0.10 } },
+  },
+  greenShipping: {
+    label: "Green Shipping Hub",
+    baseCost: 380,
+    baseCo2Reduction: 2,
+    income: 2,
+    potentialKey: null,
+    buildTime: 36,
+    requires: { research: 5, greenHydrogen: 1 },
+    description: "Ammonia and hydrogen-powered shipping infrastructure.",
+    tier: "advanced",
+    category: "transport",
+    sectorReduction: { transport: { shipping: 0.12 } },
+  },
+
+  // BUILDINGS SECTOR
+  buildingRetrofit: {
+    label: "Building Retrofit Program",
+    baseCost: 200,
+    baseCo2Reduction: 2,
+    income: 1,
+    potentialKey: null,
+    buildTime: 18,
+    requires: { research: 2 },
+    description: "Insulation and efficient heating/cooling for existing buildings.",
+    tier: "intermediate",
+    category: "buildings",
+    sectorReduction: { buildings: { residential: 0.10, commercial: 0.08 } },
+    happiness: 5,
+  },
+  heatPumps: {
+    label: "Heat Pump Rollout",
+    baseCost: 150,
+    baseCo2Reduction: 2,
+    income: 1,
+    potentialKey: null,
+    buildTime: 12,
+    requires: { research: 2, solarUtility: 2 },
+    description: "Replace gas heating with efficient electric heat pumps.",
+    tier: "intermediate",
+    category: "buildings",
+    sectorReduction: { buildings: { residential: 0.12 } },
+  },
+  greenBuildings: {
+    label: "Green Building Standards",
+    baseCost: 220,
+    baseCo2Reduction: 2,
+    income: 1,
+    potentialKey: null,
+    buildTime: 18,
+    requires: { research: 3 },
+    description: "Net-zero design standards for new commercial buildings.",
+    tier: "intermediate",
+    category: "buildings",
+    sectorReduction: { buildings: { commercial: 0.15 } },
+  },
+
+  // AGRICULTURE SECTOR
+  methaneCapture: {
+    label: "Livestock Methane Capture",
+    baseCost: 120,
+    baseCo2Reduction: 2,
+    income: 0,
+    potentialKey: null,
+    buildTime: 9,
+    requires: { research: 2 },
+    description: "Biodigesters convert livestock methane into clean energy.",
+    tier: "intermediate",
+    category: "agriculture",
+    sectorReduction: { agriculture: { livestock: 0.15 } },
+  },
+  precisionAgriculture: {
+    label: "Precision Agriculture",
+    baseCost: 140,
+    baseCo2Reduction: 1,
+    income: 1,
+    potentialKey: null,
+    buildTime: 12,
+    requires: { research: 3 },
+    description: "AI-driven farming reduces fertilizer and emissions.",
+    tier: "intermediate",
+    category: "agriculture",
+    sectorReduction: { agriculture: { crops: 0.12 } },
+  },
+  agroforestry: {
+    label: "Agroforestry Program",
+    baseCost: 160,
+    baseCo2Reduction: 3,
+    income: 0,
+    potentialKey: "forest",
+    buildTime: 24,
+    requires: { reforestation: 3, sustainableAgriculture: 1 },
+    description: "Integrates trees with crops, sequestering carbon while farming.",
+    tier: "advanced",
+    category: "agriculture",
+    sectorReduction: { agriculture: { landUse: 0.20, crops: 0.05 } },
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// SECTOR POLICIES (Global effects when enacted)
+// ═══════════════════════════════════════════════════════════════
+
+const SECTOR_POLICIES = {
+  // INDUSTRY POLICIES
+  industryEmissionsStandards: {
+    id: "industryEmissionsStandards",
+    label: "Industrial Emissions Standards",
+    description: "Mandate emissions limits for all industrial facilities.",
+    cost: 150,
+    duration: 6,           // Months to implement
+    sectorEffects: {
+      industry: { growthMultiplier: 0.5 }  // Halve industry emission growth
+    },
+    happiness: -5,         // Some economic pushback
+    requirements: { research: 3 },
+    category: "industry",
+  },
+  carbonPricing: {
+    id: "carbonPricing",
+    label: "Carbon Pricing System",
+    description: "Economy-wide carbon tax incentivizes emission reductions.",
+    cost: 200,
+    duration: 12,
+    sectorEffects: {
+      industry: { reductionBonus: 0.05 },
+      transport: { reductionBonus: 0.03 },
+      buildings: { reductionBonus: 0.02 },
+    },
+    incomeBonus: 0.05,     // 5% income boost from carbon revenues
+    happiness: -8,
+    requirements: {},
+    category: "economy",
+  },
+
+  // TRANSPORT POLICIES
+  vehicleEmissionStandards: {
+    id: "vehicleEmissionStandards",
+    label: "Vehicle Emission Standards",
+    description: "Strict fuel efficiency and emission standards for new vehicles.",
+    cost: 100,
+    duration: 12,
+    sectorEffects: {
+      transport: { reductionBonus: 0.08 }
+    },
+    happiness: -3,
+    requirements: {},
+    category: "transport",
+  },
+  evMandate: {
+    id: "evMandate",
+    label: "Electric Vehicle Mandate",
+    description: "Phase out new fossil fuel vehicle sales by 2035.",
+    cost: 180,
+    duration: 24,
+    sectorEffects: {
+      transport: { reductionBonus: 0.15, growthMultiplier: 0.3 }
+    },
+    happiness: -10,
+    requirements: { evInfrastructure: 3 },
+    category: "transport",
+  },
+
+  // BUILDINGS POLICIES
+  buildingCodes: {
+    id: "buildingCodes",
+    label: "Green Building Codes",
+    description: "Require energy efficiency standards for all new construction.",
+    cost: 80,
+    duration: 6,
+    sectorEffects: {
+      buildings: { growthMultiplier: 0 }  // Stop building emission growth
+    },
+    happiness: -2,
+    requirements: { research: 2 },
+    category: "buildings",
+  },
+  heatingElectrification: {
+    id: "heatingElectrification",
+    label: "Heating Electrification Act",
+    description: "Subsidize heat pump adoption and ban new gas heating.",
+    cost: 150,
+    duration: 18,
+    sectorEffects: {
+      buildings: { reductionBonus: 0.12 }
+    },
+    happiness: -5,
+    requirements: { heatPumps: 2 },
+    category: "buildings",
+  },
+
+  // AGRICULTURE POLICIES
+  sustainableFarmingSubsidies: {
+    id: "sustainableFarmingSubsidies",
+    label: "Sustainable Farming Subsidies",
+    description: "Redirect agricultural subsidies to low-carbon practices.",
+    cost: 120,
+    duration: 12,
+    sectorEffects: {
+      agriculture: { reductionBonus: 0.08, growthMultiplier: 0.5 }
+    },
+    happiness: 3,          // Farmers like subsidies
+    requirements: { sustainableAgriculture: 1 },
+    category: "agriculture",
+  },
+  deforestationBan: {
+    id: "deforestationBan",
+    label: "Deforestation Ban",
+    description: "Strict enforcement against illegal land clearing.",
+    cost: 100,
+    duration: 6,
+    sectorEffects: {
+      agriculture: { landUseReduction: 0.25 }
+    },
+    happiness: -3,
+    requirements: { reforestation: 3 },
+    category: "agriculture",
   },
 };
 
@@ -3676,7 +4674,16 @@ function getContinentData(continentId) {
     return mr ? mr.countries : [];
   });
 
-  return aggregateCountriesToRegion(allCountries, continent.name, continentId);
+  const data = aggregateCountriesToRegion(allCountries, continent.name, continentId);
+
+  // Override baseIncome with the defined value from REGION_AGGREGATES
+  // The aggregation sums country incomes, but we want the curated continent-level value
+  if (data && REGION_AGGREGATES[continentId]) {
+    data.baseIncome = REGION_AGGREGATES[continentId].baseIncome || data.baseIncome;
+    data.sectorIncome = REGION_AGGREGATES[continentId].sectorIncome || data.sectorIncome;
+  }
+
+  return data;
 }
 
 /**

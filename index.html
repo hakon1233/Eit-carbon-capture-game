@@ -43,52 +43,16 @@
 
         <div class="launch-actions">
           <button class="primary-button" id="start-game-btn">New Game</button>
-          <button class="primary-button" id="continue-game-btn" style="display: none;">Continue Game</button>
-          <a class="ghost-button" href="rules.html">Game Rules</a>
-          <a class="ghost-button" href="systems.html">Game Systems</a>
+          <a class="ghost-button" href="game_rules.html">Game Rules</a>
+          <a class="ghost-button" href="game_mechanics.html">Game Mechanics</a>
         </div>
-
-        <div id="save-info" class="save-info" style="display: none;"></div>
       </div>
     </div>
 
     <script>
-      // Check for auto-save and show continue button
-      const autoSave = localStorage.getItem('carbonCapture_autosave');
-      const continueBtn = document.getElementById('continue-game-btn');
-      const saveInfo = document.getElementById('save-info');
-
-      if (autoSave) {
-        try {
-          const save = JSON.parse(autoSave);
-          const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-          const date = new Date(save.timestamp);
-          const diffNames = {
-            tutorial: 'Tutorial',
-            easy: 'Easy',
-            normal: 'Normal',
-            hard: 'Hard',
-            extreme: 'Extreme'
-          };
-
-          continueBtn.style.display = 'inline-block';
-          saveInfo.style.display = 'block';
-          saveInfo.innerHTML = `<p>Auto-save found: ${months[save.state.month - 1]} ${save.state.year} (${diffNames[save.difficulty] || 'Normal'})</p>`;
-        } catch (e) {
-          console.error('Failed to parse auto-save:', e);
-        }
-      }
-
       document.getElementById('start-game-btn').addEventListener('click', function() {
         const difficulty = document.getElementById('difficulty').value;
         localStorage.setItem('gameDifficulty', difficulty);
-        localStorage.removeItem('carbonCapture_autosave'); // Clear auto-save for new game
-        localStorage.setItem('loadAutoSave', 'false');
-        window.location.href = 'game.html';
-      });
-
-      continueBtn.addEventListener('click', function() {
-        localStorage.setItem('loadAutoSave', 'true');
         window.location.href = 'game.html';
       });
     </script>
