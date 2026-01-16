@@ -10,70 +10,91 @@
     <div class="game-shell">
       <div class="topbar-wrapper">
         <header class="topbar">
-          <div id="stats-strip" class="stat-strip" role="button" tabindex="0" aria-label="Game stats (click for details)">
-            <div class="stat">
-              <span class="label">Budget</span>
-              <span id="credits" class="value">$100 B</span>
+          <div class="header-compact">
+            <!-- Budget + Income -->
+            <div class="header-finance">
+              <span class="finance-budget" id="credits">$100 B</span>
+              <span class="finance-income" id="income-display">+$26.0 B/mo</span>
             </div>
-            <div class="stat">
-              <span class="label">Income</span>
-              <span id="income" class="value">+$0/mo</span>
+
+            <!-- Temperature Gauge -->
+            <div class="header-temp">
+              <div class="temp-gauge-mini">
+                <div class="temp-gauge-zones">
+                  <div class="temp-zone temp-zone-safe"></div>
+                  <div class="temp-zone temp-zone-warning"></div>
+                  <div class="temp-zone temp-zone-danger"></div>
+                  <div class="temp-zone temp-zone-critical"></div>
+                </div>
+                <div class="temp-gauge-marker" id="temp-marker"></div>
+              </div>
+              <span class="temp-value" id="temperature">+1.12°C</span>
             </div>
-            <div class="stat">
-              <span class="label">Temp</span>
-              <span id="temperature" class="value">+1.20°C</span>
+
+            <!-- CO2 + Net Rate -->
+            <div class="header-co2" id="net-co2-stat" onclick="openCarbonBalancePopup()" title="Click for carbon breakdown">
+              <div class="co2-bar-mini">
+                <div class="co2-bar-fill" id="co2-bar-fill"></div>
+              </div>
+              <div class="co2-values">
+                <span class="co2-ppm" id="co2">419.6 ppm</span>
+                <span class="co2-rate" id="net-co2">-0.12/mo</span>
+              </div>
             </div>
-            <div class="stat">
-              <span class="label">CO2</span>
-              <span id="co2" class="value">420 ppm</span>
-            </div>
-            <div class="stat stat-clickable" id="net-co2-stat" onclick="openCarbonBalancePopup()" title="Click for carbon breakdown">
-              <span class="label">Net CO2</span>
-              <span id="net-co2" class="value">+0.5/mo</span>
-            </div>
-            <div class="stat">
-              <span class="label">Feedback</span>
-              <span id="feedback" class="value">+0.00</span>
-            </div>
-            <div class="stat">
-              <span class="label">Projects</span>
-              <span id="total-projects" class="value">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Building</span>
-              <span id="under-construction" class="value">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">RP</span>
-              <span id="research-points" class="value">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Campaigns</span>
-              <span id="campaigns" class="value">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Disasters</span>
-              <span id="disasters" class="value">0</span>
-            </div>
-            <div class="stat">
-              <span class="label">Tipping</span>
-              <span id="tipping-count" class="value">0/4</span>
-            </div>
-            <div class="stat">
-              <span class="label">Years</span>
-              <span id="years-left" class="value">75</span>
-            </div>
-            <div class="stat">
-              <span class="label">Date</span>
-              <span id="date" class="value">Jan 2025</span>
+
+            <!-- Date -->
+            <div class="header-date">
+              <span class="date-value" id="date">Jan 2025</span>
+              <span class="date-years"><span id="years-left">75</span> yrs</span>
             </div>
           </div>
-          <div id="header-controls" class="header-controls" style="display: none;">
-            <button id="next-month" class="primary-button small">Next Month</button>
-            <button id="restart-button" class="ghost-button small">Restart</button>
-            <a href="index.html" class="ghost-button small">Exit</a>
+
+          <!-- Secondary Stats Row -->
+          <div class="header-stats-row">
+            <div class="header-stat clickable" title="Click for alliance details" onclick="openStatDetail('alliance')">
+              <span class="stat-label">Allies</span>
+              <span class="stat-value" id="alliance-progress">1/6</span>
+            </div>
+            <div class="header-stat clickable" title="Click for research details" onclick="openStatDetail('research')">
+              <span class="stat-label">RP</span>
+              <span class="stat-value" id="rp-display">56</span>
+            </div>
+            <div class="header-stat clickable" title="Click for project details" onclick="openStatDetail('projects')">
+              <span class="stat-label">Built</span>
+              <span class="stat-value" id="projects-display">0</span>
+            </div>
+            <div class="header-stat clickable" title="Click for construction details" onclick="openStatDetail('building')">
+              <span class="stat-label">Build</span>
+              <span class="stat-value" id="building-display">0</span>
+            </div>
+            <div class="header-stat clickable" title="Click for capture details" onclick="openStatDetail('capture')">
+              <span class="stat-label">CCS</span>
+              <span class="stat-value" id="capture-rate">0</span>
+            </div>
+            <div class="header-stat clickable" title="Click for tech details" onclick="openStatDetail('tech')">
+              <span class="stat-label">Tech</span>
+              <span class="stat-value" id="tech-progress">0/12</span>
+            </div>
+            <div class="header-stat clickable" title="Click for disaster details" onclick="openStatDetail('disasters')">
+              <span class="stat-label">Risk</span>
+              <span class="stat-value">
+                <span id="disaster-count">0</span>
+                <span class="stat-delta" id="disaster-delta"></span>
+              </span>
+            </div>
           </div>
-          <button id="stats-info-toggle" class="ghost-button small">?</button>
+
+          <!-- Hidden elements for JS references -->
+          <div style="display:none;">
+            <span id="income">+$0/mo</span>
+            <span id="feedback">+0.00</span>
+            <span id="total-projects">0</span>
+            <span id="under-construction">0</span>
+            <span id="research-points">0</span>
+            <span id="campaigns">0</span>
+            <span id="disasters">0</span>
+            <span id="tipping-count">0/4</span>
+          </div>
         </header>
 
         <div id="stats-info" class="stats-info is-hidden">
@@ -98,12 +119,75 @@
       <div class="game-screen">
         <div class="map-stage">
           <div class="map-container">
+            <div class="map-view-overlay">
+              <select id="map-mode" class="map-mode-select">
+                <option value="alliance" selected>Alliance</option>
+                <option value="alliance_happiness">Happiness</option>
+                <option value="temperature">Temperature</option>
+                <option value="emissions">Emissions</option>
+                <option value="renewables">Renewables</option>
+                <option value="economy">Economy</option>
+                <option value="power">Power Grid</option>
+                <option value="stability">Stability</option>
+              </select>
+            </div>
+            <div id="map-legend" class="map-legend-overlay"></div>
             <object
               id="map-object"
               type="image/svg+xml"
               data="assets/maps/mapsvg-world-world.svg"
               aria-label="World map"
             ></object>
+          </div>
+          <div id="header-controls" class="header-controls" style="display: none;">
+            <button id="next-month" class="primary-button small">Next Month</button>
+            <button id="restart-button" class="ghost-button small">Restart</button>
+            <a href="index.html" class="ghost-button small">Exit</a>
+            <button id="stats-info-toggle" class="ghost-button small">?</button>
+          </div>
+        </div>
+
+        <!-- Tech Panel (shown when Tech tab is active) -->
+        <div id="tech-panel" class="tech-panel" style="display: none;">
+          <div class="tech-panel-header">
+            <h2>Technology Research</h2>
+            <div class="tech-rp-display-large">
+              <span class="rp-icon">🔬</span>
+              <span id="tech-rp-display">0 RP</span>
+              <span class="rp-rate" id="tech-rp-rate">(+0/mo)</span>
+            </div>
+          </div>
+
+          <div class="tech-panel-content">
+            <!-- Research Centers Section -->
+            <div class="tech-section">
+              <div class="tech-section-header">
+                <h3>Research Centers</h3>
+                <p class="tech-section-desc">Build research centers to generate Research Points (RP) monthly. Each center has ongoing operating costs.</p>
+              </div>
+
+              <!-- Active Research Centers -->
+              <div class="tech-subsection">
+                <h4>Your Research Centers</h4>
+                <div id="active-research-centers" class="active-research-centers">
+                  <p class="no-centers-msg">No research centers built yet.</p>
+                </div>
+              </div>
+
+              <!-- Available Research Centers by Category -->
+              <div class="tech-subsection">
+                <h4>Build Research Centers</h4>
+                <div id="research-center-options" class="research-center-grid"></div>
+              </div>
+            </div>
+
+            <!-- Tech Categories Summary -->
+            <div class="tech-section">
+              <div class="tech-section-header">
+                <h3>Research Progress</h3>
+              </div>
+              <div id="tech-categories" class="tech-categories-grid"></div>
+            </div>
           </div>
         </div>
 
@@ -157,6 +241,7 @@
           <div id="sidebar-tabs" class="sidebar-tabs" style="display: none;">
             <button class="sidebar-tab active" data-tab="world">World</button>
             <button class="sidebar-tab" data-tab="region">Region</button>
+            <button class="sidebar-tab" data-tab="tech">Tech</button>
           </div>
 
           <!-- World Tab Content -->
@@ -308,59 +393,6 @@
 
           <!-- Region Tab Content -->
           <div id="region-tab-content" class="tab-content">
-            <div class="region-search">
-            <div class="section-header-row">
-              <label class="map-label" for="region-search-input">Search Regions</label>
-              <button class="section-info-btn" data-info-target="region-search-info" aria-label="Info about Region Search" aria-expanded="false"><span class="info-icon">i</span></button>
-            </div>
-            <div id="region-search-info" class="section-info-panel is-hidden">
-              <h4>Region Search</h4>
-              <p>Type to find countries, continents, or major regions. Click a result to select and view that region on the map.</p>
-              <p class="info-tip"><strong>Tip:</strong> Search for high-potential regions like "Saudi Arabia" for solar or "Norway" for wind projects.</p>
-            </div>
-            <input type="text" id="region-search-input" class="region-search-input" placeholder="Type to search...">
-            <div id="region-search-results" class="region-search-results"></div>
-          </div>
-
-          <div class="map-tools">
-            <div class="section-header-row">
-              <label class="map-label" for="map-style">Granularity</label>
-              <button class="section-info-btn" data-info-target="granularity-info" aria-label="Info about Granularity" aria-expanded="false"><span class="info-icon">i</span></button>
-            </div>
-            <div id="granularity-info" class="section-info-panel is-hidden">
-              <h4>Map Granularity</h4>
-              <p>Choose how to divide the world: 6 continents, 15 major regions, or ~250 individual countries.</p>
-              <p class="info-tip"><strong>Tip:</strong> Use Countries view for precise project placement in high-potential areas.</p>
-            </div>
-            <select id="map-style" class="map-select">
-              <option value="continents" selected>Continents (6 regions)</option>
-              <option value="major_regions">Major Regions (15 regions)</option>
-              <option value="countries">Countries (~250 regions)</option>
-            </select>
-
-            <div class="section-header-row">
-              <label class="map-label" for="map-mode">Map View</label>
-              <button class="section-info-btn" data-info-target="map-view-info" aria-label="Info about Map View" aria-expanded="false"><span class="info-icon">i</span></button>
-            </div>
-            <div id="map-view-info" class="section-info-panel is-hidden">
-              <h4>Map Visualization</h4>
-              <p>Switch between views to analyze different data: Temperature (warming), Emissions (CO2 output), Renewables (project potential), Economy (GDP).</p>
-              <p class="info-tip"><strong>Tip:</strong> Use Renewables view to find the best locations for solar and wind projects.</p>
-            </div>
-            <select id="map-mode" class="map-select">
-              <option value="alliance" selected>Alliance</option>
-              <option value="alliance_happiness">Alliance Happiness</option>
-              <option value="temperature">Temperature</option>
-              <option value="emissions">Emissions</option>
-              <option value="renewables">Renewable Potential</option>
-              <option value="economy">Economy (GDP)</option>
-              <option value="power">Power Grid</option>
-              <option value="stability">Grid Stability</option>
-            </select>
-          </div>
-
-          <div id="map-legend" class="map-legend"></div>
-
             <section class="action-panel">
             <div class="section-header-row">
               <h2>Region Actions</h2>
@@ -415,22 +447,41 @@
     <!-- Carbon Balance Popup -->
     <div id="carbon-balance-popup" class="popup-container hidden">
       <div class="popup-overlay" onclick="closeCarbonBalancePopup()"></div>
-      <div class="carbon-balance-dialog">
+      <div class="carbon-balance-dialog carbon-balance-dialog-wide">
         <div class="popup-header">
           <h3 class="popup-title">Global Carbon Balance</h3>
           <button class="popup-close" onclick="closeCarbonBalancePopup()">&times;</button>
         </div>
         <div class="popup-body">
-          <div class="carbon-section">
-            <h4>Emissions (Sources)</h4>
-            <div id="carbon-emissions-list" class="carbon-list"></div>
-            <div class="carbon-total" id="carbon-emissions-total"></div>
+          <!-- Tab navigation -->
+          <div class="carbon-tabs">
+            <button class="carbon-tab active" data-tab="regions" onclick="switchCarbonTab('regions')">By Region</button>
+            <button class="carbon-tab" data-tab="global" onclick="switchCarbonTab('global')">Global Summary</button>
           </div>
-          <div class="carbon-section">
-            <h4>Removals (Sinks)</h4>
-            <div id="carbon-removals-list" class="carbon-list"></div>
-            <div class="carbon-total" id="carbon-removals-total"></div>
+
+          <!-- Regions tab content -->
+          <div id="carbon-tab-regions" class="carbon-tab-content active">
+            <div class="carbon-section">
+              <h4>Emissions by Region <span class="carbon-hint">(click to expand)</span></h4>
+              <div id="carbon-regions-list" class="carbon-regions-list"></div>
+            </div>
           </div>
+
+          <!-- Global tab content -->
+          <div id="carbon-tab-global" class="carbon-tab-content">
+            <div class="carbon-section">
+              <h4>Emissions (Sources)</h4>
+              <div id="carbon-emissions-list" class="carbon-list"></div>
+              <div class="carbon-total" id="carbon-emissions-total"></div>
+            </div>
+            <div class="carbon-section">
+              <h4>Removals (Sinks)</h4>
+              <div id="carbon-removals-list" class="carbon-list"></div>
+              <div class="carbon-total" id="carbon-removals-total"></div>
+            </div>
+          </div>
+
+          <!-- Net balance always visible -->
           <div class="carbon-section carbon-net">
             <h4>Net Balance</h4>
             <div id="carbon-net-balance" class="carbon-net-value"></div>
@@ -438,6 +489,22 @@
           </div>
         </div>
         <button class="popup-dismiss" onclick="closeCarbonBalancePopup()">Close</button>
+      </div>
+    </div>
+
+    <!-- Stat Detail Popup (Generic) -->
+    <div id="stat-detail-popup" class="popup-container hidden">
+      <div class="popup-overlay" onclick="closeStatDetailPopup()"></div>
+      <div class="stat-detail-dialog">
+        <div class="popup-header">
+          <span class="stat-detail-icon" id="stat-detail-icon"></span>
+          <h3 class="popup-title" id="stat-detail-title">Stat Details</h3>
+          <button class="popup-close" onclick="closeStatDetailPopup()">&times;</button>
+        </div>
+        <div class="popup-body" id="stat-detail-body">
+          <!-- Content populated dynamically -->
+        </div>
+        <button class="popup-dismiss" onclick="closeStatDetailPopup()">Close</button>
       </div>
     </div>
 
