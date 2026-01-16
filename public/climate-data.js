@@ -4282,6 +4282,12 @@ function aggregateRegionData(regionId) {
       sources,
     },
     potential: region.avgPotential,
+    // Pass through critical data for carbon balance calculation
+    sectorEmissions: region.sectorEmissions || null,
+    power: region.power || null,
+    developmentLevel: region.developmentLevel || null,
+    // Diplomatic data for negotiations
+    diplomatic: region.diplomatic || null,
     facts: countries.flatMap((c) => c.facts || []).slice(0, 4),
   };
 }
@@ -4654,11 +4660,74 @@ function getMajorRegionData(majorRegionId) {
   const region = MAJOR_REGIONS[majorRegionId];
   if (!region) return null;
 
-  return aggregateCountriesToRegion(
+  const data = aggregateCountriesToRegion(
     region.countries,
     region.name,
     majorRegionId
   );
+
+  // Override with curated major region-level values from MAJOR_REGIONS
+  if (data && region) {
+    // Power grid data for power emissions calculation
+    data.power = region.power || data.power;
+    // Development level for growth/efficiency rates
+    data.developmentLevel = region.developmentLevel || data.developmentLevel;
+
+    // Calculate sectorEmissions by distributing parent continent's emissions
+    // based on this major region's share of the continent's power demand
+    const continentId = region.continent;
+    const continentAgg = REGION_AGGREGATES[continentId];
+    if (continentAgg?.sectorEmissions) {
+      // Get all major regions in this continent
+      const continent = CONTINENTS[continentId];
+      if (continent) {
+        // Calculate total power demand for continent
+        let totalContinentDemand = 0;
+        continent.majorRegions.forEach(mrId => {
+          const mr = MAJOR_REGIONS[mrId];
+          totalContinentDemand += mr?.power?.baseDemandGW || 0;
+        });
+
+        // This region's share of continent (by power demand as proxy for economic activity)
+        const regionDemand = region.power?.baseDemandGW || 0;
+        const share = totalContinentDemand > 0 ? regionDemand / totalContinentDemand : 0;
+
+        // Distribute continent's sector emissions proportionally
+        data.sectorEmissions = {
+          industry: {
+            baseline: (continentAgg.sectorEmissions.industry?.baseline || 0) * share,
+            subsectors: Object.fromEntries(
+              Object.entries(continentAgg.sectorEmissions.industry?.subsectors || {})
+                .map(([k, v]) => [k, v * share])
+            ),
+          },
+          transport: {
+            baseline: (continentAgg.sectorEmissions.transport?.baseline || 0) * share,
+            subsectors: Object.fromEntries(
+              Object.entries(continentAgg.sectorEmissions.transport?.subsectors || {})
+                .map(([k, v]) => [k, v * share])
+            ),
+          },
+          buildings: {
+            baseline: (continentAgg.sectorEmissions.buildings?.baseline || 0) * share,
+            subsectors: Object.fromEntries(
+              Object.entries(continentAgg.sectorEmissions.buildings?.subsectors || {})
+                .map(([k, v]) => [k, v * share])
+            ),
+          },
+          agriculture: {
+            baseline: (continentAgg.sectorEmissions.agriculture?.baseline || 0) * share,
+            subsectors: Object.fromEntries(
+              Object.entries(continentAgg.sectorEmissions.agriculture?.subsectors || {})
+                .map(([k, v]) => [k, v * share])
+            ),
+          },
+        };
+      }
+    }
+  }
+
+  return data;
 }
 
 /**
@@ -4676,11 +4745,19 @@ function getContinentData(continentId) {
 
   const data = aggregateCountriesToRegion(allCountries, continent.name, continentId);
 
-  // Override baseIncome with the defined value from REGION_AGGREGATES
-  // The aggregation sums country incomes, but we want the curated continent-level value
+  // Override values from REGION_AGGREGATES
+  // The aggregation sums country data, but we want the curated continent-level values
   if (data && REGION_AGGREGATES[continentId]) {
     data.baseIncome = REGION_AGGREGATES[continentId].baseIncome || data.baseIncome;
     data.sectorIncome = REGION_AGGREGATES[continentId].sectorIncome || data.sectorIncome;
+    // Critical for carbon balance calculation - sector emissions baselines
+    data.sectorEmissions = REGION_AGGREGATES[continentId].sectorEmissions || null;
+    // Power grid data for power emissions calculation
+    data.power = REGION_AGGREGATES[continentId].power || data.power;
+    // Development level for growth/efficiency rates
+    data.developmentLevel = REGION_AGGREGATES[continentId].developmentLevel || data.developmentLevel;
+    // Diplomatic data for negotiations
+    data.diplomatic = REGION_AGGREGATES[continentId].diplomatic || data.diplomatic;
   }
 
   return data;
