@@ -13,6 +13,8 @@ export default defineConfig({
         systems: resolve(__dirname, 'systems.html'),
         game_mechanics: resolve(__dirname, 'game_mechanics.html'),
         game_rules: resolve(__dirname, 'game_rules.html'),
+        game_data_reference: resolve(__dirname, 'Game_Data_Reference.html'),
+        emissions_data_reference: resolve(__dirname, 'Emissions_Data_Reference.html'),
       },
     },
   },
