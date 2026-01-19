@@ -696,6 +696,69 @@ body::before {
   justify-content: flex-start;
 }
 
+/* Documentation Section */
+.docs-section {
+  margin-top: 40px;
+  padding-top: 30px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.docs-section h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--muted);
+  margin-bottom: 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 400;
+}
+
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.doc-link {
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.2s ease;
+}
+
+.doc-link:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.doc-icon {
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.doc-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.doc-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+@media (max-width: 600px) {
+  .docs-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .difficulty-selector {
   display: flex;
   flex-direction: column;
