@@ -3157,6 +3157,29 @@ body::before {
   gap: 8px;
 }
 
+.tech-tree-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-bottom: 8px;
+  border-left: 3px solid var(--muted);
+}
+
+.tech-tree-tip.available-tip {
+  background: rgba(240, 198, 111, 0.15);
+  border-left: 3px solid var(--accent);
+  color: var(--text);
+}
+
+.tech-tree-tip .tip-icon {
+  font-size: 1.1rem;
+}
+
 .tech-item {
   display: flex;
   align-items: center;
@@ -5267,6 +5290,22 @@ details summary .section-info-btn {
   color: var(--region-hot);
 }
 
+.power-stat-value.excellent {
+  color: var(--region-good);
+}
+
+.power-stat-value.good {
+  color: #7eb8da;
+}
+
+.power-stat-value.warning {
+  color: var(--region-mild);
+}
+
+.power-stat-value.critical {
+  color: var(--region-hot);
+}
+
 .power-bar-container {
   margin: 8px 0;
 }
@@ -5693,6 +5732,36 @@ details summary .section-info-btn {
   margin: 0 6px;
 }
 
+.auto-calc-note {
+  margin: 8px 0 0 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.emissions-avoided-display {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 12px 14px;
+  background: rgba(76, 175, 80, 0.15);
+  border: 1px solid rgba(76, 175, 80, 0.3);
+  border-radius: 8px;
+}
+
+.emissions-label {
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.emissions-value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #81c784;
+  font-family: var(--font-display);
+}
+
 .build-mode-actions {
   display: flex;
   justify-content: flex-end;
@@ -5738,9 +5807,13 @@ details summary .section-info-btn {
 
 /* Construction Progress in Region Panel */
 .construction-section {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--panel-border);
+  margin-bottom: 16px;
+}
+
+.construction-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .construction-header {
@@ -5792,7 +5865,8 @@ details summary .section-info-btn {
   color: var(--accent);
 }
 
-.construction-progress-bar {
+.construction-progress-bar,
+.construction-progress {
   height: 6px;
   background: rgba(0, 0, 0, 0.4);
   border-radius: 3px;
@@ -6118,6 +6192,18 @@ details summary .section-info-btn {
 .tech-category-item .category-count {
   font-size: 0.8rem;
   color: var(--muted);
+}
+
+.tech-category-item.has-centers {
+  border-color: var(--accent);
+  background: rgba(240, 198, 111, 0.08);
+}
+
+.tech-category-item .category-rp {
+  font-size: 0.75rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 4px;
 }
 
 /* Research Toast Notifications */
