@@ -3340,15 +3340,15 @@ const REGION_AGGREGATES = {
         nuclear: 150,          // Expansion possible with SMRs
       },
     },
-    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    // Sector emissions in Gt CO2/year (non-power sectors, adjusted to IEA 2024)
     sectorEmissions: {
       industry: {
-        baseline: 1.5,         // Gt CO2/year - mature industrial base
+        baseline: 1.2,         // Gt CO2/year - adjusted for global 9.4 Gt total
         subsectors: {
-          cement: 0.12,        // 8% - mostly imports now
-          steel: 0.25,         // 17% - declining domestic production
-          chemicals: 0.45,     // 30% - petrochemicals, plastics
-          other: 0.68,         // 45% - manufacturing, processing
+          cement: 0.10,        // 8% - mostly imports now
+          steel: 0.20,         // 17% - declining domestic production
+          chemicals: 0.36,     // 30% - petrochemicals, plastics
+          other: 0.54,         // 45% - manufacturing, processing
         },
       },
       transport: {
@@ -3422,15 +3422,15 @@ const REGION_AGGREGATES = {
         nuclear: 40,           // Limited political interest
       },
     },
-    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    // Sector emissions in Gt CO2/year (non-power sectors, adjusted to IEA 2024)
     sectorEmissions: {
       industry: {
-        baseline: 0.45,        // Gt CO2/year - growing industrial sector
+        baseline: 0.35,        // Gt CO2/year - adjusted for global 9.4 Gt total
         subsectors: {
-          cement: 0.08,        // 18% - construction boom
-          steel: 0.12,         // 27% - Brazil steel industry
-          chemicals: 0.10,     // 22% - petrochemicals
-          other: 0.15,         // 33% - mining, food processing
+          cement: 0.06,        // 17% - construction boom
+          steel: 0.09,         // 26% - Brazil steel industry
+          chemicals: 0.08,     // 23% - petrochemicals
+          other: 0.12,         // 34% - mining, food processing
         },
       },
       transport: {
@@ -3504,15 +3504,15 @@ const REGION_AGGREGATES = {
         nuclear: 120,          // Political constraints in Germany
       },
     },
-    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    // Sector emissions in Gt CO2/year (non-power sectors, adjusted to IEA 2024)
     sectorEmissions: {
       industry: {
-        baseline: 1.20,        // Gt CO2/year - diverse industrial base
+        baseline: 1.0,         // Gt CO2/year - adjusted for global 9.4 Gt total
         subsectors: {
-          cement: 0.15,        // 13% - Germany, Italy production
-          steel: 0.22,         // 18% - Germany, Poland, UK
-          chemicals: 0.35,     // 29% - Germany BASF, petrochemicals
-          other: 0.48,         // 40% - manufacturing, processing
+          cement: 0.12,        // 12% - Germany, Italy production
+          steel: 0.18,         // 18% - Germany, Poland, UK
+          chemicals: 0.29,     // 29% - Germany BASF, petrochemicals
+          other: 0.41,         // 41% - manufacturing, processing
         },
       },
       transport: {
@@ -3586,15 +3586,15 @@ const REGION_AGGREGATES = {
         nuclear: 30,           // Very limited infrastructure
       },
     },
-    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    // Sector emissions in Gt CO2/year (non-power sectors, adjusted to IEA 2024)
     sectorEmissions: {
       industry: {
-        baseline: 0.35,        // Gt CO2/year - early industrialization
+        baseline: 0.25,        // Gt CO2/year - adjusted for global 9.4 Gt total
         subsectors: {
-          cement: 0.10,        // 29% - rapid construction
-          steel: 0.08,         // 23% - growing demand
-          chemicals: 0.05,     // 14% - fertilizers
-          other: 0.12,         // 34% - mining, light industry
+          cement: 0.07,        // 28% - rapid construction
+          steel: 0.06,         // 24% - growing demand
+          chemicals: 0.04,     // 16% - fertilizers
+          other: 0.08,         // 32% - mining, light industry
         },
       },
       transport: {
@@ -3668,15 +3668,15 @@ const REGION_AGGREGATES = {
         nuclear: 300,          // China expanding rapidly (50+ reactors)
       },
     },
-    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    // Sector emissions in Gt CO2/year (non-power sectors, adjusted to IEA 2024)
     sectorEmissions: {
       industry: {
-        baseline: 10.5,        // Gt CO2/year - world's factory
+        baseline: 6.5,         // Gt CO2/year - adjusted for global 9.4 Gt total (IEA)
         subsectors: {
-          cement: 2.80,        // 27% - China 55% of global cement
-          steel: 3.50,         // 33% - China 50% of global steel
-          chemicals: 2.10,     // 20% - petrochemicals, fertilizers
-          other: 2.10,         // 20% - manufacturing, processing
+          cement: 1.75,        // 27% - China 55% of global cement
+          steel: 2.15,         // 33% - China 50% of global steel
+          chemicals: 1.30,     // 20% - petrochemicals, fertilizers
+          other: 1.30,         // 20% - manufacturing, processing
         },
       },
       transport: {
@@ -3750,15 +3750,15 @@ const REGION_AGGREGATES = {
         nuclear: 0,            // Currently banned in Australia
       },
     },
-    // Sector emissions in Gt CO2/year (non-power sectors, IEA 2023 data)
+    // Sector emissions in Gt CO2/year (non-power sectors, adjusted to IEA 2024)
     sectorEmissions: {
       industry: {
-        baseline: 0.18,        // Gt CO2/year - mining, processing
+        baseline: 0.10,        // Gt CO2/year - adjusted for global 9.4 Gt total
         subsectors: {
-          cement: 0.02,        // 11% - local production
-          steel: 0.04,         // 22% - iron ore processing
-          chemicals: 0.05,     // 28% - LNG processing
-          other: 0.07,         // 39% - aluminum, mining
+          cement: 0.01,        // 10% - local production
+          steel: 0.02,         // 20% - iron ore processing
+          chemicals: 0.03,     // 30% - LNG processing
+          other: 0.04,         // 40% - aluminum, mining
         },
       },
       transport: {
