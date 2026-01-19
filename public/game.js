@@ -1,6 +1,6 @@
 const GAME_CONFIG = {
   // Currency settings (real-world billions USD)
-  startingFunds: 100,           // $100 billion starting budget
+  startingFunds: 25,            // $25 billion starting budget (reduced for balance)
   currencyUnit: "B",            // Billions
   currencySymbol: "$",          // USD
 
@@ -9,13 +9,13 @@ const GAME_CONFIG = {
   startingTemp: 1.2,
   startYear: 2025,
   startMonth: 1,
-  co2Increase: 0.75,            // ppm per month base increase (+50% for difficulty)
+  co2Increase: 0.4,             // ppm per month base increase (real-world: ~5 ppm/year)
   baselineCo2: 280,             // Pre-industrial CO2 level
   tempFactor: 0.008,            // °C per ppm above baseline
 
   // Win/lose conditions
-  winTemp: 1.0,
-  loseTemp: 3.0,
+  winTemp: 1.5,                 // Paris Agreement target - stabilize below 1.5°C
+  loseTemp: 2.5,                // Catastrophic tipping point territory
   loseYear: 2100,
 
   // Climate Policy Campaign settings
@@ -27,6 +27,26 @@ const GAME_CONFIG = {
   // Legacy (for backward compatibility)
   startingCredits: 100,
   baseIncome: 5,
+};
+
+// Regional Project Caps - Max number of each project type per region
+// This prevents unrealistic concentration of projects and adds strategic planning
+const REGIONAL_PROJECT_CAPS = {
+  forest: 3,            // Limited suitable land for reforestation
+  carbonCapture: 2,     // Infrastructure and storage limitations
+  solar: 5,             // Grid integration limits
+  wind: 4,              // Suitable sites limited
+  offshoreWind: 3,      // Coastal locations limited
+  nuclear: 2,           // Political and safety constraints
+  coal: 3,              // (existing plants, allows building but limited)
+  naturalGas: 4,        // More flexible, but still limited
+  geothermal: 2,        // Location-dependent
+  hydropower: 2,        // River/dam sites limited
+  batteryStorage: 6,    // More flexible infrastructure
+  pumpedHydro: 2,       // Requires specific geography
+  research: 2,          // Research centers per region
+  infrastructure: 4,    // General infrastructure
+  // Default: null means no cap
 };
 
 // Growth System Configuration
@@ -102,16 +122,16 @@ const EFFICIENCY_IMPROVEMENT = {
   oilEconomy: 0.01,     // 1%/year (slower transition)
 };
 
-// Natural carbon sink configuration
+// Natural carbon sink configuration (GCB 2025)
 const NATURAL_SINK_CONFIG = {
   ocean: {
-    baseAbsorption: 10.0,     // Gt CO2/year absorbed at 420 ppm
+    baseAbsorption: 12.2,      // Gt CO2/year - GCB 2025 (29% of 42.2 Gt emissions)
     saturationStart: 450,      // ppm where absorption efficiency starts dropping
     saturationRate: 0.02,      // 2% less effective per 10 ppm above start
     temperatureImpact: 0.05,   // 5% less effective per 0.5°C above 1.5°C
   },
   land: {
-    baseAbsorption: 3.5,       // Gt CO2/year absorbed by natural vegetation
+    baseAbsorption: 8.9,       // Gt CO2/year - GCB 2025 (21% of 42.2 Gt emissions)
     saturationStart: 2.0,      // °C where forest stress begins
     saturationRate: 0.1,       // 10% less effective per 0.5°C above start
   },
@@ -3677,16 +3697,16 @@ const DIFFICULTY_MODES = {
   tutorial: {
     name: "Tutorial",
     description: "Learn the basics with a forgiving climate",
-    co2Multiplier: 0.6,         // 0.3 ppm/month
-    startingFunds: 150,         // $150B starting
+    co2Multiplier: 0.6,         // 0.24 ppm/month (base 0.4 × 0.6)
+    startingFunds: 50,          // $50B starting (reduced for balance)
     costMultiplier: 0.7,        // -30% project costs
     eventsEnabled: false,
   },
   easy: {
     name: "Easy",
     description: "A gentler introduction to climate management",
-    co2Multiplier: 0.8,         // 0.4 ppm/month
-    startingFunds: 120,         // $120B starting
+    co2Multiplier: 0.8,         // 0.32 ppm/month
+    startingFunds: 40,          // $40B starting (reduced for balance)
     costMultiplier: 0.85,       // -15% project costs
     eventsEnabled: true,
     eventSeverity: 0.5,         // Mild events
@@ -3694,8 +3714,8 @@ const DIFFICULTY_MODES = {
   normal: {
     name: "Normal",
     description: "The real climate challenge",
-    co2Multiplier: 1.0,         // 0.5 ppm/month
-    startingFunds: 100,         // $100B starting
+    co2Multiplier: 1.0,         // 0.4 ppm/month
+    startingFunds: 25,          // $25B starting (reduced for balance)
     costMultiplier: 1.0,        // Normal costs
     eventsEnabled: true,
     eventSeverity: 1.0,         // Normal events
@@ -3703,8 +3723,8 @@ const DIFFICULTY_MODES = {
   hard: {
     name: "Hard",
     description: "Political resistance and harsh economics",
-    co2Multiplier: 1.2,         // 0.6 ppm/month
-    startingFunds: 80,          // $80B starting
+    co2Multiplier: 1.2,         // 0.48 ppm/month
+    startingFunds: 20,          // $20B starting (reduced for balance)
     costMultiplier: 1.15,       // +15% project costs
     eventsEnabled: true,
     eventSeverity: 1.5,         // Harsh events
@@ -3712,8 +3732,8 @@ const DIFFICULTY_MODES = {
   extreme: {
     name: "Extreme",
     description: "Can you save the planet against all odds?",
-    co2Multiplier: 1.4,         // 0.7 ppm/month
-    startingFunds: 60,          // $60B starting
+    co2Multiplier: 1.4,         // 0.56 ppm/month
+    startingFunds: 15,          // $15B starting (reduced for balance)
     costMultiplier: 1.3,        // +30% project costs
     eventsEnabled: true,
     eventSeverity: 2.0,         // Extreme events
@@ -3833,8 +3853,8 @@ const PROJECT_TYPES = {
   // ═══════════════════════════════════════════════════════════════
   forest: {
     label: "Reforestation Program",
-    cost: 7.5,                  // $7.5 billion (was $5B, +50% for difficulty)
-    co2Reduction: 2,
+    cost: 15,                   // $15 billion (increased for balance)
+    co2Reduction: 0.02,         // Realistic carbon sink rate (was 2, 100x nerf)
     income: 0,
     category: "climate",
     constructionMonths: 4,     // Planting phase
@@ -3842,8 +3862,8 @@ const PROJECT_TYPES = {
   },
   carbonCapture: {
     label: "Carbon Capture",
-    cost: 52.5,                 // $52.5 billion (was $35B, +50% for difficulty)
-    co2Reduction: 4,
+    cost: 80,                   // $80 billion (increased for balance)
+    co2Reduction: 0.05,         // Realistic CCS rate (was 4, 80x nerf)
     income: 0,
     category: "climate",
     constructionMonths: 30,    // 24-36 months typical
@@ -3864,9 +3884,9 @@ const PROJECT_TYPES = {
   // ═══════════════════════════════════════════════════════════════
   solar: {
     label: "Utility Solar Farm",
-    cost: 15,                   // $15 billion
-    co2Reduction: 1,
-    income: 2,
+    cost: 25,                   // $25 billion (increased for balance)
+    co2Reduction: 0,            // Only reduces CO2 when replacing fossil (calculated from retired capacity)
+    income: 0.8,                // Reduced income for balance
     category: "power",
     powerCategory: "variable",
     capacityGW: 0.5,            // 500 MW per project
@@ -3876,9 +3896,9 @@ const PROJECT_TYPES = {
   },
   wind: {
     label: "Wind Farm",
-    cost: 18,                   // $18 billion
-    co2Reduction: 1,
-    income: 2,
+    cost: 22,                   // $22 billion (increased for balance)
+    co2Reduction: 0,            // Only reduces CO2 when replacing fossil (calculated from retired capacity)
+    income: 0.8,                // Reduced income for balance
     category: "power",
     powerCategory: "variable",
     capacityGW: 0.3,            // 300 MW per project
@@ -3888,9 +3908,9 @@ const PROJECT_TYPES = {
   },
   offshoreWind: {
     label: "Offshore Wind",
-    cost: 45,                   // $45 billion
-    co2Reduction: 2,
-    income: 3,
+    cost: 60,                   // $60 billion (increased for balance)
+    co2Reduction: 0,            // Only reduces CO2 when replacing fossil (calculated from retired capacity)
+    income: 1.2,                // Reduced income for balance
     category: "power",
     powerCategory: "variable",
     capacityGW: 0.8,            // 800 MW per project
@@ -3904,9 +3924,9 @@ const PROJECT_TYPES = {
   // ═══════════════════════════════════════════════════════════════
   nuclear: {
     label: "Nuclear Plant",
-    cost: 75,                   // $75 billion
-    co2Reduction: 3,            // Replaces fossil fuels
-    income: 4,
+    cost: 120,                  // $120 billion (increased for balance)
+    co2Reduction: 0,            // Only reduces CO2 when replacing fossil (calculated from retired capacity)
+    income: 1.5,                // Reduced income for balance
     category: "power",
     powerCategory: "baseload",
     capacityGW: 1.2,            // 1.2 GW per plant
@@ -3917,8 +3937,8 @@ const PROJECT_TYPES = {
   coal: {
     label: "Coal Power Plant",
     cost: 8,                    // $8 billion (cheap to build)
-    co2Reduction: -3,           // ADDS CO2 emissions!
-    income: 3,
+    co2Reduction: 0,            // Emissions calculated from power generation (0.9 Mt CO2/TWh)
+    income: 1.5,                // Reduced income for balance
     category: "power",
     powerCategory: "baseload",
     capacityGW: 1.0,            // 1 GW per plant
@@ -3929,8 +3949,8 @@ const PROJECT_TYPES = {
   naturalGas: {
     label: "Natural Gas Plant",
     cost: 12,                   // $12 billion
-    co2Reduction: -1.5,         // Adds some CO2 (less than coal)
-    income: 3,
+    co2Reduction: 0,            // Emissions calculated from power generation (0.4 Mt CO2/TWh)
+    income: 1.2,                // Reduced income for balance
     category: "power",
     powerCategory: "baseload",
     capacityGW: 0.8,            // 800 MW per plant
@@ -3940,9 +3960,9 @@ const PROJECT_TYPES = {
   },
   geothermal: {
     label: "Geothermal Plant",
-    cost: 35,                   // $35 billion
-    co2Reduction: 1,            // Clean energy
-    income: 2,
+    cost: 45,                   // $45 billion (increased for balance)
+    co2Reduction: 0,            // Only reduces CO2 when replacing fossil (calculated from retired capacity)
+    income: 0.8,                // Reduced income for balance
     category: "power",
     powerCategory: "baseload",
     capacityGW: 0.3,            // 300 MW per plant
@@ -3953,9 +3973,9 @@ const PROJECT_TYPES = {
   },
   hydropower: {
     label: "Hydroelectric Dam",
-    cost: 50,                   // $50 billion
-    co2Reduction: 1.5,          // Clean energy
-    income: 2.5,
+    cost: 65,                   // $65 billion (increased for balance)
+    co2Reduction: 0,            // Only reduces CO2 when replacing fossil (calculated from retired capacity)
+    income: 1.0,                // Reduced income for balance
     category: "power",
     powerCategory: "baseload",
     capacityGW: 0.5,            // 500 MW per dam
@@ -4859,8 +4879,23 @@ function calculateProjectedIncome() {
 }
 
 /**
+ * Calculate diminishing returns multiplier for project stacking
+ * Each additional project of the same type is 15% less effective
+ * 1st = 100%, 2nd = 85%, 3rd = 72%, 4th = 61%, etc.
+ */
+function getStackingMultiplier(projectIndex) {
+  return Math.pow(0.85, projectIndex);
+}
+
+/**
  * Calculate net CO2 change rate per month
- * Combines base increase, project reductions, and feedback effects
+ * Combines base increase, actual carbon removal projects, and feedback effects
+ *
+ * IMPORTANT: Power projects (solar, wind, nuclear, etc.) have co2Reduction: 0
+ * because they only reduce emissions when REPLACING fossil fuels.
+ * That reduction is calculated in calculateRegionEmissions() based on retired fossil capacity.
+ *
+ * Only actual carbon REMOVAL projects (forest, carbonCapture) directly reduce CO2 here.
  */
 function calculateNetCO2Rate() {
   if (!state?.regions) {
@@ -4868,14 +4903,30 @@ function calculateNetCO2Rate() {
   }
   let rate = getCo2IncreaseRate();
 
-  // Subtract project CO2 reductions
+  // Count projects by type across all regions for diminishing returns
+  const projectCountByType = {};
+
+  // Subtract CO2 reductions ONLY from actual carbon removal projects (not power)
+  // Power projects reduce emissions by replacing fossil fuels, tracked separately
   Object.values(state.regions).forEach(region => {
     region.projects.forEach(proj => {
       const projectType = typeof proj === "string" ? proj : proj.type;
       const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
       const project = PROJECT_TYPES[projectType];
-      if (project && project.co2Reduction) {
-        rate -= project.co2Reduction * effectMult; // co2Reduction is positive, so subtract
+
+      // Only apply CO2 reduction for non-power projects (forest, carbonCapture)
+      // Power projects have co2Reduction: 0 - their effect comes from fossil retirement
+      if (project && project.co2Reduction && project.category !== "power") {
+        // Initialize count for this project type if needed
+        if (!projectCountByType[projectType]) {
+          projectCountByType[projectType] = 0;
+        }
+        // Get stacking multiplier based on how many of this type we've already counted
+        const stackMult = getStackingMultiplier(projectCountByType[projectType]);
+        projectCountByType[projectType]++;
+
+        // Apply both effect multiplier and stacking multiplier
+        rate -= project.co2Reduction * effectMult * stackMult;
       }
     });
   });
@@ -5939,29 +5990,17 @@ function countProjectsInRegion(regionId, projectTypes) {
   ).length;
 }
 
-// Helper to calculate current emissions for a region
-function calculateRegionEmissions(regionId) {
+// Helper to calculate current emissions for a region (for alliance calculations)
+// Note: For emissions with retired fossil tracking, use calculateRegionEmissions() at line ~872
+function calculateAllianceRegionEmissions(regionId) {
   // Use the region's tracked emissions from alliance state, or fallback to baseline
   const alliance = state.alliance?.[regionId];
   if (alliance?.currentEmissions !== undefined) {
     return alliance.currentEmissions;
   }
 
-  // Fallback: estimate from baseline minus project reductions
-  const regionData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
-  const baseline = regionData?.co2EmissionsBaseline || 0;
-
-  // Calculate reductions from projects in this region
-  let reductions = 0;
-  if (state.projects) {
-    Object.values(state.projects).forEach(p => {
-      if (p.region === regionId && p.co2Impact) {
-        reductions += p.co2Impact;
-      }
-    });
-  }
-
-  return Math.max(0, baseline - reductions);
+  // Fallback: Use the main calculateRegionEmissions which accounts for retired fossil
+  return calculateRegionEmissions(regionId);
 }
 
 // Calculate carbon intensity improvement for a region (% improvement vs baseline)
@@ -7614,7 +7653,7 @@ function startClimateCampaign(regionId) {
 
   const campaignType = regionData.isAggregate ? "Regional Climate Policy Campaign" : "Climate Policy Campaign";
   pushMessage(
-    `${campaignType} started in ${regionData.name}! Cost: ${formatCurrency(cost)}. Duration: ${duration} months. Expected increase: +${increaseAmount.toFixed(2)}% GDP.`,
+    `${campaignType} started in ${regionData.name}! Cost: ${formatCurrency(cost)}. Duration: ${formatConstructionTime(duration)}. Expected increase: +${increaseAmount.toFixed(2)}% GDP.`,
     "good"
   );
 
@@ -7657,11 +7696,11 @@ function formatConstructionTime(months) {
     const years = Math.floor(months / 12);
     const remainingMonths = months % 12;
     if (remainingMonths === 0) {
-      return `${years} yr${years > 1 ? 's' : ''}`;
+      return `${years}y`;
     }
     return `${years}y ${remainingMonths}mo`;
   }
-  return `${months} mo`;
+  return `${months}mo`;
 }
 
 function startConstruction(regionId, projectType, cost, effectMultiplier, buildMode, replaceCapacityGW = 0, replaceFossilType = null) {
@@ -7847,6 +7886,26 @@ function buildProject(regionId, projectType) {
     return;
   }
 
+  // REGIONAL CAP CHECK: Limit projects of each type per region
+  const regionalCap = REGIONAL_PROJECT_CAPS[projectType];
+  if (regionalCap !== undefined && regionalCap !== null) {
+    // Count existing projects of this type in this region (completed + under construction)
+    const existingCount = region.projects.filter(p => {
+      const pType = typeof p === "string" ? p : p.type;
+      return pType === projectType;
+    }).length;
+    const underConstructionCount = (state.underConstruction || []).filter(c =>
+      c.regionId === regionId && c.projectType === projectType
+    ).length;
+    const totalCount = existingCount + underConstructionCount;
+
+    if (totalCount >= regionalCap) {
+      const regionName = getRegionName(regionId);
+      pushMessage(`${regionName} has reached maximum ${project.label} capacity (${regionalCap}). Try another region.`, "bad");
+      return;
+    }
+  }
+
   // Apply difficulty-based cost multiplier
   const adjustedCost = getAdjustedCost(project.cost);
 
@@ -7876,9 +7935,11 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
   const coalTWh = powerMix.coal || 0;
   const gasTWh = powerMix.gas || 0;
 
-  // Convert TWh to GW (rough capacity estimate: TWh / (capacity_factor * 8.76))
-  const coalCapacityFactor = CAPACITY_FACTORS?.coal || 0.85;
-  const gasCapacityFactor = CAPACITY_FACTORS?.gas || 0.50;
+  // Use correct capacity factors
+  const coalCapacityFactor = CAPACITY_FACTORS?.coal || 0.50;
+  const gasCapacityFactor = CAPACITY_FACTORS?.naturalGas || 0.45;
+
+  // Convert TWh to GW: GW = TWh / (capacity_factor * 8.76)
   const coalGW = coalTWh / (coalCapacityFactor * 8.76);
   const gasGW = gasTWh / (gasCapacityFactor * 8.76);
 
@@ -7889,8 +7950,30 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
   const availableGasGW = Math.max(0, gasGW - retiredGas);
 
   const capacityGW = project.capacityGW || 0;
+  const cleanCapacityFactor = CAPACITY_FACTORS[projectType] || 0.30;
   const constructionMonths = project.constructionMonths || 1;
   const timeStr = formatConstructionTime(constructionMonths);
+
+  // Calculate annual clean energy generation (TWh/year)
+  const cleanEnergyTWh = capacityGW * cleanCapacityFactor * 8.76;
+
+  // Auto-calculate equivalent fossil capacity to retire
+  // Fossil to retire = Clean TWh / (Fossil capacity factor * 8.76)
+  const autoRetireCoalGW = Math.min(cleanEnergyTWh / (coalCapacityFactor * 8.76), availableCoalGW);
+  const autoRetireGasGW = Math.min(cleanEnergyTWh / (gasCapacityFactor * 8.76), availableGasGW);
+
+  // Calculate emissions avoided for each fossil type
+  // Emissions = Fossil retired GW × capacity factor × 8.76 hours × emission factor
+  const coalEmissionFactor = GROWTH_CONFIG.emissionsPerTWhCoal; // 0.9 Mt/TWh
+  const gasEmissionFactor = GROWTH_CONFIG.emissionsPerTWhGas;   // 0.4 Mt/TWh
+
+  const coalEmissionsAvoided = autoRetireCoalGW * coalCapacityFactor * 8.76 * coalEmissionFactor;
+  const gasEmissionsAvoided = autoRetireGasGW * gasCapacityFactor * 8.76 * gasEmissionFactor;
+
+  // Default to coal if available, otherwise gas
+  const defaultFossilType = availableCoalGW > 0 ? 'coal' : 'gas';
+  const defaultRetireGW = defaultFossilType === 'coal' ? autoRetireCoalGW : autoRetireGasGW;
+  const defaultEmissionsAvoided = defaultFossilType === 'coal' ? coalEmissionsAvoided : gasEmissionsAvoided;
 
   const overlay = document.createElement("div");
   overlay.id = "build-mode-overlay";
@@ -7913,6 +7996,10 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
           <span class="build-stat-value">${capacityGW.toFixed(1)} GW</span>
         </div>
         <div class="build-stat">
+          <span class="build-stat-label">Annual Output</span>
+          <span class="build-stat-value">${cleanEnergyTWh.toFixed(1)} TWh</span>
+        </div>
+        <div class="build-stat">
           <span class="build-stat-label">Construction</span>
           <span class="build-stat-value">${timeStr}</span>
         </div>
@@ -7925,7 +8012,7 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
           <input type="radio" name="buildMode" value="add" checked>
           <div class="option-content">
             <span class="option-title">Add Capacity</span>
-            <span class="option-desc">Add ${capacityGW.toFixed(1)} GW clean power to the grid</span>
+            <span class="option-desc">Add ${capacityGW.toFixed(1)} GW clean power to the grid (no CO2 reduction)</span>
           </div>
         </label>
 
@@ -7933,23 +8020,35 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
           <input type="radio" name="buildMode" value="replace">
           <div class="option-content">
             <span class="option-title">Replace Fossil</span>
-            <span class="option-desc">Retire fossil capacity when complete</span>
+            <span class="option-desc">Retire fossil capacity to reduce CO2 emissions</span>
           </div>
         </label>
 
         <div class="replace-options hidden" id="replace-options">
           <div class="fossil-type-selector">
             <label class="fossil-option ${availableCoalGW > 0 ? '' : 'disabled'}">
-              <input type="radio" name="fossilType" value="coal" ${availableCoalGW > 0 ? 'checked' : 'disabled'}>
+              <input type="radio" name="fossilType" value="coal"
+                ${availableCoalGW > 0 ? 'checked' : 'disabled'}
+                data-auto-retire="${autoRetireCoalGW.toFixed(2)}"
+                data-emissions="${coalEmissionsAvoided.toFixed(2)}">
               <span>Coal (${availableCoalGW.toFixed(1)} GW available)</span>
             </label>
             <label class="fossil-option ${availableGasGW > 0 ? '' : 'disabled'}">
-              <input type="radio" name="fossilType" value="gas" ${availableGasGW <= 0 && availableCoalGW <= 0 ? '' : ''} ${availableGasGW > 0 ? '' : 'disabled'}>
+              <input type="radio" name="fossilType" value="gas"
+                ${availableGasGW > 0 && availableCoalGW <= 0 ? 'checked' : ''}
+                ${availableGasGW > 0 ? '' : 'disabled'}
+                data-auto-retire="${autoRetireGasGW.toFixed(2)}"
+                data-emissions="${gasEmissionsAvoided.toFixed(2)}">
               <span>Natural Gas (${availableGasGW.toFixed(1)} GW available)</span>
             </label>
           </div>
           <div class="replace-amount">
-            <label>Amount to retire: <input type="number" id="replace-amount" value="${capacityGW.toFixed(1)}" min="0.1" max="${Math.max(availableCoalGW, availableGasGW).toFixed(1)}" step="0.1"> GW</label>
+            <label>Fossil to retire: <input type="number" id="replace-amount" value="${defaultRetireGW.toFixed(2)}" min="0.1" max="${Math.max(availableCoalGW, availableGasGW).toFixed(1)}" step="0.1"> GW</label>
+            <p class="auto-calc-note">Auto-calculated to match ${cleanEnergyTWh.toFixed(1)} TWh/year output</p>
+          </div>
+          <div class="emissions-avoided-display">
+            <span class="emissions-label">CO2 Emissions Avoided:</span>
+            <span class="emissions-value" id="emissions-avoided-value">${defaultEmissionsAvoided.toFixed(2)} Mt/year</span>
           </div>
         </div>
       </div>
@@ -7979,6 +8078,33 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
     addOption.classList.remove('selected');
     replaceOptionsDiv.classList.remove('hidden');
   });
+
+  // Add event listeners for fossil type selection to update retirement amount and emissions
+  const fossilTypeInputs = overlay.querySelectorAll('input[name="fossilType"]');
+  const replaceAmountInput = overlay.querySelector('#replace-amount');
+  const emissionsDisplay = overlay.querySelector('#emissions-avoided-value');
+
+  fossilTypeInputs.forEach(input => {
+    input.addEventListener('change', () => {
+      const autoRetire = parseFloat(input.dataset.autoRetire) || 0;
+      const emissions = parseFloat(input.dataset.emissions) || 0;
+      replaceAmountInput.value = autoRetire.toFixed(2);
+      emissionsDisplay.textContent = `${emissions.toFixed(2)} Mt/year`;
+    });
+  });
+
+  // Update emissions when retirement amount changes
+  replaceAmountInput.addEventListener('input', () => {
+    const selectedFossil = overlay.querySelector('input[name="fossilType"]:checked');
+    if (selectedFossil) {
+      const fossilType = selectedFossil.value;
+      const retireGW = parseFloat(replaceAmountInput.value) || 0;
+      const capFactor = fossilType === 'coal' ? coalCapacityFactor : gasCapacityFactor;
+      const emissionFactor = fossilType === 'coal' ? coalEmissionFactor : gasEmissionFactor;
+      const emissions = retireGW * capFactor * 8.76 * emissionFactor;
+      emissionsDisplay.textContent = `${emissions.toFixed(2)} Mt/year`;
+    }
+  });
 }
 
 function cancelBuildModeDialog() {
@@ -8005,8 +8131,8 @@ function confirmBuildModeDialog(regionId, projectType, cost) {
     const climateData = getClimateDataForRegion(regionId);
     const powerMix = climateData?.power?.currentMixTWh || {};
 
-    const coalCapacityFactor = CAPACITY_FACTORS?.coal || 0.85;
-    const gasCapacityFactor = CAPACITY_FACTORS?.gas || 0.50;
+    const coalCapacityFactor = CAPACITY_FACTORS?.coal || 0.50;
+    const gasCapacityFactor = CAPACITY_FACTORS?.naturalGas || 0.45;
 
     if (replaceFossilType === "coal") {
       const coalTWh = powerMix.coal || 0;
@@ -8443,22 +8569,38 @@ function renderTippingPointsPanel() {
   }
 }
 
-// Render the technology tree panel
+// Render the technology tree panel (tech upgrades)
 function renderTechTreePanel() {
   const listEl = document.getElementById("tech-tree-list");
-  const rpDisplay = document.getElementById("research-points-display");
 
   if (!listEl) return;
 
-  // Update research points display
-  if (rpDisplay) {
-    rpDisplay.textContent = `${state.researchPoints || 0} RP`;
-  }
+  const currentRP = state.researchPoints || 0;
+  const hasResearchCenters = (state.researchCenters && state.researchCenters.length > 0) || countResearchCenters() > 0;
 
   // Sort technologies by tier
   const sortedTechs = [...TECHNOLOGIES].sort((a, b) => a.tier - b.tier);
 
+  // Find cheapest unlockable tech to highlight progress
+  const cheapestAvailableTech = sortedTechs.find(t =>
+    !state.unlockedTechs?.includes(t.id)
+  );
+
   let html = "";
+
+  // Show helpful message if no research centers built yet
+  if (!hasResearchCenters && currentRP === 0) {
+    html += `<div class="tech-tree-tip">
+      <span class="tip-icon">💡</span>
+      <span>Build Research Centers above to generate Research Points (RP) each month.</span>
+    </div>`;
+  } else if (currentRP > 0 && cheapestAvailableTech && currentRP >= cheapestAvailableTech.cost) {
+    html += `<div class="tech-tree-tip available-tip">
+      <span class="tip-icon">✨</span>
+      <span>You have enough RP to unlock <strong>${cheapestAvailableTech.name}</strong>!</span>
+    </div>`;
+  }
+
   sortedTechs.forEach((tech) => {
     const isUnlocked = state.unlockedTechs && state.unlockedTechs.includes(tech.id);
     const canUnlock = canUnlockTechnology(tech.id);
@@ -8708,7 +8850,7 @@ function renderResearchCenterOptions() {
   });
 }
 
-// Render tech categories navigation
+// Render tech categories navigation - shows research center coverage by category
 function renderTechCategories() {
   const container = document.getElementById('tech-categories');
   if (!container) return;
@@ -8716,19 +8858,28 @@ function renderTechCategories() {
   let html = '';
 
   RESEARCH_CENTERS.categories.forEach(category => {
-    const builtCount = state.researchCenters
+    const builtCenters = state.researchCenters
       ? state.researchCenters.filter(id => {
           const center = getResearchCenterById(id);
           return center && center.categoryId === category.id;
-        }).length
-      : 0;
+        })
+      : [];
+    const builtCount = builtCenters.length;
     const totalCount = category.centers.length;
 
+    // Calculate RP per month from built centers in this category
+    const categoryRP = builtCenters.reduce((sum, id) => {
+      const center = getResearchCenterById(id);
+      return sum + (center ? center.rpPerMonth : 0);
+    }, 0);
+
+    // All data here comes from hardcoded RESEARCH_CENTERS constants, not user input
     html += `
-      <div class="tech-category-item">
-        <span class="cat-icon">${category.icon}</span>
-        <span class="cat-name">${category.name}</span>
-        <span class="cat-count">${builtCount}/${totalCount}</span>
+      <div class="tech-category-item ${builtCount > 0 ? 'has-centers' : ''}">
+        <div class="category-icon">${category.icon}</div>
+        <div class="category-name">${category.name}</div>
+        <div class="category-count">${builtCount}/${totalCount} centers</div>
+        ${categoryRP > 0 ? `<div class="category-rp">+${categoryRP} RP/mo</div>` : ''}
       </div>
     `;
   });
@@ -9310,7 +9461,7 @@ function renderRegionIncome(region, climateData) {
       campaignDetails.className = "campaign-details";
       let detailsHtml = `
         <span>Cost: ${formatCurrency(cost)}</span>
-        <span>Duration: ${duration} months</span>
+        <span>Duration: ${formatConstructionTime(duration)}</span>
         <span>Effect: +${increaseAmount.toFixed(2)}% GDP</span>
       `;
       if (awarenessBonus > 0) {
@@ -9501,18 +9652,28 @@ function renderPowerPanel(regionId) {
 
   const statusEl = document.createElement("span");
   statusEl.className = "power-status";
-  if (power.stability >= POWER_CONFIG.stabilityThresholds.excellent) {
+
+  // Calculate supply/demand ratio to factor into status
+  const supplyRatio = power.demand > 0 ? power.supply / power.demand : 1;
+  const hasShortage = supplyRatio < 0.95; // 5%+ deficit is a concern
+  const hasCriticalShortage = supplyRatio < 0.85; // 15%+ deficit is critical
+
+  // Determine status considering both stability AND supply/demand
+  if (hasCriticalShortage) {
+    statusEl.classList.add("critical");
+    statusEl.textContent = "Critical";
+  } else if (hasShortage || power.stability < POWER_CONFIG.stabilityThresholds.warning) {
+    statusEl.classList.add("warning");
+    statusEl.textContent = "Warning";
+  } else if (power.stability >= POWER_CONFIG.stabilityThresholds.excellent && !hasShortage) {
     statusEl.classList.add("excellent");
     statusEl.textContent = "Excellent";
   } else if (power.stability >= POWER_CONFIG.stabilityThresholds.good) {
     statusEl.classList.add("good");
     statusEl.textContent = "Good";
-  } else if (power.stability >= POWER_CONFIG.stabilityThresholds.warning) {
+  } else {
     statusEl.classList.add("warning");
     statusEl.textContent = "Warning";
-  } else {
-    statusEl.classList.add("critical");
-    statusEl.textContent = "Critical";
   }
 
   header.append(titleEl, statusEl);
@@ -9539,9 +9700,25 @@ function renderPowerPanel(regionId) {
 
   const stabilityStat = document.createElement("div");
   stabilityStat.className = "power-stat";
+  // Determine stability class based on thresholds
+  let stabilityClass = "";
+  let stabilityHint = "";
+  if (power.stability >= POWER_CONFIG.stabilityThresholds.excellent) {
+    stabilityClass = "excellent";
+    stabilityHint = "Excellent - reliable power, business confidence";
+  } else if (power.stability >= POWER_CONFIG.stabilityThresholds.good) {
+    stabilityClass = "good";
+    stabilityHint = "Good - stable operations";
+  } else if (power.stability >= POWER_CONFIG.stabilityThresholds.warning) {
+    stabilityClass = "warning";
+    stabilityHint = "Unstable - price spikes, GDP penalty";
+  } else {
+    stabilityClass = "critical";
+    stabilityHint = "Critical - blackout risk, severe economic impact";
+  }
   stabilityStat.innerHTML = `
     <span class="power-stat-label">Stability</span>
-    <span class="power-stat-value">${power.stability.toFixed(0)}%</span>
+    <span class="power-stat-value ${stabilityClass}" title="${stabilityHint}">${power.stability.toFixed(0)}%</span>
   `;
 
   const priceStat = document.createElement("div");
@@ -9975,6 +10152,19 @@ function renderProjectButtons() {
       const mult = effectiveness.effectMultiplier;
       effectBadge.className = `project-effectiveness ${mult > 1 ? "bonus" : "penalty"}`;
       effectBadge.textContent = mult > 1 ? `${(mult * 100 - 100).toFixed(0)}% bonus` : `${(100 - mult * 100).toFixed(0)}% penalty`;
+
+      // Add tooltip explaining the effectiveness modifier
+      let tooltipText = effectiveness.reason;
+      if (!tooltipText) {
+        // Generate explanation based on project type and regional conditions
+        if (mult > 1) {
+          tooltipText = `This region has favorable conditions for ${project.label.toLowerCase()} projects, increasing effectiveness.`;
+        } else {
+          const penaltyPct = (100 - mult * 100).toFixed(0);
+          tooltipText = `Regional conditions reduce ${project.label.toLowerCase()} effectiveness by ${penaltyPct}%. Factors include latitude, climate, and local resources.`;
+        }
+      }
+      effectBadge.title = tooltipText;
       button.appendChild(effectBadge);
     }
 
@@ -10019,9 +10209,9 @@ function renderProjectButtons() {
       // Show grid impact preview if a region is selected
       if (selectedRegionId) {
         const impact = calculateGridImpactPreview(selectedRegionId, type, effectiveness.effectMultiplier || 1);
-        if (impact && impact.currentRatio > 0) {
+        if (impact && impact.currentRatio > 0 && impact.ratioChange !== 0) {
           const ratioSign = impact.ratioChange > 0 ? "+" : "";
-          effectParts.push(`Grid: ${impact.currentRatio}%→${impact.projectedRatio}% (${ratioSign}${impact.ratioChange}%)`);
+          effectParts.push(`Grid supply: ${impact.currentRatio}%→${impact.projectedRatio}%`);
         }
       }
     }
@@ -10184,19 +10374,46 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
     allianceData.happiness = Math.min(100, allianceData.happiness + happinessBonus);
   }
 
-  // Store project with its effectiveness multiplier for CO2 calculations
-  region.projects.push({
-    type: projectType,
-    effectMultiplier: effectiveness.effectMultiplier,
-  });
+  // Check if project has construction time > 1 month
+  const constructionMonths = project.constructionMonths || 1;
+  if (constructionMonths > 1) {
+    // Use construction queue for projects with build time
+    if (!state.underConstruction) {
+      state.underConstruction = [];
+    }
+    state.underConstruction.push({
+      id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      regionId,
+      type: projectType,
+      effectMultiplier: effectiveness.effectMultiplier,
+      cost,
+      monthsTotal: constructionMonths,
+      monthsRemaining: constructionMonths,
+      startDate: { year: state.year, month: state.month },
+      buildMode: "add",
+    });
 
-  const bonusText = effectiveness.effectMultiplier > 1
-    ? ` (${((effectiveness.effectMultiplier - 1) * 100).toFixed(0)}% bonus!)`
-    : effectiveness.effectMultiplier < 1
-      ? ` (${((1 - effectiveness.effectMultiplier) * 100).toFixed(0)}% penalty)`
-      : "";
+    const timeStr = formatConstructionTime(constructionMonths);
+    const bonusText = effectiveness.effectMultiplier > 1
+      ? ` (${((effectiveness.effectMultiplier - 1) * 100).toFixed(0)}% bonus!)`
+      : effectiveness.effectMultiplier < 1
+        ? ` (${((1 - effectiveness.effectMultiplier) * 100).toFixed(0)}% penalty)`
+        : "";
+    pushMessage(`Construction started: ${project.label} in ${getRegionName(regionId)}. ${timeStr} to completion.${bonusText}`, "good");
+  } else {
+    // Instant build for projects with no/minimal construction time
+    region.projects.push({
+      type: projectType,
+      effectMultiplier: effectiveness.effectMultiplier,
+    });
 
-  pushMessage(`${project.label} built in ${getRegionName(regionId)}${bonusText}`, "good");
+    const bonusText = effectiveness.effectMultiplier > 1
+      ? ` (${((effectiveness.effectMultiplier - 1) * 100).toFixed(0)}% bonus!)`
+      : effectiveness.effectMultiplier < 1
+        ? ` (${((1 - effectiveness.effectMultiplier) * 100).toFixed(0)}% penalty)`
+        : "";
+    pushMessage(`${project.label} built in ${getRegionName(regionId)}${bonusText}`, "good");
+  }
   updateUI();
 }
 
@@ -10208,6 +10425,50 @@ function renderRegionProjects() {
   }
 
   const region = state.regions[selectedRegionId];
+
+  // Show Under Construction section if there are projects being built
+  const construction = getConstructionForRegion(selectedRegionId);
+  if (construction.length > 0) {
+    const constructionSection = document.createElement("div");
+    constructionSection.className = "construction-section";
+
+    const constructionTitle = document.createElement("div");
+    constructionTitle.className = "panel-subtitle";
+    constructionTitle.textContent = "Under Construction";
+    constructionSection.appendChild(constructionTitle);
+
+    const constructionList = document.createElement("div");
+    constructionList.className = "construction-list";
+
+    construction.forEach(item => {
+      const project = PROJECT_TYPES[item.type];
+      if (!project) return;
+
+      const constructionItem = document.createElement("div");
+      constructionItem.className = "construction-item";
+
+      // Project name and time remaining
+      const header = document.createElement("div");
+      header.className = "construction-header";
+      const progressPct = ((item.monthsTotal - item.monthsRemaining) / item.monthsTotal * 100).toFixed(0);
+      const timeRemaining = formatConstructionTime(item.monthsRemaining);
+      header.innerHTML = `<span class="construction-name">${project.label}</span><span class="construction-time">${timeRemaining} left</span>`;
+
+      // Progress bar
+      const progressBar = document.createElement("div");
+      progressBar.className = "construction-progress";
+      const progressFill = document.createElement("div");
+      progressFill.className = "construction-progress-fill";
+      progressFill.style.width = `${progressPct}%`;
+      progressBar.appendChild(progressFill);
+
+      constructionItem.append(header, progressBar);
+      constructionList.appendChild(constructionItem);
+    });
+
+    constructionSection.appendChild(constructionList);
+    regionProjectsEl.appendChild(constructionSection);
+  }
 
   const subtitle = document.createElement("div");
   subtitle.className = "panel-subtitle";
