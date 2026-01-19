@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Data Reference - Carbon Capture Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f8f9fa;
+            min-height: 100vh;
+        }
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: #1a365d;
+            color: white;
+            overflow-y: auto;
+            padding: 20px 0;
+            z-index: 100;
+        }
+        .sidebar h2 {
+            padding: 0 20px 15px;
+            font-size: 1.1em;
+            border-bottom: 1px solid #2c5282;
+            margin-bottom: 15px;
+        }
+        .sidebar a {
+            display: block;
+            padding: 8px 20px;
+            color: #a0aec0;
+            text-decoration: none;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        .sidebar a:hover {
+            background: #2c5282;
+            color: white;
+        }
+        .sidebar .section-header {
+            color: #63b3ed;
+            font-weight: 600;
+            margin-top: 15px;
+            padding: 5px 20px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .container {
+            margin-left: 280px;
+            max-width: 1000px;
+            padding: 40px;
+        }
+        h1 {
+            color: #1a365d;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            border-bottom: 3px solid #3182ce;
+            padding-bottom: 15px;
+        }
+        .subtitle {
+            color: #718096;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        h2 {
+            color: #2c5282;
+            font-size: 1.5em;
+            margin: 40px 0 15px 0;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        h3 {
+            color: #4a5568;
+            font-size: 1.15em;
+            margin: 25px 0 10px 0;
+        }
+        h4 {
+            color: #718096;
+            font-size: 1em;
+            margin: 20px 0 8px 0;
+        }
+        .code-ref {
+            background: #edf2f7;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #553c9a;
+            margin-bottom: 15px;
+            display: inline-block;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 25px 0;
+            font-size: 0.9em;
+        }
+        th {
+            background: #2c5282;
+            color: white;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+        td {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        tr:hover {
+            background: #f7fafc;
+        }
+        .status-verified {
+            background: #c6f6d5;
+            color: #276749;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        .status-estimate {
+            background: #fefcbf;
+            color: #975a16;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        .status-design {
+            background: #e9d8fd;
+            color: #553c9a;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        .status-missing {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.8em;
+        }
+        .credibility-5 {
+            color: #276749;
+        }
+        .credibility-4 {
+            color: #2f855a;
+        }
+        .source-card {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+            margin: 15px 0;
+        }
+        .source-item {
+            background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s;
+        }
+        .source-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .source-item .stars {
+            color: #ecc94b;
+            font-size: 1.1em;
+            margin-bottom: 8px;
+        }
+        .source-item strong {
+            color: #2c5282;
+            display: block;
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+        .source-item a {
+            color: #3182ce;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .source-item a:hover {
+            text-decoration: underline;
+        }
+        .source-item .data-types {
+            color: #718096;
+            font-size: 0.85em;
+            margin-top: 8px;
+            line-height: 1.4;
+        }
+        .info-box {
+            background: linear-gradient(135deg, #ebf8ff 0%, #bee3f8 100%);
+            border-left: 4px solid #3182ce;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .info-box h4 {
+            color: #2c5282;
+            margin: 0 0 10px 0;
+        }
+        .warning-box {
+            background: linear-gradient(135deg, #fffaf0 0%, #feebc8 100%);
+            border-left: 4px solid #dd6b20;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .warning-box h4 {
+            color: #c05621;
+            margin: 0 0 10px 0;
+        }
+        .verified-box {
+            background: linear-gradient(135deg, #f0fff4 0%, #c6f6d5 100%);
+            border-left: 4px solid #38a169;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .verified-box h4 {
+            color: #276749;
+            margin: 0 0 10px 0;
+        }
+        .verified-box ul {
+            margin-left: 20px;
+        }
+        .verified-box li {
+            margin: 5px 0;
+        }
+        .gap-list {
+            margin: 15px 0;
+        }
+        .gap-high {
+            background: #fff5f5;
+            border-left: 4px solid #e53e3e;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .gap-medium {
+            background: #fffaf0;
+            border-left: 4px solid #dd6b20;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .gap-low {
+            background: #f0fff4;
+            border-left: 4px solid #38a169;
+            padding: 15px 20px;
+            margin: 10px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        .gap-list ol, .gap-list ul {
+            margin-left: 20px;
+        }
+        .gap-list li {
+            margin: 8px 0;
+        }
+        code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        .footer {
+            text-align: center;
+            color: #a0aec0;
+            font-size: 0.9em;
+            margin-top: 60px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        .section-divider {
+            height: 2px;
+            background: linear-gradient(90deg, #3182ce 0%, transparent 100%);
+            margin: 40px 0;
+        }
+        @media (max-width: 900px) {
+            .sidebar {
+                display: none;
+            }
+            .container {
+                margin-left: 0;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <h2>Game Data Reference</h2>
+        <div class="section-header">Sources</div>
+        <a href="#sources">Verified Sources</a>
+        <a href="#verified-data">Key Data Verified</a>
+
+        <div class="section-header">Core Config</div>
+        <a href="#game-config">Game Configuration</a>
+        <a href="#economic-growth">Economic Growth</a>
+        <a href="#sector-growth">Sector Growth</a>
+
+        <div class="section-header">Climate System</div>
+        <a href="#carbon-sinks">Natural Carbon Sinks</a>
+        <a href="#tipping-points">Tipping Points</a>
+        <a href="#feedback-loops">Feedback Loops</a>
+
+        <div class="section-header">Power System</div>
+        <a href="#power-grid">Grid Configuration</a>
+        <a href="#capacity-factors">Capacity Factors</a>
+        <a href="#emission-factors">Emission Factors</a>
+
+        <div class="section-header">Projects</div>
+        <a href="#project-costs">Project Costs</a>
+        <a href="#technology-tree">Technology Tree</a>
+        <a href="#research-centers">Research Centers</a>
+
+        <div class="section-header">Events & Systems</div>
+        <a href="#events">Random Events</a>
+        <a href="#disasters">Natural Disasters</a>
+        <a href="#diplomacy">Diplomacy</a>
+
+        <div class="section-header">Reference</div>
+        <a href="#global-emissions">Global Emissions</a>
+        <a href="#regional-power">Regional Power</a>
+        <a href="#data-gaps">Data Gaps</a>
+        <a href="#code-locations">Code Locations</a>
+    </nav>
+
+    <div class="container">
+        <h1>Game Data Reference</h1>
+        <p class="subtitle">Carbon Capture Game - Complete Data Documentation with Verified Sources</p>
+
+        <!-- ==================== SOURCES ==================== -->
+        <h2 id="sources">Sources Used and Credibility Ratings</h2>
+
+        <div class="source-card">
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>Global Carbon Budget 2025</strong>
+                <a href="https://globalcarbonbudget.org/gcb-2025/the-global-carbon-budget-faqs-2025/" target="_blank">globalcarbonbudget.org</a>
+                <div class="data-types">CO2 emissions, carbon sinks, remaining carbon budget</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>IPCC AR6</strong>
+                <a href="https://www.ipcc.ch/" target="_blank">ipcc.ch</a>
+                <div class="data-types">Climate thresholds, tipping points, temperature projections</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>IEA</strong>
+                <a href="https://www.iea.org/data-and-statistics" target="_blank">iea.org/data-and-statistics</a>
+                <div class="data-types">Energy data, emission factors, electricity prices</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>IRENA 2024</strong>
+                <a href="https://www.irena.org/Publications/2025/Jun/Renewable-Power-Generation-Costs-in-2024" target="_blank">irena.org</a>
+                <div class="data-types">Renewable costs, LCOE, capacity factors</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>World Bank GEP 2025</strong>
+                <a href="https://www.worldbank.org/en/publication/global-economic-prospects" target="_blank">worldbank.org</a>
+                <div class="data-types">GDP growth rates, economic forecasts</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>Our World in Data</strong>
+                <a href="https://ourworldindata.org/co2-emissions" target="_blank">ourworldindata.org</a>
+                <div class="data-types">Aggregated IEA/GCP data, historical trends</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>NOAA</strong>
+                <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank">noaa.gov</a>
+                <div class="data-types">Atmospheric CO2 measurements</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>NREL</strong>
+                <a href="https://www.nrel.gov/analysis/life-cycle-assessment.html" target="_blank">nrel.gov</a>
+                <div class="data-types">Lifecycle emissions, technology data</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>ND-GAIN</strong>
+                <a href="https://gain.nd.edu/our-work/country-index/" target="_blank">gain.nd.edu</a>
+                <div class="data-types">Climate vulnerability indices</div>
+            </div>
+            <div class="source-item">
+                <div class="stars">&#9733;&#9733;&#9733;&#9733;</div>
+                <strong>Nordhaus DICE</strong>
+                <a href="https://en.wikipedia.org/wiki/DICE_model" target="_blank">Academic papers</a>
+                <div class="data-types">GDP-climate damage functions</div>
+            </div>
+        </div>
+
+        <h3 id="verified-data">Key Data Verified (January 2026)</h3>
+
+        <div class="verified-box">
+            <h4>From Global Carbon Budget 2025</h4>
+            <ul>
+                <li>Fossil CO2 emissions 2025: <strong>38.1 Gt/year</strong> (1.1% growth)</li>
+                <li>Land-use change emissions 2025: <strong>4.1 Gt/year</strong></li>
+                <li>Total CO2 emissions: <strong>~42.2 Gt/year</strong></li>
+                <li>Ocean CO2 sink: <strong>29%</strong> of total emissions (~12.2 Gt/yr)</li>
+                <li>Land CO2 sink: <strong>21%</strong> of total emissions (~8.9 Gt/yr)</li>
+                <li>Remaining carbon budget for 1.5&deg;C: <strong>~4 years</strong> at current emissions</li>
+                <li>Remaining carbon budget for 1.7&deg;C: <strong>525 GtCO2</strong> (12 years)</li>
+                <li>Remaining carbon budget for 2.0&deg;C: <strong>1055 GtCO2</strong> (25 years)</li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From IRENA 2024 Report</h4>
+            <ul>
+                <li>Solar PV LCOE: <strong>$0.043/kWh</strong> ($43/MWh global average)</li>
+                <li>Onshore Wind LCOE: <strong>$0.034/kWh</strong> ($34/MWh - cheapest source)</li>
+                <li>Offshore Wind LCOE: <strong>$0.078-0.080/kWh</strong> ($78-80/MWh)</li>
+                <li><strong>91%</strong> of new renewable capacity cheaper than fossil alternatives</li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From IPCC AR6</h4>
+            <ul>
+                <li>Tipping point risks emerge above <strong>1&deg;C</strong></li>
+                <li>Risks become high around <strong>2&deg;C</strong></li>
+                <li>Risks reach very high around <strong>2.5-4&deg;C</strong></li>
+                <li>Current warming: <strong>~1.2&deg;C</strong> above pre-industrial</li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From World Bank GEP January 2025</h4>
+            <ul>
+                <li>Global growth: <strong>2.7%</strong> (2025-2026)</li>
+                <li>Advanced economies: <strong>~1.5%</strong></li>
+                <li>Emerging markets (EMDEs): <strong>~4%</strong> steady</li>
+                <li>Low-income countries: <strong>5-5.7%</strong></li>
+                <li>MENA (oil economies): <strong>3.4-4.1%</strong></li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From IEA Energy Efficiency 2024</h4>
+            <ul>
+                <li>Global average efficiency improvement: <strong>1.0-1.8%/yr</strong></li>
+                <li>Industry sector improvement: <strong>&lt;0.5%/yr</strong> (lowest)</li>
+                <li>Developing economies (China, India): <strong>2.5-4%/yr</strong> (catch-up effect)</li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From IPCC/NREL Lifecycle Assessments</h4>
+            <ul>
+                <li>Nuclear lifecycle emissions: <strong>4-12 gCO2/kWh</strong></li>
+                <li>Wind lifecycle emissions: <strong>~4 gCO2/kWh</strong> (lowest)</li>
+                <li>Solar PV lifecycle emissions: <strong>6-43 gCO2/kWh</strong></li>
+                <li>Coal for comparison: <strong>820-1200 gCO2/kWh</strong></li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From Nordhaus DICE Model / IMF</h4>
+            <ul>
+                <li>GDP damage at 3&deg;C warming: <strong>2.1%</strong> (DICE model)</li>
+                <li>GDP damage at 6&deg;C warming: <strong>8.5%</strong> (DICE model)</li>
+                <li>IMF cumulative damage by 2100: <strong>7.22%</strong> without mitigation</li>
+                <li>Traditional estimates: <strong>1-3% per &deg;C</strong></li>
+            </ul>
+        </div>
+
+        <div class="verified-box">
+            <h4>From IPCC AR6 WG2 (Extreme Weather)</h4>
+            <ul>
+                <li>Precipitation extremes: <strong>+7% per 1&deg;C</strong> (Clausius-Clapeyron)</li>
+                <li>10-year extreme events: <strong>~2x more frequent</strong> at 1.5&deg;C</li>
+                <li>10-year extreme events: <strong>~2.7x more frequent</strong> at 2&deg;C</li>
+                <li>Tropical cyclone intensity: <strong>+5% per &deg;C</strong></li>
+            </ul>
+        </div>
+
+        <div class="info-box">
+            <h4>From ND-GAIN Country Index</h4>
+            <ul>
+                <li>Ranks <strong>185 countries</strong> on climate vulnerability</li>
+                <li>Components: Exposure, Sensitivity, Adaptive Capacity</li>
+                <li>Highest vulnerability: Africa, South Asia</li>
+                <li>Lowest vulnerability: Northern Europe</li>
+            </ul>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== CORE CONFIG ==================== -->
+        <h2 id="game-config">1. Core Game Configuration</h2>
+        <div class="code-ref">Location: game.js GAME_CONFIG (lines 1-30)</div>
+
+        <h3>Starting Values</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Starting Funds</td>
+                    <td>$100 billion</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Starting CO2</td>
+                    <td>420 ppm</td>
+                    <td><span class="status-verified">NOAA 2024</span> (~421 ppm)</td>
+                </tr>
+                <tr>
+                    <td>Starting Temperature</td>
+                    <td>+1.2&deg;C</td>
+                    <td><span class="status-verified">IPCC AR6</span></td>
+                </tr>
+                <tr>
+                    <td>Start Year</td>
+                    <td>2025</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Win Temperature</td>
+                    <td>+1.0&deg;C</td>
+                    <td><span class="status-design">GAME DESIGN</span> (below current)</td>
+                </tr>
+                <tr>
+                    <td>Lose Temperature</td>
+                    <td>+3.0&deg;C</td>
+                    <td><span class="status-verified">IPCC</span> dangerous threshold</td>
+                </tr>
+                <tr>
+                    <td>Lose Year</td>
+                    <td>2100</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>CO2 Climate Constants</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Game Value</th>
+                    <th>Real-World</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Base CO2 increase</td>
+                    <td>0.75 ppm/month</td>
+                    <td>~2.5 ppm/year</td>
+                    <td><span class="status-missing">NO SOURCE</span></td>
+                </tr>
+                <tr>
+                    <td>Pre-industrial CO2</td>
+                    <td>280 ppm</td>
+                    <td>~280 ppm</td>
+                    <td><span class="status-verified">IPCC</span></td>
+                </tr>
+                <tr>
+                    <td>Temp per ppm factor</td>
+                    <td>0.008 &deg;C/ppm</td>
+                    <td>~0.005-0.01</td>
+                    <td><span class="status-verified">IPCC</span> climate sensitivity</td>
+                </tr>
+                <tr>
+                    <td>EMISSIONS_TO_PPM_FACTOR</td>
+                    <td>0.128</td>
+                    <td>~0.21 (real)</td>
+                    <td><span class="status-design">GAME DESIGN</span> - tuned for pace</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <h4>Note on EMISSIONS_TO_PPM_FACTOR</h4>
+            <p>The factor is intentionally ~2x real-world for faster gameplay. Real-world: ~4.7 Gt CO2 = 1 ppm with ~45% airborne fraction.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== ECONOMIC GROWTH ==================== -->
+        <h2 id="economic-growth">2. Economic Growth Configuration</h2>
+        <div class="code-ref">Location: game.js GROWTH_CONFIG (lines 33-55)</div>
+
+        <h3>GDP Growth Rates by Development Level</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Development Level</th>
+                    <th>Game Rate</th>
+                    <th>Real-World (World Bank 2025)</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Developed</td>
+                    <td>2%/year</td>
+                    <td><strong>~1.5%</strong> (advanced economies)</td>
+                    <td><span class="status-verified">World Bank GEP</span></td>
+                </tr>
+                <tr>
+                    <td>Emerging</td>
+                    <td>4%/year</td>
+                    <td><strong>~4%</strong> (EMDEs steady)</td>
+                    <td><span class="status-verified">World Bank GEP</span></td>
+                </tr>
+                <tr>
+                    <td>Developing</td>
+                    <td>5.5%/year</td>
+                    <td><strong>5-5.7%</strong> (low-income)</td>
+                    <td><span class="status-verified">World Bank GEP</span></td>
+                </tr>
+                <tr>
+                    <td>Oil Economy</td>
+                    <td>2.5%/year</td>
+                    <td><strong>3.4-4.1%</strong> (MENA region)</td>
+                    <td><span class="status-verified">World Bank GEP</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Emissions Intensity (Gt CO2 per 1000 TWh)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Fuel</th>
+                    <th>Game Value</th>
+                    <th>Real-World</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Coal</td>
+                    <td>0.9</td>
+                    <td>0.82-1.1</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Natural Gas</td>
+                    <td>0.4</td>
+                    <td>0.41-0.50</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Other (Oil)</td>
+                    <td>0.2</td>
+                    <td>0.65-0.75</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>GDP-Climate Impact</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Max GDP growth modifier</td>
+                    <td>150%</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Min GDP growth modifier</td>
+                    <td>50%</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>GDP penalty start temp</td>
+                    <td>1.5&deg;C</td>
+                    <td><span class="status-estimate">Climate economics research</span></td>
+                </tr>
+                <tr>
+                    <td>GDP penalty rate</td>
+                    <td>-10%/&deg;C above threshold</td>
+                    <td><span class="status-missing">NO SOURCE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== SECTOR GROWTH ==================== -->
+        <h2 id="sector-growth">3. Sector Emissions Growth</h2>
+        <div class="code-ref">Location: game.js SECTOR_GROWTH_RATES (lines 62-67)</div>
+
+        <h3>Base Annual Growth Rates</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sector</th>
+                    <th>Rate</th>
+                    <th>Notes</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Industry</td>
+                    <td>2.5%/year</td>
+                    <td>Before modifiers</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Transport</td>
+                    <td>3%/year</td>
+                    <td>Before modifiers</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Buildings</td>
+                    <td>2%/year</td>
+                    <td>Before modifiers</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Agriculture</td>
+                    <td>1.5%/year</td>
+                    <td>Before modifiers</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Growth Modifiers by Development Level</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Industry</th>
+                    <th>Transport</th>
+                    <th>Buildings</th>
+                    <th>Agriculture</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Developed</td>
+                    <td>0.5x</td>
+                    <td>0.6x</td>
+                    <td>0.4x</td>
+                    <td>0.3x</td>
+                </tr>
+                <tr>
+                    <td>Emerging</td>
+                    <td>1.2x</td>
+                    <td>1.5x</td>
+                    <td>1.0x</td>
+                    <td>0.8x</td>
+                </tr>
+                <tr>
+                    <td>Developing</td>
+                    <td>1.8x</td>
+                    <td>2.0x</td>
+                    <td>1.5x</td>
+                    <td>1.0x</td>
+                </tr>
+                <tr>
+                    <td>Oil Economy</td>
+                    <td>1.0x</td>
+                    <td>1.2x</td>
+                    <td>0.8x</td>
+                    <td>0.5x</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: All are ESTIMATES based on general economic patterns</em></p>
+
+        <h3>Efficiency Improvement (Annual Reduction)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Development Level</th>
+                    <th>Rate</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Developed</td>
+                    <td>1.5%/year</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Emerging</td>
+                    <td>2%/year</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Developing</td>
+                    <td>2.5%/year</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Oil Economy</td>
+                    <td>1%/year</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== CARBON SINKS ==================== -->
+        <h2 id="carbon-sinks">4. Natural Carbon Sinks</h2>
+        <div class="code-ref">Location: game.js NATURAL_SINK_CONFIG (lines 106-118)</div>
+
+        <h3>Ocean Sink</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Game Value</th>
+                    <th>Real-World (GCB 2025)</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Base absorption</td>
+                    <td>12.2 Gt/year</td>
+                    <td><strong>~12.2 Gt/year</strong> (29% of 42.2 Gt)</td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+                <tr>
+                    <td>Saturation start</td>
+                    <td>450 ppm</td>
+                    <td>Research varies</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Saturation rate</td>
+                    <td>-2%/10 ppm</td>
+                    <td>Research varies</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Temp impact</td>
+                    <td>-5%/0.5&deg;C above 1.5&deg;C</td>
+                    <td><strong>7% smaller</strong> than without climate change</td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Land Sink (Natural)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Game Value</th>
+                    <th>Real-World (GCB 2025)</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Base absorption</td>
+                    <td>8.9 Gt/year</td>
+                    <td><strong>~8.9 Gt/year</strong> (21% of 42.2 Gt)</td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+                <tr>
+                    <td>Saturation start</td>
+                    <td>2.0&deg;C</td>
+                    <td>Research varies</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Saturation rate</td>
+                    <td>-10%/0.5&deg;C</td>
+                    <td><strong>25% smaller</strong> than without climate change</td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <h4>GCB 2025 Update</h4>
+            <p>Ocean sink revised <strong>upward</strong> (29%, was 26%) and land sink revised <strong>downward</strong> (21%, was 29%). Combined sinks absorb ~50% of anthropogenic CO2.</p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== TIPPING POINTS ==================== -->
+        <h2 id="tipping-points">5. Climate Tipping Points</h2>
+        <div class="code-ref">Location: game.js TIPPING_POINTS (lines 958-1005)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipping Point</th>
+                    <th>Game Threshold</th>
+                    <th>Effect (ppm/month)</th>
+                    <th>IPCC AR6 Threshold</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Arctic Sea Ice</td>
+                    <td>1.4&deg;C</td>
+                    <td>+0.08</td>
+                    <td><strong>&gt;1.0&deg;C</strong> (risks emerge)</td>
+                    <td><span class="status-verified">IPCC AR6</span></td>
+                </tr>
+                <tr>
+                    <td>Permafrost Methane</td>
+                    <td>1.7&deg;C</td>
+                    <td>+0.15</td>
+                    <td><strong>~1.5-2.0&deg;C</strong></td>
+                    <td><span class="status-verified">IPCC AR6</span></td>
+                </tr>
+                <tr>
+                    <td>Amazon Dieback</td>
+                    <td>2.1&deg;C</td>
+                    <td>+0.12 (+ -50% forest)</td>
+                    <td><strong>~2.0-2.5&deg;C</strong></td>
+                    <td><span class="status-verified">IPCC AR6</span></td>
+                </tr>
+                <tr>
+                    <td>Ocean Circulation (AMOC)</td>
+                    <td>2.4&deg;C</td>
+                    <td>+0.18 (+ -30% ocean)</td>
+                    <td><strong>~2.5-3.0&deg;C</strong></td>
+                    <td><span class="status-verified">IPCC AR6</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="warning-box">
+            <h4>IPCC AR6 Key Findings</h4>
+            <ul>
+                <li>Tipping point risks <strong>emerge above 1&deg;C</strong> of warming</li>
+                <li>Risks become <strong>high around 2&deg;C</strong></li>
+                <li>Risks reach <strong>very high around 2.5-4&deg;C</strong></li>
+                <li>Current warming: <strong>~1.2&deg;C</strong> above pre-industrial (we are already in the risk zone)</li>
+            </ul>
+            <p style="margin-top: 10px;"><em>Note: Game thresholds are slightly tightened from IPCC estimates for gameplay challenge. Effect magnitudes (ppm/month) are GAME DESIGN, not real science.</em></p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== FEEDBACK LOOPS ==================== -->
+        <h2 id="feedback-loops">6. Feedback Loops</h2>
+        <div class="code-ref">Location: game.js FEEDBACK_LOOPS (lines 1008-1030)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Feedback</th>
+                    <th>Start</th>
+                    <th>Max</th>
+                    <th>Max Effect (ppm/month)</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Ice-Albedo</td>
+                    <td>1.5&deg;C</td>
+                    <td>3.0&deg;C</td>
+                    <td>+0.05</td>
+                    <td><span class="status-estimate">IPCC concept, magnitude ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Ocean Saturation</td>
+                    <td>450 ppm</td>
+                    <td>550 ppm</td>
+                    <td>+0.08</td>
+                    <td><span class="status-estimate">IPCC concept, magnitude ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Vegetation Stress</td>
+                    <td>2.0&deg;C</td>
+                    <td>3.0&deg;C</td>
+                    <td>+0.04</td>
+                    <td><span class="status-estimate">IPCC concept, magnitude ESTIMATE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== POWER GRID ==================== -->
+        <h2 id="power-grid">7. Power Grid Configuration</h2>
+        <div class="code-ref">Location: game.js POWER_CONFIG (lines 1156-1200)</div>
+
+        <h3>Grid Stability</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Base electricity price</td>
+                    <td>$0.12/kWh</td>
+                    <td><span class="status-verified">IEA</span> global average</td>
+                </tr>
+                <tr>
+                    <td>Critical stability</td>
+                    <td>30</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Warning stability</td>
+                    <td>50</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Good stability</td>
+                    <td>70</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Excellent stability</td>
+                    <td>90</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Variable penalty factor</td>
+                    <td>-60 at 100% variable</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Storage mitigation</td>
+                    <td>+40 per storage ratio</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Max storage mitigation</td>
+                    <td>80%</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Price Thresholds</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Price ($/kWh)</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Cheap</td>
+                    <td>$0.08</td>
+                    <td>Market observation</td>
+                </tr>
+                <tr>
+                    <td>Normal</td>
+                    <td>$0.12</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Expensive</td>
+                    <td>$0.20</td>
+                    <td>Market observation</td>
+                </tr>
+                <tr>
+                    <td>Crisis</td>
+                    <td>$0.30</td>
+                    <td>Market observation</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 id="capacity-factors">Capacity Factors</h3>
+        <div class="code-ref">Location: game.js CAPACITY_FACTORS (lines 1210-1226)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Generation Type</th>
+                    <th>Game Factor</th>
+                    <th>Real-World</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Solar</td>
+                    <td>0.20</td>
+                    <td>0.15-0.25</td>
+                    <td><span class="status-verified">IEA/IRENA</span></td>
+                </tr>
+                <tr>
+                    <td>Wind (onshore)</td>
+                    <td>0.30</td>
+                    <td>0.25-0.35</td>
+                    <td><span class="status-verified">IEA/IRENA</span></td>
+                </tr>
+                <tr>
+                    <td>Offshore Wind</td>
+                    <td>0.40</td>
+                    <td>0.35-0.50</td>
+                    <td><span class="status-verified">IEA/IRENA</span></td>
+                </tr>
+                <tr>
+                    <td>Nuclear</td>
+                    <td>0.90</td>
+                    <td>0.85-0.93</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Coal</td>
+                    <td>0.50</td>
+                    <td>0.40-0.60</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Natural Gas</td>
+                    <td>0.45</td>
+                    <td>0.40-0.55</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Geothermal</td>
+                    <td>0.80</td>
+                    <td>0.75-0.90</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Hydropower</td>
+                    <td>0.40</td>
+                    <td>0.30-0.55</td>
+                    <td><span class="status-verified">IEA</span> (seasonal)</td>
+                </tr>
+                <tr>
+                    <td>Battery Storage</td>
+                    <td>0.15</td>
+                    <td>Varies</td>
+                    <td>Grid operator data</td>
+                </tr>
+                <tr>
+                    <td>Pumped Hydro</td>
+                    <td>0.25</td>
+                    <td>Varies</td>
+                    <td>Grid operator data</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== PROJECT COSTS ==================== -->
+        <h2 id="project-costs">8. Project Costs and Effects</h2>
+        <div class="code-ref">Location: game.js PROJECT_TYPES (lines 3830-4109)</div>
+
+        <h3>Variable Power (Solar/Wind)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Cost ($B)</th>
+                    <th>Capacity (GW)</th>
+                    <th>Construction</th>
+                    <th>Real-World Cost</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Utility Solar</td>
+                    <td>15</td>
+                    <td>0.5</td>
+                    <td>9 mo</td>
+                    <td><strong>~$0.7-1B/GW</strong></td>
+                    <td><span class="status-verified">IRENA 2024</span></td>
+                </tr>
+                <tr>
+                    <td>Wind Farm</td>
+                    <td>18</td>
+                    <td>0.3</td>
+                    <td>15 mo</td>
+                    <td><strong>~$1.2-1.5B/GW</strong></td>
+                    <td><span class="status-verified">IRENA 2024</span></td>
+                </tr>
+                <tr>
+                    <td>Offshore Wind</td>
+                    <td>45</td>
+                    <td>0.8</td>
+                    <td>30 mo</td>
+                    <td><strong>~$2.5-4B/GW</strong></td>
+                    <td><span class="status-verified">IRENA 2024</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="info-box">
+            <h4>IRENA 2024 LCOE Data</h4>
+            <ul>
+                <li>Solar PV: <strong>$0.043/kWh</strong> ($43/MWh) global average</li>
+                <li>Onshore Wind: <strong>$0.034/kWh</strong> ($34/MWh) - cheapest source</li>
+                <li>Offshore Wind: <strong>$0.078-0.080/kWh</strong> ($78-80/MWh)</li>
+                <li><strong>91%</strong> of new renewable capacity is now cheaper than fossil alternatives</li>
+            </ul>
+            <p style="margin-top: 10px;"><em>Note: Game costs are significantly higher than real-world per-GW costs. This is intentional for game balance.</em></p>
+        </div>
+
+        <h3>Baseload Power</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Cost ($B)</th>
+                    <th>Capacity (GW)</th>
+                    <th>Stability</th>
+                    <th>Construction</th>
+                    <th>Real-World</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Nuclear</td>
+                    <td>75</td>
+                    <td>1.2</td>
+                    <td>+15</td>
+                    <td>84 mo</td>
+                    <td>~$6-10B/GW</td>
+                </tr>
+                <tr>
+                    <td>Coal</td>
+                    <td>8</td>
+                    <td>1.0</td>
+                    <td>+10</td>
+                    <td>48 mo</td>
+                    <td>~$1-2B/GW</td>
+                </tr>
+                <tr>
+                    <td>Natural Gas</td>
+                    <td>12</td>
+                    <td>0.8</td>
+                    <td>+8</td>
+                    <td>24 mo</td>
+                    <td>~$0.8-1.5B/GW</td>
+                </tr>
+                <tr>
+                    <td>Geothermal</td>
+                    <td>35</td>
+                    <td>0.3</td>
+                    <td>+8</td>
+                    <td>36 mo</td>
+                    <td>~$3-5B/GW</td>
+                </tr>
+                <tr>
+                    <td>Hydropower</td>
+                    <td>50</td>
+                    <td>0.5</td>
+                    <td>+12</td>
+                    <td>60 mo</td>
+                    <td>~$2-4B/GW</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Energy Storage</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Cost ($B)</th>
+                    <th>Power (GW)</th>
+                    <th>Storage (GWh)</th>
+                    <th>Stability</th>
+                    <th>Real-World</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Battery</td>
+                    <td>20</td>
+                    <td>0.2</td>
+                    <td>0.8</td>
+                    <td>+15</td>
+                    <td>~$200-400M/GWh</td>
+                </tr>
+                <tr>
+                    <td>Pumped Hydro</td>
+                    <td>40</td>
+                    <td>0.5</td>
+                    <td>6.0</td>
+                    <td>+20</td>
+                    <td>~$50-100M/GWh</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Climate/Environment Projects</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Cost ($B)</th>
+                    <th>CO2 Reduction</th>
+                    <th>Construction</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Reforestation</td>
+                    <td>7.5</td>
+                    <td>2 units</td>
+                    <td>4 mo</td>
+                    <td><span class="status-estimate">ESTIMATE</span></td>
+                </tr>
+                <tr>
+                    <td>Carbon Capture</td>
+                    <td>52.5</td>
+                    <td>4 units</td>
+                    <td>30 mo</td>
+                    <td><span class="status-missing">NO SOURCE</span></td>
+                </tr>
+                <tr>
+                    <td>Research Center</td>
+                    <td>22.5</td>
+                    <td>0 (3 income)</td>
+                    <td>18 mo</td>
+                    <td><span class="status-missing">NO SOURCE</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Economic Projects</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Cost ($B)</th>
+                    <th>Income</th>
+                    <th>GDP Boost</th>
+                    <th>Happiness</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Infrastructure</td>
+                    <td>30</td>
+                    <td>4.5</td>
+                    <td>+2%</td>
+                    <td>+10</td>
+                </tr>
+                <tr>
+                    <td>Education Hub</td>
+                    <td>22.5</td>
+                    <td>3</td>
+                    <td>+1%</td>
+                    <td>+15</td>
+                </tr>
+                <tr>
+                    <td>Healthcare</td>
+                    <td>37.5</td>
+                    <td>3</td>
+                    <td>+1%</td>
+                    <td>+20</td>
+                </tr>
+                <tr>
+                    <td>Trade Agreement</td>
+                    <td>15</td>
+                    <td>6</td>
+                    <td>+3%</td>
+                    <td>+5</td>
+                </tr>
+                <tr>
+                    <td>Tourism</td>
+                    <td>18</td>
+                    <td>4.5</td>
+                    <td>+2%</td>
+                    <td>+8</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: All economic project values are ESTIMATES</em></p>
+
+        <h3>Electrification Projects</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Project</th>
+                    <th>Cost ($B)</th>
+                    <th>Power Demand</th>
+                    <th>Sector Reduction</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>EV Infrastructure</td>
+                    <td>25</td>
+                    <td>+5%</td>
+                    <td>Road -15%</td>
+                </tr>
+                <tr>
+                    <td>Heat Pumps</td>
+                    <td>15</td>
+                    <td>+8%</td>
+                    <td>Residential -20%</td>
+                </tr>
+                <tr>
+                    <td>Industrial Electrification</td>
+                    <td>40</td>
+                    <td>+10%</td>
+                    <td>Industry -10%</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: All electrification values are ESTIMATES</em></p>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== TECHNOLOGY TREE ==================== -->
+        <h2 id="technology-tree">9. Technology Tree</h2>
+        <div class="code-ref">Location: game.js TECHNOLOGIES (lines 1703-1774)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Technology</th>
+                    <th>RP Cost</th>
+                    <th>Effect</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Advanced Photovoltaics</td>
+                    <td>100</td>
+                    <td>Solar +20% CO2, +15% income</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Turbine Optimization</td>
+                    <td>250</td>
+                    <td>Offshore -20% cost, +15% CO2</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Bioengineered Trees</td>
+                    <td>200</td>
+                    <td>Forest +30% CO2</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Small Modular Reactors</td>
+                    <td>500</td>
+                    <td>Nuclear -25% cost, +20% income</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Direct Air Capture</td>
+                    <td>1000</td>
+                    <td>Carbon Capture +100% CO2</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+                <tr>
+                    <td>Green Hydrogen</td>
+                    <td>750</td>
+                    <td>All renewables +15% income</td>
+                    <td><span class="status-design">GAME DESIGN</span></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Research Points per Center: 5 RP/month (GAME DESIGN)</em></p>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== RESEARCH CENTERS ==================== -->
+        <h2 id="research-centers">10. Research Centers</h2>
+        <div class="code-ref">Location: game.js RESEARCH_CENTERS (lines 1781-1892)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Center</th>
+                    <th>Build ($B)</th>
+                    <th>Monthly ($B)</th>
+                    <th>RP/Month</th>
+                    <th>Tech Discount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Solar Research</td>
+                    <td>8</td>
+                    <td>0.4</td>
+                    <td>8</td>
+                    <td>Renewable -10%</td>
+                </tr>
+                <tr>
+                    <td>Wind Research</td>
+                    <td>6</td>
+                    <td>0.3</td>
+                    <td>6</td>
+                    <td>Renewable -8%</td>
+                </tr>
+                <tr>
+                    <td>Carbon Capture Hub</td>
+                    <td>10</td>
+                    <td>0.5</td>
+                    <td>10</td>
+                    <td>Carbon -12%</td>
+                </tr>
+                <tr>
+                    <td>DAC Center</td>
+                    <td>12</td>
+                    <td>0.6</td>
+                    <td>9</td>
+                    <td>Carbon -15%</td>
+                </tr>
+                <tr>
+                    <td>Storage Lab</td>
+                    <td>7</td>
+                    <td>0.35</td>
+                    <td>7</td>
+                    <td>Efficiency -10%</td>
+                </tr>
+                <tr>
+                    <td>Smart Grid Center</td>
+                    <td>5</td>
+                    <td>0.25</td>
+                    <td>5</td>
+                    <td>Efficiency -8%</td>
+                </tr>
+                <tr>
+                    <td>Climate Resilience</td>
+                    <td>15</td>
+                    <td>0.8</td>
+                    <td>12</td>
+                    <td>Adaptation -15%</td>
+                </tr>
+                <tr>
+                    <td>Sustainable Agriculture</td>
+                    <td>4</td>
+                    <td>0.2</td>
+                    <td>4</td>
+                    <td>Adaptation -6%</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: All values are ESTIMATES loosely based on real R&D facility costs</em></p>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== EVENTS ==================== -->
+        <h2 id="events">11. Random Events</h2>
+        <div class="code-ref">Location: game.js EVENTS (lines 1895-2087)</div>
+
+        <h3>Climate Events</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Probability</th>
+                    <th>Duration</th>
+                    <th>Effect</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Heat Wave</td>
+                    <td>3%</td>
+                    <td>3 months</td>
+                    <td>-10% income</td>
+                </tr>
+                <tr>
+                    <td>Hurricane</td>
+                    <td>2.5%</td>
+                    <td>2 months</td>
+                    <td>-15% effectiveness</td>
+                </tr>
+                <tr>
+                    <td>Drought</td>
+                    <td>2.5%</td>
+                    <td>4 months</td>
+                    <td>-15% income</td>
+                </tr>
+                <tr>
+                    <td>Flooding</td>
+                    <td>2%</td>
+                    <td>2 months</td>
+                    <td>-20% effectiveness, -10% income</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Political Events</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Probability</th>
+                    <th>Duration</th>
+                    <th>Effect</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Climate Summit</td>
+                    <td>2%</td>
+                    <td>6 months</td>
+                    <td>+15% income</td>
+                </tr>
+                <tr>
+                    <td>Policy Shift</td>
+                    <td>2%</td>
+                    <td>12 months</td>
+                    <td>+25% campaign effectiveness</td>
+                </tr>
+                <tr>
+                    <td>Fossil Lobby</td>
+                    <td>2.5%</td>
+                    <td>6 months</td>
+                    <td>+10% costs, -20% campaigns</td>
+                </tr>
+                <tr>
+                    <td>Youth Movement</td>
+                    <td>2%</td>
+                    <td>8 months</td>
+                    <td>+30% campaign effectiveness</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Economic Events</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Probability</th>
+                    <th>Duration</th>
+                    <th>Effect</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Recession</td>
+                    <td>1.5%</td>
+                    <td>12 months</td>
+                    <td>-25% income</td>
+                </tr>
+                <tr>
+                    <td>Green Boom</td>
+                    <td>2%</td>
+                    <td>8 months</td>
+                    <td>+20% income, -10% costs</td>
+                </tr>
+                <tr>
+                    <td>Oil Crisis</td>
+                    <td>2%</td>
+                    <td>6 months</td>
+                    <td>-10% income, +10% renewable effectiveness</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Breakthroughs (Permanent)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Event</th>
+                    <th>Probability</th>
+                    <th>Effect</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Solar Breakthrough</td>
+                    <td>1%</td>
+                    <td>Solar +15% CO2 reduction</td>
+                </tr>
+                <tr>
+                    <td>Battery Revolution</td>
+                    <td>1%</td>
+                    <td>Solar/Wind +20% income</td>
+                </tr>
+                <tr>
+                    <td>CCS Advancement</td>
+                    <td>1%</td>
+                    <td>Carbon Capture +25% CO2, -15% cost</td>
+                </tr>
+                <tr>
+                    <td>Fusion Progress</td>
+                    <td>0.8%</td>
+                    <td>+2 RP per center</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: All probabilities and effects are GAME DESIGN, not real-world data</em></p>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== DISASTERS ==================== -->
+        <h2 id="disasters">12. Natural Disasters</h2>
+        <div class="code-ref">Location: game.js NATURAL_DISASTERS (lines 2090-2180)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Disaster</th>
+                    <th>Base Prob</th>
+                    <th>Temp Scaling</th>
+                    <th>Income Reduction</th>
+                    <th>Duration</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Heat Wave</td>
+                    <td>0.5%</td>
+                    <td>2.5x/&deg;C</td>
+                    <td>15%</td>
+                    <td>2-3 mo</td>
+                </tr>
+                <tr>
+                    <td>Hurricane</td>
+                    <td>0.4%</td>
+                    <td>2.0x/&deg;C</td>
+                    <td>25%</td>
+                    <td>1-2 mo</td>
+                </tr>
+                <tr>
+                    <td>Flooding</td>
+                    <td>0.5%</td>
+                    <td>1.8x/&deg;C</td>
+                    <td>20%</td>
+                    <td>1-2 mo</td>
+                </tr>
+                <tr>
+                    <td>Drought</td>
+                    <td>0.3%</td>
+                    <td>3.0x/&deg;C</td>
+                    <td>20%</td>
+                    <td>3-6 mo</td>
+                </tr>
+                <tr>
+                    <td>Wildfire</td>
+                    <td>0.3%</td>
+                    <td>2.8x/&deg;C</td>
+                    <td>15%</td>
+                    <td>2-4 mo</td>
+                </tr>
+                <tr>
+                    <td>Cold Snap</td>
+                    <td>0.2%</td>
+                    <td>1.2x/&deg;C</td>
+                    <td>10%</td>
+                    <td>1-2 mo</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Regional Vulnerability (0-1 scale)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Region</th>
+                    <th>Heat</th>
+                    <th>Hurricane</th>
+                    <th>Flood</th>
+                    <th>Drought</th>
+                    <th>Wildfire</th>
+                    <th>Cold</th>
+                    <th>Resilience</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Europe</td>
+                    <td>0.4</td>
+                    <td>0.0</td>
+                    <td>0.5</td>
+                    <td>0.3</td>
+                    <td>0.3</td>
+                    <td>0.3</td>
+                    <td>0.7</td>
+                </tr>
+                <tr>
+                    <td>Asia</td>
+                    <td>0.6</td>
+                    <td>0.3</td>
+                    <td>0.6</td>
+                    <td>0.4</td>
+                    <td>0.2</td>
+                    <td>0.2</td>
+                    <td>0.5</td>
+                </tr>
+                <tr>
+                    <td>North America</td>
+                    <td>0.5</td>
+                    <td>0.4</td>
+                    <td>0.5</td>
+                    <td>0.4</td>
+                    <td>0.5</td>
+                    <td>0.4</td>
+                    <td>0.7</td>
+                </tr>
+                <tr>
+                    <td>South America</td>
+                    <td>0.5</td>
+                    <td>0.2</td>
+                    <td>0.6</td>
+                    <td>0.5</td>
+                    <td>0.4</td>
+                    <td>0.0</td>
+                    <td>0.4</td>
+                </tr>
+                <tr>
+                    <td>Africa</td>
+                    <td>0.7</td>
+                    <td>0.1</td>
+                    <td>0.5</td>
+                    <td>0.7</td>
+                    <td>0.3</td>
+                    <td>0.0</td>
+                    <td>0.3</td>
+                </tr>
+                <tr>
+                    <td>Oceania</td>
+                    <td>0.7</td>
+                    <td>0.3</td>
+                    <td>0.4</td>
+                    <td>0.7</td>
+                    <td>0.8</td>
+                    <td>0.0</td>
+                    <td>0.6</td>
+                </tr>
+                <tr>
+                    <td>Middle East</td>
+                    <td>0.9</td>
+                    <td>0.0</td>
+                    <td>0.3</td>
+                    <td>0.8</td>
+                    <td>0.1</td>
+                    <td>0.0</td>
+                    <td>0.5</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: All values are ESTIMATES based on general climate vulnerability assessments</em></p>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== DIPLOMACY ==================== -->
+        <h2 id="diplomacy">13. Diplomatic System</h2>
+
+        <h3>Alliance Interest Thresholds</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Level</th>
+                    <th>Interest Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Very High</td><td>80+</td></tr>
+                <tr><td>High</td><td>60-79</td></tr>
+                <tr><td>Moderate</td><td>40-59</td></tr>
+                <tr><td>Low</td><td>20-39</td></tr>
+                <tr><td>Hostile</td><td>0-19</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Happiness Thresholds</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>State</th>
+                    <th>Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>Happy</td><td>80+</td></tr>
+                <tr><td>Content</td><td>60-79</td></tr>
+                <tr><td>Concerned</td><td>40-59</td></tr>
+                <tr><td>Unhappy</td><td>20-39</td></tr>
+                <tr><td>Critical</td><td>0-19</td></tr>
+            </tbody>
+        </table>
+
+        <h3>Negotiable Terms</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Min</th>
+                    <th>Max</th>
+                    <th>Default</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Carbon Commitment</td>
+                    <td>0.5%</td>
+                    <td>3.0%</td>
+                    <td>1.0%</td>
+                </tr>
+                <tr>
+                    <td>Renewable Target</td>
+                    <td>20%</td>
+                    <td>80%</td>
+                    <td>40%</td>
+                </tr>
+                <tr>
+                    <td>CCS Requirement</td>
+                    <td>0</td>
+                    <td>5</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>Carbon Tax Level</td>
+                    <td>0%</td>
+                    <td>50%</td>
+                    <td>10%</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== DIFFICULTY ==================== -->
+        <h2>14. Difficulty Modes</h2>
+        <div class="code-ref">Location: game.js DIFFICULTY_MODES (lines 3676-3721)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mode</th>
+                    <th>CO2 Mult</th>
+                    <th>Starting Funds ($B)</th>
+                    <th>Cost Mult</th>
+                    <th>Event Severity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Tutorial</td>
+                    <td>0.6x</td>
+                    <td>150</td>
+                    <td>0.7x</td>
+                    <td>None</td>
+                </tr>
+                <tr>
+                    <td>Easy</td>
+                    <td>0.8x</td>
+                    <td>120</td>
+                    <td>0.85x</td>
+                    <td>0.5x</td>
+                </tr>
+                <tr>
+                    <td>Normal</td>
+                    <td>1.0x</td>
+                    <td>100</td>
+                    <td>1.0x</td>
+                    <td>1.0x</td>
+                </tr>
+                <tr>
+                    <td>Hard</td>
+                    <td>1.2x</td>
+                    <td>80</td>
+                    <td>1.15x</td>
+                    <td>1.5x</td>
+                </tr>
+                <tr>
+                    <td>Extreme</td>
+                    <td>1.4x</td>
+                    <td>60</td>
+                    <td>1.3x</td>
+                    <td>2.0x</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== GLOBAL EMISSIONS ==================== -->
+        <h2 id="global-emissions">15. Global Emissions Totals</h2>
+        <div class="code-ref">Location: climate-data.js REGION_AGGREGATES</div>
+
+        <h3>Target Values vs Real World (GCB 2025)</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Metric</th>
+                    <th>Game Value</th>
+                    <th>Real World 2025</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Fossil CO2 emissions</strong></td>
+                    <td>~43 Gt/yr</td>
+                    <td><strong>38.1 Gt/yr</strong></td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+                <tr>
+                    <td>Land-use change</td>
+                    <td>(included)</td>
+                    <td><strong>4.1 Gt/yr</strong></td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+                <tr>
+                    <td><strong>Total CO2 emissions</strong></td>
+                    <td>~43 Gt/yr</td>
+                    <td><strong>~42.2 Gt/yr</strong></td>
+                    <td><span class="status-verified">GCB 2025</span></td>
+                </tr>
+                <tr>
+                    <td>Power sector</td>
+                    <td>~12 Gt/yr</td>
+                    <td>~14.5 Gt/yr</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Industry</td>
+                    <td>~14.2 Gt/yr</td>
+                    <td>~9.4 Gt/yr</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Transport</td>
+                    <td>~8.6 Gt/yr</td>
+                    <td>~8.0 Gt/yr</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Buildings</td>
+                    <td>~4.1 Gt/yr</td>
+                    <td>~3.0 Gt/yr</td>
+                    <td><span class="status-verified">IEA</span></td>
+                </tr>
+                <tr>
+                    <td>Agriculture</td>
+                    <td>~5.3 Gt/yr</td>
+                    <td>~5.8 Gt/yr</td>
+                    <td><span class="status-verified">IPCC</span></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="verified-box">
+            <h4>GCB 2025 Key Findings</h4>
+            <ul>
+                <li>2025 fossil emissions: <strong>38.1 Gt CO2</strong> (+1.1% from 2024) - record high</li>
+                <li>Land-use change: <strong>4.1 Gt CO2</strong> (down from previous years)</li>
+                <li>Ocean sink: <strong>29%</strong> of emissions (~12.2 Gt/yr)</li>
+                <li>Land sink: <strong>21%</strong> of emissions (~8.9 Gt/yr)</li>
+            </ul>
+            <p style="margin-top: 10px;"><em>Note: Game values now closely match real-world totals from GCB 2025.</em></p>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== REGIONAL POWER ==================== -->
+        <h2 id="regional-power">16. Power Generation by Major Region (TWh/year)</h2>
+        <div class="code-ref">Location: climate-data.js MAJOR_REGIONS (lines 296-724)</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Region</th>
+                    <th>Coal</th>
+                    <th>Gas</th>
+                    <th>Nuclear</th>
+                    <th>Hydro</th>
+                    <th>Wind</th>
+                    <th>Solar</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>East Asia</td>
+                    <td>6000</td>
+                    <td>960</td>
+                    <td>720</td>
+                    <td>1680</td>
+                    <td>1080</td>
+                    <td>1320</td>
+                    <td><strong>12000</strong></td>
+                </tr>
+                <tr>
+                    <td>South Asia</td>
+                    <td>1625</td>
+                    <td>175</td>
+                    <td>75</td>
+                    <td>250</td>
+                    <td>175</td>
+                    <td>175</td>
+                    <td><strong>2500</strong></td>
+                </tr>
+                <tr>
+                    <td>Southeast Asia</td>
+                    <td>450</td>
+                    <td>280</td>
+                    <td>0</td>
+                    <td>150</td>
+                    <td>20</td>
+                    <td>70</td>
+                    <td><strong>1000</strong></td>
+                </tr>
+                <tr>
+                    <td>West Asia</td>
+                    <td>98</td>
+                    <td>1050</td>
+                    <td>42</td>
+                    <td>112</td>
+                    <td>56</td>
+                    <td>28</td>
+                    <td><strong>1400</strong></td>
+                </tr>
+                <tr>
+                    <td>North America</td>
+                    <td>770</td>
+                    <td>1920</td>
+                    <td>865</td>
+                    <td>480</td>
+                    <td>530</td>
+                    <td>290</td>
+                    <td><strong>4900</strong></td>
+                </tr>
+                <tr>
+                    <td>South America</td>
+                    <td>78</td>
+                    <td>232</td>
+                    <td>47</td>
+                    <td>930</td>
+                    <td>155</td>
+                    <td>93</td>
+                    <td><strong>1550</strong></td>
+                </tr>
+                <tr>
+                    <td>Western Europe</td>
+                    <td>60</td>
+                    <td>180</td>
+                    <td>480</td>
+                    <td>120</td>
+                    <td>150</td>
+                    <td>90</td>
+                    <td><strong>1200</strong></td>
+                </tr>
+                <tr>
+                    <td>Eastern Europe</td>
+                    <td>326</td>
+                    <td>196</td>
+                    <td>284</td>
+                    <td>152</td>
+                    <td>44</td>
+                    <td>28</td>
+                    <td><strong>1200</strong></td>
+                </tr>
+                <tr>
+                    <td>Sub-Saharan Africa</td>
+                    <td>256</td>
+                    <td>25</td>
+                    <td>18</td>
+                    <td>145</td>
+                    <td>17</td>
+                    <td>42</td>
+                    <td><strong>550</strong></td>
+                </tr>
+            </tbody>
+        </table>
+        <p><em>Source: Based on IEA 2023 data, simplified for game regions</em></p>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== EMISSION FACTORS ==================== -->
+        <h2 id="emission-factors">17. Power Emission Factors</h2>
+        <div class="code-ref">Location: game.js lines 665-666</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Fuel</th>
+                    <th>Factor Used</th>
+                    <th>Real-World Range</th>
+                    <th>Unit</th>
+                    <th>Source</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Coal</td>
+                    <td>1.0</td>
+                    <td>0.82-1.1</td>
+                    <td>kg CO2/kWh</td>
+                    <td><span class="status-verified">IEA</span> (varies by coal type)</td>
+                </tr>
+                <tr>
+                    <td>Natural Gas</td>
+                    <td>0.45</td>
+                    <td>0.41-0.50</td>
+                    <td>kg CO2/kWh</td>
+                    <td><span class="status-verified">IEA</span> (combined cycle)</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="code-ref" style="margin-top: 15px;">
+            <pre style="margin: 0;">const baseCoalEmissions = (currentMix.coal || 0) * 0.001; // 1.0 kg/kWh = 1 Mt/TWh
+const baseGasEmissions = (currentMix.gas || 0) * 0.00045; // 0.45 kg/kWh</pre>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== DATA GAPS ==================== -->
+        <h2 id="data-gaps">18. Key Data Gaps (Priority List)</h2>
+
+        <div class="verified-box">
+            <h4>VERIFIED (January 2026)</h4>
+            <ol>
+                <li><strong>Total CO2 emissions</strong> - 42.2 Gt/yr (GCB 2025)</li>
+                <li><strong>Natural carbon sinks</strong> - Ocean 29%, Land 21% (GCB 2025)</li>
+                <li><strong>Tipping point thresholds</strong> - Verified against IPCC AR6</li>
+                <li><strong>Renewable project costs</strong> - Verified against IRENA 2024</li>
+                <li><strong>Current warming</strong> - ~1.2&deg;C (IPCC/NOAA)</li>
+                <li><strong>Remaining carbon budgets</strong> - 1.5&deg;C (~4yr), 1.7&deg;C (525 Gt), 2&deg;C (1055 Gt)</li>
+                <li><strong>GDP growth rates by development</strong> - World Bank GEP Jan 2025</li>
+                <li><strong>Energy efficiency improvement rates</strong> - IEA 2024 (1-4%/yr depending on region)</li>
+                <li><strong>Lifecycle emissions for clean tech</strong> - IPCC/NREL (4-43 gCO2/kWh)</li>
+                <li><strong>GDP-climate damage function</strong> - Nordhaus DICE (2.1% at 3&deg;C), IMF studies</li>
+                <li><strong>Disaster probability scaling</strong> - IPCC AR6 WG2 (~2x at 2&deg;C)</li>
+                <li><strong>Regional vulnerability methodology</strong> - ND-GAIN Index</li>
+            </ol>
+        </div>
+
+        <div class="gap-list">
+            <div class="gap-high">
+                <h4 style="margin: 0 0 10px 0; color: #c53030;">HIGH PRIORITY - Still Need Better Sources</h4>
+                <ol>
+                    <li>All sector growth rates (industry, transport, buildings, agriculture) - need IEA sectoral data</li>
+                    <li>Natural sink saturation parameters (specific ppm/temperature thresholds) - need carbon cycle papers</li>
+                    <li>Power plant construction costs by technology - need Lazard/IEA capital cost data</li>
+                </ol>
+            </div>
+
+            <div class="gap-medium">
+                <h4 style="margin: 0 0 10px 0; color: #dd6b20;">MEDIUM PRIORITY - GAME DESIGN (Document Rationale Only)</h4>
+                <ol start="4">
+                    <li>Tipping point effect magnitudes (ppm/month) - <span class="status-design">intentionally scaled for gameplay</span></li>
+                    <li>Feedback loop effect magnitudes - <span class="status-design">intentionally scaled for gameplay</span></li>
+                    <li>Event probabilities and durations - <span class="status-design">tuned for engagement</span></li>
+                    <li>Research center costs and RP generation - <span class="status-design">balanced for progression</span></li>
+                </ol>
+            </div>
+
+            <div class="gap-low">
+                <h4 style="margin: 0 0 10px 0; color: #276749;">LOW PRIORITY - Pure Game Mechanics (No Real-World Equivalent)</h4>
+                <ul>
+                    <li>Happiness impact values - <span class="status-design">GAME DESIGN</span></li>
+                    <li>Alliance negotiation terms - <span class="status-design">GAME DESIGN</span></li>
+                    <li>Achievement thresholds - <span class="status-design">GAME DESIGN</span></li>
+                    <li>Difficulty mode multipliers - <span class="status-design">GAME DESIGN</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- ==================== CODE LOCATIONS ==================== -->
+        <h2 id="code-locations">19. Code File Locations</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>File</th>
+                    <th>Lines</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>GAME_CONFIG</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1-30</td>
+                </tr>
+                <tr>
+                    <td>GROWTH_CONFIG</td>
+                    <td><code>public/game.js</code></td>
+                    <td>33-55</td>
+                </tr>
+                <tr>
+                    <td>SECTOR_GROWTH_RATES</td>
+                    <td><code>public/game.js</code></td>
+                    <td>62-67</td>
+                </tr>
+                <tr>
+                    <td>DEVELOPMENT_GROWTH_MODIFIERS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>70-95</td>
+                </tr>
+                <tr>
+                    <td>EFFICIENCY_IMPROVEMENT</td>
+                    <td><code>public/game.js</code></td>
+                    <td>98-103</td>
+                </tr>
+                <tr>
+                    <td>NATURAL_SINK_CONFIG</td>
+                    <td><code>public/game.js</code></td>
+                    <td>106-118</td>
+                </tr>
+                <tr>
+                    <td>EMBODIED_CARBON</td>
+                    <td><code>public/game.js</code></td>
+                    <td>121-129</td>
+                </tr>
+                <tr>
+                    <td>TIPPING_POINTS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>958-1005</td>
+                </tr>
+                <tr>
+                    <td>FEEDBACK_LOOPS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1008-1030</td>
+                </tr>
+                <tr>
+                    <td>POWER_CONFIG</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1156-1200</td>
+                </tr>
+                <tr>
+                    <td>CAPACITY_FACTORS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1210-1226</td>
+                </tr>
+                <tr>
+                    <td>TECHNOLOGIES</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1703-1774</td>
+                </tr>
+                <tr>
+                    <td>RESEARCH_CENTERS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1781-1892</td>
+                </tr>
+                <tr>
+                    <td>EVENTS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>1895-2087</td>
+                </tr>
+                <tr>
+                    <td>NATURAL_DISASTERS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>2090-2180</td>
+                </tr>
+                <tr>
+                    <td>DEFAULT_VULNERABILITY</td>
+                    <td><code>public/game.js</code></td>
+                    <td>2205-2227</td>
+                </tr>
+                <tr>
+                    <td>ACHIEVEMENTS</td>
+                    <td><code>public/game.js</code></td>
+                    <td>2510-2683</td>
+                </tr>
+                <tr>
+                    <td>DIFFICULTY_MODES</td>
+                    <td><code>public/game.js</code></td>
+                    <td>3676-3721</td>
+                </tr>
+                <tr>
+                    <td>PROJECT_TYPES</td>
+                    <td><code>public/game.js</code></td>
+                    <td>3830-4109</td>
+                </tr>
+                <tr>
+                    <td>MAJOR_REGIONS</td>
+                    <td><code>public/climate-data.js</code></td>
+                    <td>296-724</td>
+                </tr>
+                <tr>
+                    <td>COUNTRY_DATA</td>
+                    <td><code>public/climate-data.js</code></td>
+                    <td>780-3296</td>
+                </tr>
+                <tr>
+                    <td>REGION_AGGREGATES</td>
+                    <td><code>public/climate-data.js</code></td>
+                    <td>3297-3790</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="footer">
+            <p>Last updated: January 16, 2026</p>
+            <p>Sources verified via Chrome MCP browser research</p>
+            <p>Carbon Capture Game - Data Reference Documentation</p>
+        </div>
+    </div>
+</body>
+</html>
