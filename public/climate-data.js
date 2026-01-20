@@ -494,7 +494,7 @@ const MAJOR_REGIONS = {
     name: "Northern Europe",
     developmentLevel: "developed",
     continent: "europe",
-    countries: ["DK", "EE", "FI", "IS", "IE", "LV", "LT", "NO", "SE", "GB"],
+    countries: ["DK", "EE", "FI", "GL", "IS", "IE", "LV", "LT", "NO", "SE", "GB"],
     power: {
       baseDemandGW: 80,        // Real 2024: ~600 TWh / 8760 hrs ≈ 68 GW average
       demandGrowthRate: 0.01,  // 1% annual growth (mature, electrification)
@@ -603,7 +603,7 @@ const MAJOR_REGIONS = {
     name: "North America",
     developmentLevel: "developed",
     continent: "north_america",
-    countries: ["CA", "US", "MX", "GL"],
+    countries: ["CA", "US", "MX"],
     power: {
       baseDemandGW: 550,       // Real 2024: ~4,800 TWh / 8760 hrs ≈ 548 GW average
       demandGrowthRate: 0.018, // 1.8% annual growth (data centers, EVs)
