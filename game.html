@@ -51,31 +51,31 @@
 
           <!-- Secondary Stats Row -->
           <div class="header-stats-row">
-            <div class="header-stat clickable" title="Click for alliance details" onclick="openStatDetail('alliance')">
+            <div class="header-stat clickable" title="Allied Regions - Regions that have joined your climate alliance (click for details)" onclick="openStatDetail('alliance')">
               <span class="stat-label">Allies</span>
               <span class="stat-value" id="alliance-progress">1/6</span>
             </div>
-            <div class="header-stat clickable" title="Click for research details" onclick="openStatDetail('research')">
+            <div class="header-stat clickable" title="Research Points - Earned from research centers, used to unlock technologies (click for details)" onclick="openStatDetail('research')">
               <span class="stat-label">RP</span>
               <span class="stat-value" id="rp-display">56</span>
             </div>
-            <div class="header-stat clickable" title="Click for project details" onclick="openStatDetail('projects')">
+            <div class="header-stat clickable" title="Built Projects - Total completed projects across all regions (click for details)" onclick="openStatDetail('projects')">
               <span class="stat-label">Built</span>
               <span class="stat-value" id="projects-display">0</span>
             </div>
-            <div class="header-stat clickable" title="Click for construction details" onclick="openStatDetail('building')">
+            <div class="header-stat clickable" title="Under Construction - Projects currently being built (click for details)" onclick="openStatDetail('building')">
               <span class="stat-label">Build</span>
               <span class="stat-value" id="building-display">0</span>
             </div>
-            <div class="header-stat clickable" title="Click for capture details" onclick="openStatDetail('capture')">
+            <div class="header-stat clickable" title="Carbon Capture - Total CO2 captured by CCS projects in Gt/year (click for details)" onclick="openStatDetail('capture')">
               <span class="stat-label">CCS</span>
               <span class="stat-value" id="capture-rate">0</span>
             </div>
-            <div class="header-stat clickable" title="Click for tech details" onclick="openStatDetail('tech')">
+            <div class="header-stat clickable" title="Technologies - Unlocked technologies out of total available (click for details)" onclick="openStatDetail('tech')">
               <span class="stat-label">Tech</span>
               <span class="stat-value" id="tech-progress">0/12</span>
             </div>
-            <div class="header-stat clickable" title="Click for disaster details" onclick="openStatDetail('disasters')">
+            <div class="header-stat clickable" title="Disaster Risk - Active climate disasters affecting regions (click for details)" onclick="openStatDetail('disasters')">
               <span class="stat-label">Risk</span>
               <span class="stat-value">
                 <span id="disaster-count">0</span>
@@ -123,7 +123,6 @@
               <select id="map-mode" class="map-mode-select">
                 <option value="alliance" selected>Alliance</option>
                 <option value="alliance_happiness">Happiness</option>
-                <option value="temperature">Temperature</option>
                 <option value="emissions">Emissions</option>
                 <option value="renewables">Renewables</option>
                 <option value="economy">Economy</option>
@@ -162,41 +161,25 @@
             <!-- Research Centers Section -->
             <div class="tech-section">
               <div class="tech-section-header">
-                <h3>Research Centers</h3>
-                <p class="tech-section-desc">Build research centers to generate Research Points (RP) monthly. Each center has ongoing operating costs.</p>
+                <h3>🏛️ Research Centers</h3>
+                <p class="tech-section-desc">Build research centers to generate Research Points monthly.</p>
               </div>
-
-              <!-- Active Research Centers -->
-              <div class="tech-subsection">
-                <h4>Your Research Centers</h4>
-                <div id="active-research-centers" class="active-research-centers">
-                  <p class="no-centers-msg">No research centers built yet.</p>
-                </div>
-              </div>
-
-              <!-- Available Research Centers by Category -->
-              <div class="tech-subsection">
-                <h4>Build Research Centers</h4>
-                <div id="research-center-options" class="research-center-grid"></div>
-              </div>
+              <div id="research-center-options" class="research-center-grid"></div>
             </div>
 
             <!-- Technology Tree Section -->
             <div class="tech-section">
               <div class="tech-section-header">
-                <h3>Technology Upgrades</h3>
-                <p class="tech-section-desc">Spend Research Points to unlock permanent upgrades for your climate projects.</p>
+                <h3>🔬 Technology Upgrades</h3>
+                <p class="tech-section-desc">Spend RP to unlock permanent upgrades for your climate projects.</p>
+              </div>
+              <!-- Tech Tree Legend -->
+              <div class="tech-tree-legend">
+                <span class="legend-item available"><span class="dot"></span> Available</span>
+                <span class="legend-item unlocked"><span class="dot"></span> Unlocked</span>
+                <span class="legend-item locked"><span class="dot"></span> Locked</span>
               </div>
               <div id="tech-tree-list" class="tech-tree-list"></div>
-            </div>
-
-            <!-- Tech Categories Summary -->
-            <div class="tech-section">
-              <div class="tech-section-header">
-                <h3>Research Progress</h3>
-                <p class="tech-section-desc">Track your research center coverage by category.</p>
-              </div>
-              <div id="tech-categories" class="tech-categories-grid"></div>
             </div>
           </div>
         </div>

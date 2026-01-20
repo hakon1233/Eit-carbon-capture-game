@@ -5,17 +5,21 @@ const GAME_CONFIG = {
   currencySymbol: "$",          // USD
 
   // Climate settings
-  startingCo2: 420,
-  startingTemp: 1.2,
+  startingCo2: 423,             // Current CO2 level (2025)
+  startingTemp: 1.09,           // Starting temperature: 423 * 0.0105 - 3.37 = 1.09°C
   startYear: 2025,
   startMonth: 1,
-  co2Increase: 0.4,             // ppm per month base increase (real-world: ~5 ppm/year)
-  baselineCo2: 280,             // Pre-industrial CO2 level
-  tempFactor: 0.008,            // °C per ppm above baseline
+  co2Increase: 0.29,            // ppm per month (3.5 ppm/year from WMO 2023-2024 data, legacy fallback)
+  // Temperature formula: T(c) = c * 0.0105 - 3.37 (no baseline subtraction needed)
+  tempFactor: 0.0105,           // °C per ppm (new formula coefficient)
+  tempOffset: -3.37,            // Temperature offset (new formula)
+  baselineCo2: 320,             // Minimum CO2 floor (ultimate win = 0°C)
 
-  // Win/lose conditions
-  winTemp: 1.5,                 // Paris Agreement target - stabilize below 1.5°C
-  loseTemp: 2.5,                // Catastrophic tipping point territory
+  // Win/lose conditions (based on new formula)
+  winCo2: 416,                  // +1.0°C target
+  loseCo2: 511,                 // +2.0°C catastrophic (Paris Agreement limit)
+  winTemp: 1.0,                 // Win at +1.0°C
+  loseTemp: 2.0,                // Lose at +2.0°C
   loseYear: 2100,
 
   // Climate Policy Campaign settings
@@ -46,6 +50,22 @@ const REGIONAL_PROJECT_CAPS = {
   pumpedHydro: 2,       // Requires specific geography
   research: 2,          // Research centers per region
   infrastructure: 4,    // General infrastructure
+  // CCS Capture Projects
+  postCombustionCapture: 3,   // Retrofit multiple existing plants
+  preCombustionCapture: 2,    // New IGCC facilities limited
+  oxyfuelCapture: 2,          // Specialized facilities limited
+  directAirCapture: 4,        // Can be built anywhere (modular)
+  beccsPlant: 2,              // Biomass supply limitations
+  // CCS Transport Infrastructure
+  co2Pipeline: 3,             // Regional pipeline networks
+  co2OffshorePipeline: 2,     // Requires coastal regions
+  co2ShipTerminal: 2,         // Requires coastal/port regions
+  // CCS Storage Infrastructure
+  depletedReservoirStorage: 2,  // Limited by geological availability
+  salineAquiferStorage: 2,      // Limited by suitable formations
+  // CCS Integrated Hubs
+  ccsHubSmall: 2,             // Regional hubs
+  ccsHubMajor: 1,             // Only one major complex per region
   // Default: null means no cap
 };
 
@@ -149,9 +169,10 @@ const EMBODIED_CARBON = {
 };
 
 // Conversion factor: Gt CO2/year to ppm/month
-// Real-world: ~4.7 Gt CO2 emissions = 1 ppm (with ~45% airborne fraction)
-// This value is tuned for game pacing (~2x real-world rate for faster gameplay)
-const EMISSIONS_TO_PPM_FACTOR = 0.128;
+// Formula: c = (m - 18.4) * 0.1277247 yearly, where 18.4 Gt/year is Earth's natural carbon storage
+// Monthly: c = (m - 1.54) * 0.1277247, where 1.54 Gt/month is monthly natural storage
+// Natural storage is handled by ocean/land absorption in getCarbonRemovals()
+const EMISSIONS_TO_PPM_FACTOR = 0.1277247;
 
 // ═══════════════════════════════════════════════════════════════
 // SECTOR EMISSIONS INITIALIZATION
@@ -1727,6 +1748,7 @@ const TECHNOLOGIES = [
     description: "Next-generation solar cells with 20% improved efficiency",
     cost: 100,               // Research points required
     tier: 1,
+    field: "renewable",
     effects: {
       projectBonus: { solar: { co2Reduction: 1.2, income: 1.15 } },
     },
@@ -1738,6 +1760,7 @@ const TECHNOLOGIES = [
     description: "Improved wind turbine designs reduce offshore wind costs by 20%",
     cost: 250,
     tier: 2,
+    field: "renewable",
     effects: {
       projectBonus: { offshoreWind: { costReduction: 0.8, co2Reduction: 1.15 } },
     },
@@ -1749,6 +1772,7 @@ const TECHNOLOGIES = [
     description: "Fast-growing, carbon-hungry tree varieties increase reforestation effectiveness by 30%",
     cost: 200,
     tier: 2,
+    field: "adaptation",
     effects: {
       projectBonus: { forest: { co2Reduction: 1.3 } },
     },
@@ -1760,21 +1784,11 @@ const TECHNOLOGIES = [
     description: "Compact nuclear designs reduce costs by 25% and increase income by 20%",
     cost: 500,
     tier: 3,
+    field: "efficiency",
     effects: {
       projectBonus: { nuclear: { costReduction: 0.75, income: 1.2 } },
     },
     icon: "⚛️",
-  },
-  {
-    id: "direct_air_capture",
-    name: "Direct Air Capture",
-    description: "Revolutionary carbon capture technology doubles CO2 removal efficiency",
-    cost: 1000,
-    tier: 4,
-    effects: {
-      projectBonus: { carbonCapture: { co2Reduction: 2.0 } },
-    },
-    icon: "🌀",
   },
   {
     id: "green_hydrogen",
@@ -1782,6 +1796,7 @@ const TECHNOLOGIES = [
     description: "Hydrogen production enables new clean energy storage, boosting all renewable income by 15%",
     cost: 750,
     tier: 3,
+    field: "renewable",
     effects: {
       projectBonus: {
         solar: { income: 1.15 },
@@ -1791,10 +1806,638 @@ const TECHNOLOGIES = [
     },
     icon: "💧",
   },
+
+  // ═══════════════════════════════════════════════════════════════
+  // CCS TECHNOLOGIES - Carbon Capture and Storage Tech Tree
+  // Starting from scratch in 2025, these technologies unlock advanced
+  // CCS capabilities through research progression.
+  // ═══════════════════════════════════════════════════════════════
+
+  // TIER 1 - FOUNDATION
+  {
+    id: "ccs_fundamentals",
+    name: "CCS Fundamentals",
+    description: "Basic understanding of carbon capture, transport, and storage. Foundation for all CCS development.",
+    cost: 80,
+    tier: 1,
+    field: "carbon",
+    effects: {
+      projectBonus: { carbonCapture: { co2Reduction: 1.1 } },
+    },
+    icon: "📚",
+  },
+  {
+    id: "amine_solvents",
+    name: "Amine Solvent Technology",
+    description: "Chemical solvents that absorb CO2 from flue gas. Enables post-combustion capture.",
+    cost: 120,
+    tier: 1,
+    field: "carbon",
+    requires: ["ccs_fundamentals"],
+    effects: {
+      projectBonus: { carbonCapture: { co2Reduction: 1.15, costReduction: 0.95 } },
+    },
+    icon: "🧪",
+  },
+
+  // TIER 2 - CAPTURE METHODS & BASIC TRANSPORT
+  {
+    id: "post_combustion_capture",
+    name: "Post-Combustion Capture",
+    description: "Retrofittable capture for existing fossil plants. Uses amine scrubbing to remove CO2 from flue gas.",
+    cost: 200,
+    tier: 2,
+    field: "carbon",
+    requires: ["amine_solvents"],
+    effects: {
+      projectBonus: { postCombustionCapture: { co2Reduction: 1.2, costReduction: 0.9 } },
+    },
+    icon: "🏭",
+  },
+  {
+    id: "pre_combustion_capture",
+    name: "Pre-Combustion Capture",
+    description: "Gasification-based capture producing hydrogen and CO2. Currently $60/tonne, targeting $30/tonne.",
+    cost: 250,
+    tier: 2,
+    field: "carbon",
+    requires: ["ccs_fundamentals"],
+    effects: {
+      projectBonus: { preCombustionCapture: { co2Reduction: 1.15, income: 1.1 } },
+    },
+    icon: "⚗️",
+  },
+  {
+    id: "oxyfuel_combustion",
+    name: "Oxy-Fuel Combustion",
+    description: "Burns fuel with pure oxygen for >90% CO2 concentration in exhaust. Highest capture efficiency.",
+    cost: 280,
+    tier: 2,
+    field: "carbon",
+    requires: ["ccs_fundamentals"],
+    effects: {
+      projectBonus: { oxyfuelCapture: { co2Reduction: 1.25 } },
+    },
+    icon: "🔥",
+  },
+  {
+    id: "pipeline_transport",
+    name: "CO2 Pipeline Networks",
+    description: "Onshore pipelines transport CO2 at €1.5-5/tonne. Essential infrastructure for large-scale CCS.",
+    cost: 180,
+    tier: 2,
+    field: "carbon",
+    requires: ["ccs_fundamentals"],
+    effects: {
+      projectBonus: {
+        co2Pipeline: { costReduction: 0.85 },
+        carbonCapture: { costReduction: 0.95 },
+      },
+    },
+    icon: "🔧",
+  },
+  {
+    id: "offshore_pipeline",
+    name: "Offshore Pipeline Technology",
+    description: "Subsea pipelines for offshore storage. Cost €3.5-9.5/tonne. Required for offshore sequestration.",
+    cost: 220,
+    tier: 2,
+    field: "carbon",
+    requires: ["pipeline_transport"],
+    effects: {
+      projectBonus: { co2OffshorePipeline: { costReduction: 0.85 } },
+    },
+    icon: "🌊",
+  },
+
+  // TIER 3 - STORAGE & ADVANCED TRANSPORT
+  {
+    id: "depleted_reservoir_storage",
+    name: "Depleted Reservoir Storage",
+    description: "Store CO2 in depleted oil/gas fields. Reuses existing infrastructure. €1-14/tonne depending on location.",
+    cost: 300,
+    tier: 3,
+    field: "carbon",
+    requires: ["pipeline_transport"],
+    effects: {
+      projectBonus: { depletedReservoirStorage: { costReduction: 0.8, co2Reduction: 1.2 } },
+    },
+    icon: "🛢️",
+  },
+  {
+    id: "saline_aquifer_storage",
+    name: "Deep Saline Aquifer Storage",
+    description: "Store CO2 in porous rock formations saturated with brine. Largest storage capacity globally. €6-20/tonne.",
+    cost: 350,
+    tier: 3,
+    field: "carbon",
+    requires: ["offshore_pipeline"],
+    effects: {
+      projectBonus: { salineAquiferStorage: { co2Reduction: 1.3 } },
+    },
+    icon: "💎",
+  },
+  {
+    id: "co2_shipping",
+    name: "CO2 Shipping Technology",
+    description: "Ship-based CO2 transport at €11-16/tonne. Flexible, enables cross-border CCS and remote storage access.",
+    cost: 320,
+    tier: 3,
+    field: "carbon",
+    requires: ["ccs_fundamentals", "offshore_pipeline"],
+    effects: {
+      projectBonus: { co2ShipTerminal: { costReduction: 0.85 } },
+    },
+    icon: "🚢",
+  },
+  {
+    id: "enhanced_oil_recovery",
+    name: "Enhanced Oil Recovery (EOR)",
+    description: "Inject CO2 into oil reservoirs to extract more oil while permanently storing CO2. Generates revenue.",
+    cost: 280,
+    tier: 3,
+    field: "carbon",
+    requires: ["depleted_reservoir_storage"],
+    effects: {
+      projectBonus: {
+        depletedReservoirStorage: { income: 1.5 },
+        carbonCapture: { income: 1.2 },
+      },
+    },
+    icon: "💰",
+  },
+
+  // TIER 4 - ADVANCED CCS TECHNOLOGIES
+  {
+    id: "direct_air_capture_tech",
+    name: "Direct Air Capture (DAC)",
+    description: "Capture CO2 directly from ambient air (~420ppm). Most expensive but location-independent negative emissions.",
+    cost: 800,
+    tier: 4,
+    field: "carbon",
+    requires: ["amine_solvents", "saline_aquifer_storage"],
+    effects: {
+      projectBonus: { directAirCapture: { co2Reduction: 1.5, costReduction: 0.85 } },
+    },
+    icon: "🌀",
+  },
+  {
+    id: "beccs_technology",
+    name: "BECCS (Bioenergy with CCS)",
+    description: "Burn biomass for energy and capture emissions. Only technology that produces energy AND removes CO2.",
+    cost: 900,
+    tier: 4,
+    field: "carbon",
+    requires: ["post_combustion_capture", "depleted_reservoir_storage"],
+    effects: {
+      projectBonus: { beccsPlant: { co2Reduction: 1.3, income: 1.2 } },
+    },
+    icon: "🌿",
+  },
+  {
+    id: "ccs_optimization",
+    name: "CCS System Optimization",
+    description: "AI-driven optimization reduces costs across all CCS operations by 20%. Integrates capture, transport, storage.",
+    cost: 600,
+    tier: 4,
+    field: "carbon",
+    requires: ["depleted_reservoir_storage", "saline_aquifer_storage", "co2_shipping"],
+    effects: {
+      projectBonus: {
+        carbonCapture: { costReduction: 0.8, co2Reduction: 1.15 },
+        postCombustionCapture: { costReduction: 0.8 },
+        preCombustionCapture: { costReduction: 0.8 },
+        oxyfuelCapture: { costReduction: 0.8 },
+        directAirCapture: { costReduction: 0.8 },
+        beccsPlant: { costReduction: 0.8 },
+      },
+    },
+    icon: "🤖",
+  },
 ];
 
-// Research points generated per Research Center per month
+// Research points generated per Research Center per month (legacy - used for regional research projects)
 const RESEARCH_POINTS_PER_CENTER = 5;
+
+// ═══════════════════════════════════════════════════════════════
+// NEW REGIONAL RESEARCH SYSTEM
+// Research centers are built in allied regions, generate RP/month
+// toward assigned technologies within their research field.
+// ═══════════════════════════════════════════════════════════════
+
+// Research Center Scaling - no max level, uses formulas
+const RESEARCH_CENTER_BASE = {
+  buildCost: 8,  // $8B to build level 1
+  // Named levels for flavor (higher levels use "Level X Research Center")
+  levelNames: {
+    1: "Basic Lab",
+    2: "Advanced Facility",
+    3: "Research Institute",
+    4: "National Laboratory",
+    5: "World-Class Institute",
+  }
+};
+
+// Get RP per month for a given level: 5, 10, 18, 26, 35, 45, ...
+// Formula: floor(5 * level * (1 + 0.1 * (level - 1)))
+function getResearchCenterRPPerMonth(level) {
+  if (level < 1) return 0;
+  return Math.floor(5 * level * (1 + 0.1 * (level - 1)));
+}
+
+// Get upgrade cost to reach the next level: 12, 20, 28, 36, ...
+// Formula: 4 + 8 * level (cost to upgrade FROM level to level+1)
+function getResearchCenterUpgradeCost(currentLevel) {
+  if (currentLevel < 1) return 0;
+  return 4 + 8 * currentLevel;
+}
+
+// Get the display name for a research center level
+function getResearchCenterName(level) {
+  return RESEARCH_CENTER_BASE.levelNames[level] || `Level ${level} Research Center`;
+}
+
+// Get all data for a level (convenience function)
+function getResearchCenterLevelData(level) {
+  return {
+    level: level,
+    rpPerMonth: getResearchCenterRPPerMonth(level),
+    upgradeCost: getResearchCenterUpgradeCost(level),
+    name: getResearchCenterName(level)
+  };
+}
+
+// Calculate total monthly operating cost for all research centers
+// Formula: $0.5B base + $0.3B per level for each center
+function getResearchCenterMonthlyCost() {
+  if (!state.regionalResearchCenters) return 0;
+  let totalCost = 0;
+  for (const regionId in state.regionalResearchCenters) {
+    const center = state.regionalResearchCenters[regionId];
+    if (center && center.level > 0) {
+      totalCost += 0.5 + 0.3 * center.level;
+    }
+  }
+  return totalCost;
+}
+
+// Research Fields - switching between fields has cost and cooldown
+const RESEARCH_FIELDS = {
+  renewable: {
+    id: "renewable",
+    name: "Renewable Energy",
+    icon: "☀️",
+    switchCost: 8,    // $8B to switch to this field
+    switchTime: 2,    // 2 months cooldown
+    description: "Solar, wind, and hydrogen technologies"
+  },
+  carbon: {
+    id: "carbon",
+    name: "Carbon Capture",
+    icon: "🏭",
+    switchCost: 10,   // $10B to switch
+    switchTime: 3,    // 3 months cooldown
+    description: "CCS technologies and CO2 storage"
+  },
+  efficiency: {
+    id: "efficiency",
+    name: "Energy Efficiency",
+    icon: "⚡",
+    switchCost: 6,    // $6B to switch
+    switchTime: 2,    // 2 months cooldown
+    description: "Nuclear and grid optimization"
+  },
+  adaptation: {
+    id: "adaptation",
+    name: "Climate Adaptation",
+    icon: "🛡️",
+    switchCost: 8,    // $8B to switch
+    switchTime: 2,    // 2 months cooldown
+    description: "Nature-based solutions and resilience"
+  },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// REGIONAL RESEARCH CENTER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
+
+// Check if a region can have a research center built
+function canBuildRegionalCenter(regionId) {
+  const region = state.regions?.[regionId];
+  if (!region) return { can: false, reason: "Region not found" };
+
+  // Must have alliance
+  if (!state.alliance || state.alliance[regionId]?.status !== 'allied') {
+    return { can: false, reason: "No alliance with this region" };
+  }
+
+  // Check if already has a center
+  if (state.regionalResearchCenters && state.regionalResearchCenters[regionId]) {
+    return { can: false, reason: "Already has a research center" };
+  }
+
+  // Check cost
+  const buildCost = RESEARCH_CENTER_BASE.buildCost;
+  if (state.funds < buildCost) {
+    return { can: false, reason: `Not enough funds (need $${buildCost}B)` };
+  }
+
+  return { can: true };
+}
+
+// Build a research center in an allied region
+function buildRegionalCenter(regionId) {
+  const check = canBuildRegionalCenter(regionId);
+  if (!check.can) {
+    showResearchNotification(check.reason, 'warning');
+    return false;
+  }
+
+  const buildCost = RESEARCH_CENTER_BASE.buildCost;
+  state.funds -= buildCost;
+
+  // Initialize the center at level 1 with no assignment
+  if (!state.regionalResearchCenters) state.regionalResearchCenters = {};
+  state.regionalResearchCenters[regionId] = {
+    level: 1,
+    field: null,      // Not assigned to any field yet
+    projectId: null,  // Not assigned to any project yet
+  };
+
+  const region = state.regions?.[regionId];
+  const levelData = getResearchCenterLevelData(1);
+  showResearchNotification(`Built ${levelData.name} in ${region.name}! (+${levelData.rpPerMonth} RP/mo)`, 'success');
+
+  renderTechTree();
+  updateUI();
+  saveGame();
+  return true;
+}
+
+// Check if a regional center can be upgraded (no max level)
+function canUpgradeRegionalCenter(regionId) {
+  if (!state.regionalResearchCenters || !state.regionalResearchCenters[regionId]) {
+    return { can: false, reason: "No research center in this region" };
+  }
+
+  const center = state.regionalResearchCenters[regionId];
+  const currentLevel = center.level;
+
+  // No max level - can always upgrade
+  const upgradeCost = getResearchCenterUpgradeCost(currentLevel);
+
+  if (state.funds < upgradeCost) {
+    return { can: false, reason: `Not enough funds (need $${upgradeCost}B)` };
+  }
+
+  return { can: true, cost: upgradeCost, nextLevel: currentLevel + 1 };
+}
+
+// Upgrade a regional research center
+function upgradeRegionalCenter(regionId) {
+  const check = canUpgradeRegionalCenter(regionId);
+  if (!check.can) {
+    showResearchNotification(check.reason, 'warning');
+    return false;
+  }
+
+  state.funds -= check.cost;
+  state.regionalResearchCenters[regionId].level = check.nextLevel;
+
+  const region = state.regions?.[regionId];
+  const levelData = getResearchCenterLevelData(check.nextLevel);
+  showResearchNotification(`Upgraded to ${levelData.name} in ${region.name}! (+${levelData.rpPerMonth} RP/mo)`, 'success');
+
+  renderTechTree();
+  updateUI();
+  saveGame();
+  return true;
+}
+
+// Get the RP/month output for a center based on its level
+function getCenterRPPerMonth(level) {
+  return getResearchCenterRPPerMonth(level);
+}
+
+// Assign a research center to a field and project
+function assignCenterToProject(regionId, fieldId, techId) {
+  if (!state.regionalResearchCenters || !state.regionalResearchCenters[regionId]) {
+    showResearchNotification("No research center in this region", 'warning');
+    return false;
+  }
+
+  const center = state.regionalResearchCenters[regionId];
+  const tech = TECHNOLOGIES.find(t => t.id === techId);
+
+  if (!tech) {
+    showResearchNotification("Technology not found", 'error');
+    return false;
+  }
+
+  // Check if tech field matches the requested field
+  if (tech.field !== fieldId) {
+    showResearchNotification("Technology doesn't belong to this field", 'error');
+    return false;
+  }
+
+  // Check if tech is already unlocked
+  if (state.unlockedTechs && state.unlockedTechs.includes(techId)) {
+    showResearchNotification("Technology already unlocked", 'warning');
+    return false;
+  }
+
+  // Check prerequisites
+  if (tech.requires && tech.requires.length > 0) {
+    const hasAllPrereqs = tech.requires.every(
+      reqId => state.unlockedTechs && state.unlockedTechs.includes(reqId)
+    );
+    if (!hasAllPrereqs) {
+      showResearchNotification("Prerequisites not met", 'warning');
+      return false;
+    }
+  }
+
+  const oldField = center.field;
+  const oldProject = center.projectId;
+
+  // Check if switching fields (not just projects within same field)
+  if (oldField && oldField !== fieldId) {
+    const fieldData = RESEARCH_FIELDS[fieldId];
+
+    // Check if can afford field switch cost
+    if (state.funds < fieldData.switchCost) {
+      showResearchNotification(`Not enough funds to switch fields (need $${fieldData.switchCost}B)`, 'warning');
+      return false;
+    }
+
+    // Deduct switch cost and set cooldown
+    state.funds -= fieldData.switchCost;
+    if (!state.centerCooldowns) state.centerCooldowns = {};
+    state.centerCooldowns[regionId] = fieldData.switchTime;
+
+    showResearchNotification(`Switching to ${fieldData.name} field - ${fieldData.switchTime} months cooldown`, 'info');
+  }
+
+  // If switching project before completion, reset progress on old project
+  if (oldProject && oldProject !== techId) {
+    if (!state.techProgress) state.techProgress = {};
+    // Reset progress on old project (it was not completed)
+    state.techProgress[oldProject] = 0;
+  }
+
+  // Assign the new field and project
+  center.field = fieldId;
+  center.projectId = techId;
+
+  // Initialize progress for the new tech if not exists
+  if (!state.techProgress) state.techProgress = {};
+  if (state.techProgress[techId] === undefined) {
+    state.techProgress[techId] = 0;
+  }
+
+  const region = state.regions?.[regionId];
+  showResearchNotification(`${region.name} center now researching: ${tech.name}`, 'success');
+
+  renderTechTree();
+  updateUI();
+  saveGame();
+  return true;
+}
+
+// Process monthly research - accumulate RP toward assigned projects
+function processMonthlyResearch() {
+  if (!state.regionalResearchCenters) return;
+
+  // Decrement cooldowns first
+  if (state.centerCooldowns) {
+    for (const regionId in state.centerCooldowns) {
+      if (state.centerCooldowns[regionId] > 0) {
+        state.centerCooldowns[regionId]--;
+      }
+    }
+  }
+
+  // Process each active center
+  for (const regionId in state.regionalResearchCenters) {
+    const center = state.regionalResearchCenters[regionId];
+
+    // Skip if on cooldown
+    if (state.centerCooldowns && state.centerCooldowns[regionId] > 0) {
+      continue;
+    }
+
+    // Skip if not assigned to a project
+    if (!center.projectId) continue;
+
+    // Skip if tech already unlocked
+    if (state.unlockedTechs && state.unlockedTechs.includes(center.projectId)) {
+      continue;
+    }
+
+    // Add RP to the project
+    const rpPerMonth = getCenterRPPerMonth(center.level);
+    if (!state.techProgress) state.techProgress = {};
+    if (state.techProgress[center.projectId] === undefined) {
+      state.techProgress[center.projectId] = 0;
+    }
+    state.techProgress[center.projectId] += rpPerMonth;
+
+    // Check if tech is now unlocked
+    const tech = TECHNOLOGIES.find(t => t.id === center.projectId);
+    if (tech && state.techProgress[center.projectId] >= tech.cost) {
+      // Unlock the technology!
+      if (!state.unlockedTechs) state.unlockedTechs = [];
+      state.unlockedTechs.push(center.projectId);
+
+      const region = state.regions?.[regionId];
+      showResearchNotification(`${tech.name} research complete!`, 'success');
+
+      // Clear the assignment so player can choose next project
+      center.projectId = null;
+    }
+  }
+}
+
+// Get total RP/month from all active regional centers
+function getTotalRegionalRPPerMonth() {
+  if (!state.regionalResearchCenters) return 0;
+
+  let total = 0;
+  for (const regionId in state.regionalResearchCenters) {
+    const center = state.regionalResearchCenters[regionId];
+
+    // Skip if on cooldown
+    if (state.centerCooldowns && state.centerCooldowns[regionId] > 0) {
+      continue;
+    }
+
+    total += getCenterRPPerMonth(center.level);
+  }
+  return total;
+}
+
+// Destroy a research center when alliance is lost
+function destroyRegionalCenter(regionId) {
+  if (!state.regionalResearchCenters || !state.regionalResearchCenters[regionId]) {
+    return;
+  }
+
+  const region = state.regions?.[regionId];
+  delete state.regionalResearchCenters[regionId];
+
+  // Also clean up cooldown if any
+  if (state.centerCooldowns && state.centerCooldowns[regionId]) {
+    delete state.centerCooldowns[regionId];
+  }
+
+  if (region) {
+    showResearchNotification(`Research center in ${region.name} destroyed - alliance lost!`, 'warning');
+  }
+
+  renderTechTree();
+}
+
+// Get list of regions where player can build research centers
+function getAvailableRegionsForResearch() {
+  if (!state.alliance) return [];
+
+  // Get allied regions from state.alliance object
+  const alliedRegions = Object.keys(state.alliance).filter(regionId =>
+    state.alliance[regionId].status === 'allied'
+  );
+
+  return alliedRegions.filter(regionId => {
+    // Must not already have a center
+    return !state.regionalResearchCenters || !state.regionalResearchCenters[regionId];
+  });
+}
+
+// Get technologies available for research in a field
+function getTechsInField(fieldId) {
+  return TECHNOLOGIES.filter(tech => tech.field === fieldId);
+}
+
+// Get researchable technologies in a field (prerequisites met, not unlocked)
+function getResearchableTechsInField(fieldId) {
+  return TECHNOLOGIES.filter(tech => {
+    if (tech.field !== fieldId) return false;
+    if (state.unlockedTechs && state.unlockedTechs.includes(tech.id)) return false;
+
+    // Check prerequisites
+    if (tech.requires && tech.requires.length > 0) {
+      const hasAllPrereqs = tech.requires.every(
+        reqId => state.unlockedTechs && state.unlockedTechs.includes(reqId)
+      );
+      if (!hasAllPrereqs) return false;
+    }
+
+    return true;
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// END REGIONAL RESEARCH CENTER FUNCTIONS
+// ═══════════════════════════════════════════════════════════════
 
 // Global Research Centers - Generate RP monthly and provide tech discounts
 // Based on real-world R&D facility costs and outputs
@@ -3861,21 +4504,181 @@ const PROJECT_TYPES = {
     description: "Plant trees across the region to absorb carbon.",
   },
   carbonCapture: {
-    label: "Carbon Capture",
-    cost: 80,                   // $80 billion (increased for balance)
-    co2Reduction: 0.05,         // Realistic CCS rate (was 4, 80x nerf)
+    label: "Basic Carbon Capture",
+    cost: 35,                   // $35B (based on $332M/unit from Sintef, scaled for ~105 units)
+    co2Reduction: 0.001,        // 105 Mt CO2/year (realistic: $332M captures 1 Mt/year)
     income: 0,
     category: "climate",
-    constructionMonths: 30,    // 24-36 months typical
-    description: "Industrial-scale carbon capture and storage.",
+    subcategory: "ccs_capture",
+    constructionMonths: 42,     // 3.5 years (Northern Lights timeline from Equinor)
+    description: "First-generation industrial carbon capture. Research advanced CCS for better options.",
   },
+
+  // ═══════════════════════════════════════════════════════════════
+  // CCS CAPTURE PROJECTS - Different capture methods unlocked via tech
+  // ═══════════════════════════════════════════════════════════════
+  postCombustionCapture: {
+    label: "Post-Combustion CCS Plant",
+    cost: 65,                   // $65B - retrofittable, mature technology
+    co2Reduction: 0.08,         // 80 Mt/year (captures from existing plants)
+    income: 0,
+    category: "climate",
+    subcategory: "ccs_capture",
+    constructionMonths: 36,     // 3 years
+    unlockedBy: "post_combustion_capture",
+    description: "Retrofit existing fossil plants with amine-based CO2 capture. Most proven CCS technology.",
+  },
+  preCombustionCapture: {
+    label: "Pre-Combustion CCS (IGCC)",
+    cost: 90,                   // $90B - requires new integrated facility
+    co2Reduction: 0.1,          // 100 Mt/year
+    income: 0.8,                // Produces hydrogen as byproduct
+    category: "climate",
+    subcategory: "ccs_capture",
+    constructionMonths: 48,     // 4 years
+    unlockedBy: "pre_combustion_capture",
+    description: "Integrated gasification combined cycle. Produces hydrogen and concentrated CO2 stream.",
+  },
+  oxyfuelCapture: {
+    label: "Oxy-Fuel CCS Plant",
+    cost: 85,                   // $85B
+    co2Reduction: 0.12,         // 120 Mt/year - high capture rate
+    income: 0,
+    category: "climate",
+    subcategory: "ccs_capture",
+    constructionMonths: 42,     // 3.5 years
+    unlockedBy: "oxyfuel_combustion",
+    description: "Burns fuel with pure oxygen for >90% CO2 concentration in exhaust. Highest capture efficiency.",
+  },
+  directAirCapture: {
+    label: "Direct Air Capture Facility",
+    cost: 120,                  // $120B - very expensive
+    co2Reduction: 0.04,         // 40 Mt/year (small scale but from ambient air)
+    income: 0,
+    category: "climate",
+    subcategory: "ccs_capture",
+    constructionMonths: 24,     // 2 years (modular construction)
+    unlockedBy: "direct_air_capture_tech",
+    description: "Captures CO2 directly from atmosphere. Location-independent negative emissions technology.",
+  },
+  beccsPlant: {
+    label: "BECCS Power Plant",
+    cost: 110,                  // $110B
+    co2Reduction: 0.07,         // 70 Mt/year net removal
+    income: 1.2,                // Produces electricity
+    category: "climate",
+    subcategory: "ccs_capture",
+    powerCategory: "baseload",
+    capacityGW: 0.5,            // 500 MW
+    stabilityContribution: 8,
+    constructionMonths: 54,     // 4.5 years
+    unlockedBy: "beccs_technology",
+    description: "Biomass power with carbon capture. Generates electricity while achieving negative emissions.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // CCS TRANSPORT INFRASTRUCTURE
+  // ═══════════════════════════════════════════════════════════════
+  co2Pipeline: {
+    label: "CO2 Pipeline Network (Onshore)",
+    cost: 25,                   // $25B
+    co2Reduction: 0,            // Transport only - enables storage
+    income: 0.3,                // Transport fees from other capture projects
+    category: "climate",
+    subcategory: "ccs_transport",
+    constructionMonths: 24,
+    unlockedBy: "pipeline_transport",
+    transportCapacity: 0.2,     // 200 Mt/year capacity
+    description: "Onshore pipeline network for CO2 transport. €1.5-5/tonne operating cost. Enables regional CCS.",
+  },
+  co2OffshorePipeline: {
+    label: "CO2 Pipeline Network (Offshore)",
+    cost: 45,                   // $45B - more expensive offshore
+    co2Reduction: 0,
+    income: 0.4,
+    category: "climate",
+    subcategory: "ccs_transport",
+    constructionMonths: 36,
+    unlockedBy: "offshore_pipeline",
+    transportCapacity: 0.15,    // 150 Mt/year capacity
+    description: "Subsea pipeline for offshore storage sites. €3.5-9.5/tonne operating cost. Required for offshore sequestration.",
+  },
+  co2ShipTerminal: {
+    label: "CO2 Shipping Terminal",
+    cost: 35,                   // $35B
+    co2Reduction: 0,
+    income: 0.5,                // Higher income from cross-border transport
+    category: "climate",
+    subcategory: "ccs_transport",
+    constructionMonths: 30,
+    unlockedBy: "co2_shipping",
+    transportCapacity: 0.1,     // 100 Mt/year (more flexible, smaller scale)
+    description: "Port facility for CO2 ship loading/unloading. €11-16/tonne but enables flexible cross-border CCS.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // CCS STORAGE INFRASTRUCTURE
+  // ═══════════════════════════════════════════════════════════════
+  depletedReservoirStorage: {
+    label: "Depleted Oil/Gas Field Storage",
+    cost: 40,                   // $40B
+    co2Reduction: 0,            // Storage enables negative emissions when combined with capture
+    income: 0.6,                // Revenue from EOR or storage fees
+    category: "climate",
+    subcategory: "ccs_storage",
+    constructionMonths: 24,
+    unlockedBy: "depleted_reservoir_storage",
+    storageCapacity: 0.5,       // 500 Mt total capacity
+    storageRate: 0.05,          // 50 Mt/year injection rate
+    description: "Permanent CO2 storage in depleted hydrocarbon reservoirs. €1-14/tonne. Reuses existing infrastructure.",
+  },
+  salineAquiferStorage: {
+    label: "Deep Saline Aquifer Storage",
+    cost: 55,                   // $55B
+    co2Reduction: 0,
+    income: 0.2,                // Lower income but larger capacity
+    category: "climate",
+    subcategory: "ccs_storage",
+    constructionMonths: 36,
+    unlockedBy: "saline_aquifer_storage",
+    storageCapacity: 2.0,       // 2 Gt total capacity - largest
+    storageRate: 0.1,           // 100 Mt/year injection rate
+    description: "Store CO2 in deep porous formations. €6-20/tonne offshore. Largest long-term storage potential.",
+  },
+
+  // ═══════════════════════════════════════════════════════════════
+  // CCS INTEGRATED HUBS - Combined capture/transport/storage
+  // ═══════════════════════════════════════════════════════════════
+  ccsHubSmall: {
+    label: "Regional CCS Hub",
+    cost: 70,                   // $70B (bundled discount)
+    co2Reduction: 0.06,         // 60 Mt/year removal
+    income: 0.4,
+    category: "climate",
+    subcategory: "ccs_integrated",
+    constructionMonths: 36,
+    unlockedBy: "pipeline_transport",
+    description: "Integrated capture-transport-storage hub. Bundles infrastructure for cost savings.",
+  },
+  ccsHubMajor: {
+    label: "Major CCS Industrial Complex",
+    cost: 150,                  // $150B
+    co2Reduction: 0.15,         // 150 Mt/year removal
+    income: 1.0,
+    category: "climate",
+    subcategory: "ccs_integrated",
+    constructionMonths: 60,     // 5 years
+    unlockedBy: "ccs_optimization",
+    description: "Large-scale integrated CCS with multiple capture sources, transport networks, and storage sites.",
+  },
+
   research: {
     label: "Research Center",
-    cost: 22.5,                 // $22.5 billion (was $15B, +50% for difficulty)
-    co2Reduction: 0,
+    cost: 15,                   // $15B (based on Sintef Horizon ~$28.7M, scaled for ~523 centers)
+    co2Reduction: 0,            // No direct CO2 reduction (confirmed by sources)
     income: 3,
     category: "climate",
-    constructionMonths: 18,    // 12-24 months typical
+    constructionMonths: 30,     // 2.5 years (Sintef Horizon construction timeline)
     description: "Climate technology innovation hub.",
   },
 
@@ -4433,16 +5236,13 @@ function countResearchCenters() {
   return count;
 }
 
-// Generate research points based on number of research centers (regional + global)
+// Generate research points - now uses regional research center system
 function generateResearchPoints() {
-  const regionalCenters = countResearchCenters();
-  const regionalPoints = regionalCenters * RESEARCH_POINTS_PER_CENTER;
-  const globalCenterPoints = getResearchCenterRPPerMonth();
-  const points = regionalPoints + globalCenterPoints;
-  if (points > 0 && state.researchPoints !== undefined) {
-    state.researchPoints += points;
-  }
-  return points;
+  // Process the new regional research system - accumulates RP toward assigned projects
+  processMonthlyResearch();
+
+  // Return total RP/month for display purposes
+  return getTotalRegionalRPPerMonth();
 }
 
 // Check if a technology can be unlocked
@@ -4455,8 +5255,70 @@ function canUnlockTechnology(techId) {
     return false;
   }
 
+  // Check prerequisites
+  if (tech.requires && tech.requires.length > 0) {
+    const hasAllPrereqs = tech.requires.every(
+      (reqId) => state.unlockedTechs && state.unlockedTechs.includes(reqId)
+    );
+    if (!hasAllPrereqs) return false;
+  }
+
   // Have enough research points?
   return (state.researchPoints || 0) >= tech.cost;
+}
+
+// Get list of missing prerequisites for a technology
+function getMissingPrerequisites(techId) {
+  const tech = TECHNOLOGIES.find((t) => t.id === techId);
+  if (!tech || !tech.requires) return [];
+
+  return tech.requires.filter(
+    (reqId) => !state.unlockedTechs || !state.unlockedTechs.includes(reqId)
+  );
+}
+
+// Check if a project type is unlocked (via technology research)
+function isProjectUnlocked(projectType) {
+  const project = PROJECT_TYPES[projectType];
+  if (!project) return false;
+
+  // No unlock requirement = always available
+  if (!project.unlockedBy) return true;
+
+  // Check if required tech is unlocked
+  return state.unlockedTechs && state.unlockedTechs.includes(project.unlockedBy);
+}
+
+// Calculate a tech's depth in the tree (for tree visualization)
+// Depth 0 = no prerequisites, Depth N = max parent depth + 1
+function calculateTechDepth(techId, techs, memo = {}) {
+  if (memo[techId] !== undefined) return memo[techId];
+
+  const tech = techs.find((t) => t.id === techId);
+  if (!tech || !tech.requires || tech.requires.length === 0) {
+    memo[techId] = 0;
+    return 0;
+  }
+
+  const maxParentDepth = Math.max(
+    ...tech.requires.map((reqId) => calculateTechDepth(reqId, techs, memo))
+  );
+  memo[techId] = maxParentDepth + 1;
+  return memo[techId];
+}
+
+// Organize technologies by their depth level for tree rendering
+function organizeTechsByDepth(techs) {
+  const memo = {};
+  const depths = {};
+
+  techs.forEach((tech) => {
+    const depth = calculateTechDepth(tech.id, techs, memo);
+    if (!depths[depth]) depths[depth] = [];
+    depths[depth].push(tech);
+  });
+
+  return depths;
 }
 
 // Unlock a technology
@@ -4796,7 +5658,8 @@ function loadMapColors() {
 }
 
 function calculateTemperature(co2) {
-  return (co2 - GAME_CONFIG.baselineCo2) * GAME_CONFIG.tempFactor;
+  // T(c) = c * 0.0105 - 3.37
+  return co2 * GAME_CONFIG.tempFactor + GAME_CONFIG.tempOffset;
 }
 
 /**
@@ -5719,6 +6582,16 @@ function enterSetupMode() {
   updateSetupUI();
   updateMapColors();
   updateMapLegend();
+
+  // Reset top bar displays to initial/default values
+  if (creditsEl) creditsEl.textContent = formatCurrency(GAME_CONFIG.startingFunds);
+  if (temperatureEl) temperatureEl.textContent = `+${GAME_CONFIG.startingTemp.toFixed(2)}°C`;
+  if (co2El) co2El.textContent = `${GAME_CONFIG.startingCo2.toFixed(1)} ppm`;
+  if (dateEl) dateEl.textContent = `${MONTHS[GAME_CONFIG.startMonth - 1]} ${GAME_CONFIG.startYear}`;
+
+  // Reset CO2 rate display
+  const co2RateEl = document.querySelector('.co2-rate');
+  if (co2RateEl) co2RateEl.textContent = '+0.00/mo';
 }
 
 // Update setup UI when a region is selected
@@ -6206,6 +7079,9 @@ function handleRegionLeaving(regionId) {
   const currentMonth = (state.year - GAME_CONFIG.startYear) * 12 + state.month;
   alliance.hostileUntil = currentMonth + HOSTILE_COOLDOWN_MONTHS;
 
+  // Destroy any research center in this region
+  destroyRegionalCenter(regionId);
+
   // Domino effect - other allies lose happiness
   Object.entries(state.alliance).forEach(([otherId, otherAlliance]) => {
     if (otherId !== regionId && otherAlliance.status === ALLIANCE_STATUS.ALLIED) {
@@ -6462,17 +7338,19 @@ function calculateNegotiationCost(regionId) {
   const baseCost = gdp * 0.001; // 0.1% of GDP
 
   // Interest modifier: higher interest = lower cost
-  // At 80+ interest: 0.5x cost
-  // At 20- interest: 1.5x cost
+  // At 80+ interest (Very High): 0.5x cost
+  // At 60-79 interest (High): 0.7x cost
+  // At 40-59 interest (Moderate): 1.0x cost (default)
+  // At 20-39 interest (Low): 1.5x cost
+  // At 0-19 interest (Very Low): 1.5x cost (can negotiate but success capped at 50%)
   let interestMultiplier = 1.0;
   if (interest >= INTEREST_THRESHOLDS.VERY_HIGH) {
     interestMultiplier = 0.5;
   } else if (interest >= INTEREST_THRESHOLDS.HIGH) {
     interestMultiplier = 0.7;
-  } else if (interest < INTEREST_THRESHOLDS.LOW) {
-    interestMultiplier = 1.5;
   } else if (interest < INTEREST_THRESHOLDS.MODERATE) {
-    interestMultiplier = 1.2;
+    // Both Low and Very Low pay 1.5x
+    interestMultiplier = 1.5;
   }
 
   return Math.round(baseCost * interestMultiplier * 10) / 10; // Round to 1 decimal
@@ -6522,13 +7400,13 @@ function startNegotiation(regionId) {
 
   // Check cost
   const cost = calculateNegotiationCost(regionId);
-  if (state.budget < cost) {
+  if (state.funds < cost) {
     pushMessage(`Not enough budget to initiate negotiations. Need $${cost}B.`, "bad");
     return;
   }
 
   // Deduct cost
-  state.budget -= cost;
+  state.funds -= cost;
   pushMessage(`Spent $${cost}B on diplomatic negotiations.`, "info");
 
   // Record approach time (for cooldown)
@@ -6613,41 +7491,47 @@ function showNegotiationPopup(regionId, demands) {
         </div>
       </div>
 
-      <div class="terms-section">
-        <h4>Your Alliance Terms:</h4>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Set the requirements for joining. Higher demands reduce success chance.</p>
-        ${termsHTML}
+      <div class="negotiation-content">
+        <div class="terms-section">
+          <h4>Your Alliance Terms:</h4>
+          <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 12px;">Set the requirements for joining. Higher demands reduce success chance.</p>
+          ${termsHTML}
+        </div>
+
+        <div class="demands-section">
+          <h4>Their Conditions for Joining:</h4>
+          <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 12px;">Click to accept or reject each demand. Rejecting demands reduces success chance.</p>
+          ${demands.map((demand, index) => {
+            const demandType = DEMAND_TYPES[demand.type];
+            const text = demandType.text.replace("{value}", demand.value);
+            return `
+              <div class="demand-item accepted" data-index="${index}" onclick="toggleDemand(${index})">
+                <div class="demand-checkbox">✓</div>
+                <span class="demand-text">${text}</span>
+                <span class="demand-difficulty ${demandType.difficulty}">${demandType.difficulty}</span>
+              </div>
+            `;
+          }).join("")}
+        </div>
       </div>
 
-      <div class="demands-section">
-        <h4>Their Conditions for Joining:</h4>
-        <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">Click to accept or reject each demand. Rejecting demands reduces success chance.</p>
-        ${demands.map((demand, index) => {
-          const demandType = DEMAND_TYPES[demand.type];
-          const text = demandType.text.replace("{value}", demand.value);
-          return `
-            <div class="demand-item accepted" data-index="${index}" onclick="toggleDemand(${index})">
-              <div class="demand-checkbox">✓</div>
-              <span class="demand-text">${text}</span>
-              <span class="demand-difficulty ${demandType.difficulty}">${demandType.difficulty}</span>
-            </div>
-          `;
-        }).join("")}
-      </div>
-
-      <div class="success-probability">
-        <span class="probability-label">Success Probability:</span>
-        <span id="negotiation-probability" class="probability-value high">90%</span>
-      </div>
-
-      <div class="negotiation-actions">
-        <button class="cancel-negotiation-btn" onclick="cancelNegotiation()">Cancel</button>
-        <button class="submit-offer-btn" onclick="submitNegotiationOffer()">Make Offer</button>
+      <div class="negotiation-footer">
+        <div class="success-probability">
+          <span class="probability-label">Success Probability:</span>
+          <span id="negotiation-probability" class="probability-value high">90%</span>
+        </div>
+        <div class="negotiation-actions">
+          <button class="cancel-negotiation-btn" onclick="cancelNegotiation()">Cancel</button>
+          <button class="submit-offer-btn" onclick="submitNegotiationOffer()">Make Offer</button>
+        </div>
       </div>
     </div>
   `;
 
   document.body.appendChild(overlay);
+
+  // Calculate and display the actual probability (not the hardcoded 90%)
+  updateNegotiationProbability();
 }
 
 // Update term value when slider changes
@@ -6701,7 +7585,8 @@ function toggleDemand(index) {
   updateNegotiationProbability();
 }
 
-// Calculate and update the success probability
+// Calculate and update the success probability using election-style mechanics
+// Interest represents voter support percentage, with polling uncertainty (±15%)
 function updateNegotiationProbability() {
   if (!state.pendingNegotiation) return;
 
@@ -6711,32 +7596,61 @@ function updateNegotiationProbability() {
   const diplomatic = regionData?.diplomatic || {};
   const joinDifficulty = diplomatic.joinDifficulty || 5;
 
-  // Interest-based probability (primary factor)
+  // Interest represents voter support percentage
   const interest = alliance?.interest || 50;
-  let probability = interest * 0.8; // Base: interest directly affects success
 
-  // Difficulty modifier (secondary factor - reduces max by up to 20%)
+  // Modifiers affect the effective support
+  let effectiveSupport = interest;
+
+  // Difficulty modifier (reduces effective support by up to ±8%)
   const difficultyPenalty = (joinDifficulty - 5) * 2; // -8 to +8
-  probability -= difficultyPenalty;
+  effectiveSupport -= difficultyPenalty;
 
-  // Each rejected demand reduces probability
+  // Each rejected demand reduces effective support
   const rejectedCount = state.pendingNegotiation.demands.filter(d => !d.accepted).length;
-  probability -= rejectedCount * 15;
+  effectiveSupport -= rejectedCount * 5;
 
-  // Terms penalty (if terms are set above defaults)
+  // Terms bonus (if terms are set above defaults, it increases support)
   const terms = state.pendingNegotiation.terms;
   if (terms) {
     Object.entries(terms).forEach(([termKey, value]) => {
       const termConfig = NEGOTIABLE_TERMS[termKey];
       if (termConfig && value > termConfig.default) {
         const stepsAboveDefault = (value - termConfig.default) / termConfig.step;
-        probability += termConfig.impactPerStep * stepsAboveDefault;
+        // Positive terms increase effective support (impactPerStep is negative, so we subtract)
+        effectiveSupport -= termConfig.impactPerStep * stepsAboveDefault;
       }
     });
   }
 
-  // Clamp probability
-  probability = Math.max(10, Math.min(100, probability));
+  // Clamp effective support
+  effectiveSupport = Math.max(0, Math.min(100, effectiveSupport));
+
+  // Calculate probability using election model with ±15% polling uncertainty
+  // Probability = chance that (effectiveSupport + random(-15, +15)) >= 50
+  // This follows a triangular distribution approximation
+  const uncertainty = 15;
+  let probability;
+
+  if (effectiveSupport >= 50 + uncertainty) {
+    // Support high enough that even worst-case swing succeeds
+    probability = 100;
+  } else if (effectiveSupport <= 50 - uncertainty) {
+    // Support too low - even best-case swing fails
+    probability = 0;
+  } else {
+    // Linear interpolation between extremes
+    // At 35% support: 0% chance, at 65% support: 100% chance
+    probability = ((effectiveSupport - (50 - uncertainty)) / (2 * uncertainty)) * 100;
+  }
+
+  // Very Low interest (<20): cap success at 50% maximum regardless of terms
+  if (interest < INTEREST_THRESHOLDS.LOW) {
+    probability = Math.min(probability, 50);
+  }
+
+  // Ensure minimum 5% chance if they're willing to negotiate at all
+  probability = Math.max(5, Math.min(100, probability));
 
   // Update UI
   const probEl = document.getElementById("negotiation-probability");
@@ -6746,8 +7660,9 @@ function updateNegotiationProbability() {
       (probability >= 70 ? "high" : probability >= 40 ? "medium" : "low");
   }
 
-  // Store for reference
+  // Store for reference (both the display probability and effective support for the roll)
   state.pendingNegotiation.currentProbability = probability;
+  state.pendingNegotiation.effectiveSupport = effectiveSupport;
 
   return probability;
 }
@@ -6774,14 +7689,28 @@ function cancelNegotiation() {
 function submitNegotiationOffer() {
   if (!state.pendingNegotiation) return;
 
-  const probability = updateNegotiationProbability();
+  updateNegotiationProbability();
   const regionId = state.pendingNegotiation.regionId;
   const regionData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
   const regionName = regionData?.name || regionId;
+  const alliance = state.alliance?.[regionId];
+  const interest = alliance?.interest || 50;
 
-  // Roll for success
-  const roll = Math.random() * 100;
-  const success = roll < probability;
+  // Election-style roll: simulate an election with polling uncertainty
+  // effectiveSupport represents the "true" voter support, add random ±15% swing
+  const effectiveSupport = state.pendingNegotiation.effectiveSupport || 50;
+  const uncertainty = 15;
+  const pollingSwing = (Math.random() - 0.5) * 2 * uncertainty; // Random value between -15 and +15
+  const electionResult = effectiveSupport + pollingSwing;
+
+  // Success if election result >= 50% (majority vote)
+  let success = electionResult >= 50;
+
+  // Very Low interest (<20): cap at 50% success rate even if terms would push higher
+  if (interest < INTEREST_THRESHOLDS.LOW && success) {
+    // Even if election succeeded, 50% chance it still fails due to political instability
+    success = Math.random() < 0.5;
+  }
 
   // Close popup
   const overlay = document.getElementById("negotiation-overlay");
@@ -6884,7 +7813,7 @@ function getNegotiateButtonHTML(regionId) {
 
   // Calculate and show cost
   const cost = calculateNegotiationCost(regionId);
-  const canAfford = state.budget >= cost;
+  const canAfford = state.funds >= cost;
   const costClass = canAfford ? "" : "cannot-afford";
 
   return `
@@ -7141,8 +8070,12 @@ function initGame() {
     activeCampaigns: [], // Active Climate Policy Campaigns
     difficulty: currentDifficulty,
     // New tracking for advanced features
-    researchPoints: 0,
+    researchPoints: 0,  // Legacy - kept for compatibility
     unlockedTechs: [],
+    // New regional research system
+    regionalResearchCenters: {},  // regionId -> { level, field, projectId }
+    techProgress: {},             // techId -> accumulated RP toward unlock
+    centerCooldowns: {},          // regionId -> months remaining until active
     achievements: [],
     history: [], // Monthly snapshots for graphs
     emissionsHistory: [], // Monthly emissions snapshots for trends
@@ -7160,6 +8093,9 @@ function initGame() {
     // Construction system
     underConstruction: [], // Projects currently being built
   };
+
+  // Recalculate power stats for all regions (calculates stability from power mix)
+  updateAllPowerGrids();
 
   selectedRegionId = null;
 
@@ -7685,6 +8621,9 @@ function selectRegion(regionId) {
   }
   selectedRegionId = regionId;
   updateUI();
+
+  // Auto-switch to Region tab when a region is clicked
+  switchToTab('region');
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -7731,7 +8670,15 @@ function startConstruction(regionId, projectType, cost, effectMultiplier, buildM
     }
 
     // Building projects increases happiness slightly
-    const happinessBonus = project.category === "economic" ? 8 : 5;
+    // Nuclear is controversial and has neutral happiness effect
+    let happinessBonus = 0;
+    if (projectType === "nuclear") {
+      happinessBonus = 0; // Nuclear is controversial - neutral effect
+    } else if (project.category === "economic") {
+      happinessBonus = 8;
+    } else {
+      happinessBonus = 5;
+    }
     allianceData.happiness = Math.min(100, allianceData.happiness + happinessBonus);
   }
 
@@ -8569,6 +9516,229 @@ function renderTippingPointsPanel() {
   }
 }
 
+// Render a single tech node (Plague Inc style - compact hexagon with hover details)
+function renderTechNode(tech) {
+  const isUnlocked = state.unlockedTechs?.includes(tech.id);
+  const missingPrereqs = getMissingPrerequisites(tech.id);
+  const hasPrereqsMet = missingPrereqs.length === 0;
+
+  // Check if any centers are actively researching this tech
+  const progress = state.techProgress?.[tech.id] || 0;
+  const progressPercent = Math.min(100, (progress / tech.cost) * 100);
+  const isBeingResearched = getResearchingCenters(tech.id).length > 0;
+
+  let nodeClass = "locked";
+  if (isUnlocked) nodeClass = "unlocked";
+  else if (isBeingResearched) nodeClass = "researching";
+  else if (hasPrereqsMet) nodeClass = "available";
+  else nodeClass = "prereq-locked";
+
+  const categoryClass = tech.field === "carbon" ? "tech-carbon" : "";
+  const prereqIds = tech.requires ? tech.requires.join(",") : "";
+
+  // Build requirements list for tooltip
+  let requiresHtml = "";
+  if (tech.requires && tech.requires.length > 0) {
+    const reqNames = tech.requires.map(id => {
+      const t = TECHNOLOGIES.find(tech => tech.id === id);
+      const isMet = state.unlockedTechs?.includes(id);
+      return `<span class="req ${isMet ? 'met' : 'unmet'}">${t ? t.name : id}</span>`;
+    }).join("");
+    requiresHtml = `<div class="tooltip-reqs"><span class="req-label">Requires:</span> ${reqNames}</div>`;
+  }
+
+  // Get assigned centers info
+  const assignedCenters = getResearchingCenters(tech.id);
+  let centersHtml = "";
+  if (assignedCenters.length > 0) {
+    const centerNames = assignedCenters.map(regionId => {
+      const region = state.regions?.[regionId];
+      return region ? region.name : regionId;
+    }).join(", ");
+    centersHtml = `<div class="tooltip-centers">Researching: ${centerNames}</div>`;
+  }
+
+  // Progress bar for non-unlocked techs with progress
+  let progressHtml = "";
+  if (!isUnlocked && (progress > 0 || isBeingResearched)) {
+    progressHtml = `
+      <div class="tooltip-progress">
+        <div class="tooltip-progress-bar">
+          <div class="tooltip-progress-fill" style="width: ${progressPercent}%"></div>
+        </div>
+        <span class="tooltip-progress-text">${progress}/${tech.cost} RP</span>
+      </div>
+    `;
+  }
+
+  // Determine status message
+  let actionHtml = "";
+  if (isUnlocked) {
+    actionHtml = `<div class="tooltip-status unlocked">✓ Unlocked</div>`;
+  } else if (isBeingResearched) {
+    const rpPerMonth = getResearchRPPerMonth(tech.id);
+    const monthsRemaining = Math.ceil((tech.cost - progress) / rpPerMonth);
+    actionHtml = `<div class="tooltip-status researching">🔬 In Progress (+${rpPerMonth} RP/mo, ~${monthsRemaining} months)</div>`;
+  } else if (!hasPrereqsMet) {
+    actionHtml = `<div class="tooltip-status locked">🔒 Prerequisites needed</div>`;
+  } else {
+    actionHtml = `<div class="tooltip-status available">Assign a research center to begin</div>`;
+  }
+
+  const nodeHtml = `
+    <div class="tech-hex ${nodeClass} ${categoryClass}"
+         data-tech-id="${tech.id}"
+         data-requires="${prereqIds}">
+      <div class="hex-inner">
+        <span class="hex-icon">${tech.icon}</span>
+        ${isBeingResearched ? `<div class="hex-progress-ring" style="--progress: ${progressPercent}%"></div>` : ''}
+      </div>
+      <div class="hex-label">${tech.name}</div>
+      <div class="hex-tooltip">
+        <div class="tooltip-header">
+          <span class="tooltip-icon">${tech.icon}</span>
+          <span class="tooltip-name">${tech.name}</span>
+          <span class="tooltip-cost">${tech.cost} RP</span>
+        </div>
+        <div class="tooltip-desc">${tech.description}</div>
+        ${requiresHtml}
+        ${progressHtml}
+        ${centersHtml}
+        ${actionHtml}
+      </div>
+    </div>
+  `;
+  return nodeHtml;
+}
+
+// Helper: Get centers researching a specific tech
+function getResearchingCenters(techId) {
+  if (!state.regionalResearchCenters) return [];
+
+  return Object.keys(state.regionalResearchCenters).filter(regionId => {
+    const center = state.regionalResearchCenters[regionId];
+    return center.projectId === techId;
+  });
+}
+
+// Helper: Get total RP/month being contributed to a tech
+function getResearchRPPerMonth(techId) {
+  if (!state.regionalResearchCenters) return 0;
+
+  let total = 0;
+  for (const regionId in state.regionalResearchCenters) {
+    const center = state.regionalResearchCenters[regionId];
+    if (center.projectId !== techId) continue;
+
+    // Skip if on cooldown
+    if (state.centerCooldowns?.[regionId] > 0) continue;
+
+    total += getCenterRPPerMonth(center.level);
+  }
+  return total;
+}
+
+// Render a tree section (CCS or Other technologies)
+function renderTreeSection(title, depthMap, icon) {
+  const maxDepth = Math.max(...Object.keys(depthMap).map(Number), 0);
+
+  // Build tier labels row
+  let tierLabelsHtml = "";
+  for (let depth = 0; depth <= maxDepth; depth++) {
+    const tierName = depth === 0 ? "Basic" : `Tier ${depth}`;
+    tierLabelsHtml += `<div class="tech-tier-label">${tierName}</div>`;
+  }
+
+  let columnsHtml = "";
+  for (let depth = 0; depth <= maxDepth; depth++) {
+    const techs = depthMap[depth] || [];
+    let nodesHtml = "";
+    techs.forEach((tech) => {
+      nodesHtml += renderTechNode(tech);
+    });
+    columnsHtml += `<div class="tech-tree-column" data-depth="${depth}">${nodesHtml}</div>`;
+  }
+
+  const sectionHtml = `
+    <div class="tech-tree-section">
+      <h4 class="tech-tree-section-title">${icon} ${title}</h4>
+      <div class="tech-tree-graph" data-section="${title.toLowerCase().replace(/ /g, '-')}">
+        <svg class="tech-tree-connections"></svg>
+        <div class="tech-tier-labels">${tierLabelsHtml}</div>
+        <div class="tech-tree-columns">
+          ${columnsHtml}
+        </div>
+      </div>
+    </div>
+  `;
+  return sectionHtml;
+}
+
+// Draw SVG connection lines between prerequisite techs
+function drawTreeConnections() {
+  document.querySelectorAll(".tech-tree-graph").forEach((graph) => {
+    const svg = graph.querySelector(".tech-tree-connections");
+    const nodes = graph.querySelectorAll(".tech-hex");
+
+    // Use offsetLeft/offsetTop for scroll-independent positioning
+    // Get the columns container as the reference point
+    const columnsContainer = graph.querySelector(".tech-tree-columns");
+    if (!columnsContainer) return;
+
+    let paths = "";
+
+    nodes.forEach((node) => {
+      const requires = node.dataset.requires?.split(",").filter(Boolean) || [];
+      if (requires.length === 0) return;
+
+      // Get position relative to the columns container using offset properties
+      const hexInner = node.querySelector(".hex-inner");
+      const targetEl = hexInner || node;
+
+      // Calculate position by walking up the offset parent chain
+      let endX = targetEl.offsetLeft;
+      let endY = targetEl.offsetTop + targetEl.offsetHeight / 2;
+      let el = targetEl.offsetParent;
+      while (el && el !== columnsContainer && columnsContainer.contains(el)) {
+        endX += el.offsetLeft;
+        endY += el.offsetTop;
+        el = el.offsetParent;
+      }
+
+      requires.forEach((reqId) => {
+        const parentNode = graph.querySelector(`[data-tech-id="${reqId}"]`);
+        if (!parentNode) return;
+
+        const parentHex = parentNode.querySelector(".hex-inner");
+        const parentEl = parentHex || parentNode;
+
+        // Calculate parent position the same way
+        let startX = parentEl.offsetLeft + parentEl.offsetWidth;
+        let startY = parentEl.offsetTop + parentEl.offsetHeight / 2;
+        let pel = parentEl.offsetParent;
+        while (pel && pel !== columnsContainer && columnsContainer.contains(pel)) {
+          startX += pel.offsetLeft;
+          startY += pel.offsetTop;
+          pel = pel.offsetParent;
+        }
+
+        // Check if connection should be "unlocked" style
+        const isUnlockedPath = node.classList.contains("unlocked");
+        const isParentUnlocked = parentNode.classList.contains("unlocked");
+
+        // Curved bezier path with thicker lines
+        const midX = (startX + endX) / 2;
+        const pathClass = isUnlockedPath ? "unlocked" : (isParentUnlocked ? "partial" : "");
+        paths += `<path d="M${startX},${startY} C${midX},${startY} ${midX},${endY} ${endX},${endY}"
+                        class="tech-connection ${pathClass}"/>`;
+      });
+    });
+
+    // Note: Using innerHTML here for SVG paths - data comes from internal game state
+    svg.innerHTML = paths;
+  });
+}
+
 // Render the technology tree panel (tech upgrades)
 function renderTechTreePanel() {
   const listEl = document.getElementById("tech-tree-list");
@@ -8578,13 +9748,13 @@ function renderTechTreePanel() {
   const currentRP = state.researchPoints || 0;
   const hasResearchCenters = (state.researchCenters && state.researchCenters.length > 0) || countResearchCenters() > 0;
 
-  // Sort technologies by tier
-  const sortedTechs = [...TECHNOLOGIES].sort((a, b) => a.tier - b.tier);
+  // Separate CCS and Other technologies
+  const ccsTechs = TECHNOLOGIES.filter((t) => t.category === "carbon");
+  const otherTechs = TECHNOLOGIES.filter((t) => t.category !== "carbon");
 
-  // Find cheapest unlockable tech to highlight progress
-  const cheapestAvailableTech = sortedTechs.find(t =>
-    !state.unlockedTechs?.includes(t.id)
-  );
+  // Organize by depth for tree visualization
+  const ccsDepths = organizeTechsByDepth(ccsTechs);
+  const otherDepths = organizeTechsByDepth(otherTechs);
 
   let html = "";
 
@@ -8594,65 +9764,45 @@ function renderTechTreePanel() {
       <span class="tip-icon">💡</span>
       <span>Build Research Centers above to generate Research Points (RP) each month.</span>
     </div>`;
-  } else if (currentRP > 0 && cheapestAvailableTech && currentRP >= cheapestAvailableTech.cost) {
-    html += `<div class="tech-tree-tip available-tip">
-      <span class="tip-icon">✨</span>
-      <span>You have enough RP to unlock <strong>${cheapestAvailableTech.name}</strong>!</span>
-    </div>`;
   }
 
-  sortedTechs.forEach((tech) => {
-    const isUnlocked = state.unlockedTechs && state.unlockedTechs.includes(tech.id);
-    const canUnlock = canUnlockTechnology(tech.id);
-    const currentRP = state.researchPoints || 0;
+  // Render Other Technologies section first (simpler, mostly standalone)
+  html += renderTreeSection("Energy & Nature", otherDepths, "⚡");
 
-    let itemClass = "locked";
-    if (isUnlocked) {
-      itemClass = "unlocked";
-    } else if (canUnlock) {
-      itemClass = "available";
-    }
+  // Render CCS Technologies section (complex tree)
+  html += renderTreeSection("Carbon Capture & Storage", ccsDepths, "🏭");
 
-    html += `
-      <div class="tech-item ${itemClass}">
-        <span class="tech-icon">${tech.icon}</span>
-        <div class="tech-info">
-          <div class="tech-name">${tech.name}</div>
-          <div class="tech-description">${tech.description}</div>
-          <div class="tech-cost">
-            <span class="tech-tier">Tier ${tech.tier}</span>
-            ${!isUnlocked ? ` • ${tech.cost} RP (${currentRP}/${tech.cost})` : ""}
-          </div>
-        </div>
-        <div class="tech-action">
-          ${isUnlocked ? `
-            <span class="tech-status unlocked">Unlocked</span>
-          ` : `
-            <button
-              class="tech-unlock-btn"
-              data-tech-id="${tech.id}"
-              ${!canUnlock ? "disabled" : ""}
-            >
-              ${canUnlock ? "Unlock" : "Locked"}
-            </button>
-          `}
-        </div>
-      </div>
-    `;
-  });
-
+  // Note: Using innerHTML here - all content from internal game data, not user input
   listEl.innerHTML = html;
 
-  // Wire up unlock buttons
-  listEl.querySelectorAll(".tech-unlock-btn").forEach((btn) => {
+  // Wire up unlock buttons in tooltips
+  listEl.querySelectorAll(".tooltip-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
+      e.stopPropagation();
       const techId = e.target.dataset.techId;
       if (techId) {
         unlockTechnology(techId);
       }
     });
   });
+
+  // Draw connection lines after layout is complete
+  // Use setTimeout to ensure DOM is fully laid out (requestAnimationFrame may fire too early)
+  setTimeout(() => {
+    drawTreeConnections();
+  }, 50);
 }
+
+// Redraw tree connections on window resize
+let resizeTimeout;
+window.addEventListener("resize", () => {
+  clearTimeout(resizeTimeout);
+  resizeTimeout = setTimeout(() => {
+    if (document.querySelector(".tech-tree-graph")) {
+      drawTreeConnections();
+    }
+  }, 100);
+});
 
 // ============ GLOBAL RESEARCH CENTERS ============
 
@@ -8668,30 +9818,18 @@ function getResearchCenterById(centerId) {
   return null;
 }
 
-// Get total RP per month from global research centers
-function getResearchCenterRPPerMonth() {
-  if (!state.researchCenters || state.researchCenters.length === 0) return 0;
+// Get total RP per month from all regional research centers
+function getTotalRegionalRP() {
+  if (!state.regionalResearchCenters) return 0;
   let totalRP = 0;
-  state.researchCenters.forEach(centerId => {
-    const center = getResearchCenterById(centerId);
-    if (center) {
-      totalRP += center.rpPerMonth;
+  Object.entries(state.regionalResearchCenters).forEach(([regionId, center]) => {
+    // Only count if not on cooldown
+    const cooldown = state.centerCooldowns?.[regionId] || 0;
+    if (cooldown === 0) {
+      totalRP += getResearchCenterRPPerMonth(center.level);
     }
   });
   return totalRP;
-}
-
-// Get total monthly cost from global research centers
-function getResearchCenterMonthlyCost() {
-  if (!state.researchCenters || state.researchCenters.length === 0) return 0;
-  let totalCost = 0;
-  state.researchCenters.forEach(centerId => {
-    const center = getResearchCenterById(centerId);
-    if (center) {
-      totalCost += center.monthlyCost;
-    }
-  });
-  return totalCost;
 }
 
 // Simple toast notification for research centers
@@ -8748,143 +9886,256 @@ function buildResearchCenter(centerId) {
 
 // Render the tech tree tab content
 function renderTechTree() {
-  // Update tech panel RP display
+  // Update tech panel RP display - show total RP/month from regional centers
   const techRPDisplay = document.getElementById('tech-rp-display');
   const techRPRate = document.getElementById('tech-rp-rate');
 
+  // Count active centers (built regional research centers)
+  const centerCount = state.regionalResearchCenters ?
+    Object.keys(state.regionalResearchCenters).length : 0;
+
   if (techRPDisplay) {
-    techRPDisplay.textContent = `${state.researchPoints || 0} RP`;
+    techRPDisplay.textContent = `${centerCount} Centers`;
   }
 
   if (techRPRate) {
-    const regionalRP = countResearchCenters() * RESEARCH_POINTS_PER_CENTER;
-    const globalRP = getResearchCenterRPPerMonth();
-    const totalRP = regionalRP + globalRP;
-    techRPRate.textContent = `(+${totalRP}/mo)`;
+    const totalRP = getTotalRegionalRPPerMonth();
+    techRPRate.textContent = `(+${totalRP} RP/mo)`;
   }
 
-  renderActiveResearchCenters();
-  renderResearchCenterOptions();
-  renderTechCategories();
+  renderRegionalCentersUI();
 }
 
-// Render active (built) research centers
-function renderActiveResearchCenters() {
-  const container = document.getElementById('active-research-centers');
-  if (!container) return;
+// ═══════════════════════════════════════════════════════════════
+// REGIONAL RESEARCH CENTERS UI
+// ═══════════════════════════════════════════════════════════════
 
-  if (!state.researchCenters || state.researchCenters.length === 0) {
-    container.innerHTML = '<p class="no-centers-msg">No research centers built yet.</p>';
-    return;
-  }
-
-  let html = '';
-  state.researchCenters.forEach(centerId => {
-    const center = getResearchCenterById(centerId);
-    if (!center) return;
-
-    html += `
-      <div class="active-center-card">
-        <div class="center-header">
-          <span class="center-icon">${center.categoryIcon}</span>
-          <span class="center-name">${center.name}</span>
-        </div>
-        <div class="center-stats">
-          <span class="stat-item rp">+${center.rpPerMonth} RP/mo</span>
-          <span class="stat-item cost">-$${center.monthlyCost}B/mo</span>
-        </div>
-      </div>
-    `;
-  });
-
-  container.innerHTML = html;
-}
-
-// Render research center build options
-function renderResearchCenterOptions() {
+// Render the regional research centers UI
+function renderRegionalCentersUI() {
   const container = document.getElementById('research-center-options');
   if (!container) return;
 
   let html = '';
 
-  RESEARCH_CENTERS.categories.forEach(category => {
-    category.centers.forEach(center => {
-      const isBuilt = state.researchCenters && state.researchCenters.includes(center.id);
-      const canAfford = state.funds >= center.buildCost;
+  // Get built centers and available regions
+  const builtCenters = state.regionalResearchCenters || {};
+  const availableRegions = getAvailableRegionsForResearch();
+  const buildCost = RESEARCH_CENTER_BASE.buildCost;
+  const canAffordBuild = state.funds >= buildCost;
+
+  // Section 1: Active Research Centers
+  const centerRegions = Object.keys(builtCenters);
+  if (centerRegions.length > 0) {
+    html += '<div class="rc-section"><h4 class="rc-section-title">Active Research Centers</h4>';
+    html += '<div class="rc-active-grid">';
+
+    centerRegions.forEach(regionId => {
+      const center = builtCenters[regionId];
+      const regionData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+      const regionName = regionData?.name || regionId;
+      const levelData = getResearchCenterLevelData(center.level);
+      const cooldown = state.centerCooldowns?.[regionId] || 0;
+      const isOnCooldown = cooldown > 0;
+
+      // Get assigned field and project info
+      const fieldData = center.field ? RESEARCH_FIELDS[center.field] : null;
+      const tech = center.projectId ? TECHNOLOGIES.find(t => t.id === center.projectId) : null;
+      const progress = tech ? (state.techProgress?.[center.projectId] || 0) : 0;
+      const progressPercent = tech ? Math.min(100, (progress / tech.cost) * 100) : 0;
+
+      // Can upgrade? (no max level - always can upgrade)
+      const upgradeCost = getResearchCenterUpgradeCost(center.level);
+      const canAffordUpgrade = state.funds >= upgradeCost;
 
       html += `
-        <div class="rc-option-card ${isBuilt ? 'built' : ''} ${!canAfford && !isBuilt ? 'unaffordable' : ''}">
-          <div class="rc-header">
-            <span class="rc-icon">${category.icon}</span>
-            <span class="rc-name">${center.name}</span>
+        <div class="rc-active-card ${isOnCooldown ? 'on-cooldown' : ''}">
+          <div class="rc-active-header">
+            <span class="rc-region-name">${regionName}</span>
+            <span class="rc-level-badge">${levelData.name}</span>
           </div>
-          <p class="rc-description">${center.description}</p>
-          <div class="rc-stats">
-            <span class="rc-stat">+${center.rpPerMonth} RP/mo</span>
-            <span class="rc-stat">-$${center.monthlyCost}B/mo</span>
+          <div class="rc-active-stats">
+            <span class="rc-rp">+${levelData.rpPerMonth} RP/mo</span>
+            ${isOnCooldown ? `<span class="rc-cooldown">Switching: ${cooldown}mo</span>` : ''}
           </div>
-          <div class="rc-footer">
-            <span class="rc-cost">$${center.buildCost}B</span>
-            ${isBuilt
-              ? '<span class="rc-built-badge">Built</span>'
-              : `<button class="rc-build-btn" data-center-id="${center.id}" ${!canAfford ? 'disabled' : ''}>
-                  ${canAfford ? 'Build' : 'Cannot Afford'}
-                </button>`
-            }
+          ${tech ? `
+            <div class="rc-assignment">
+              <div class="rc-assignment-header">
+                <span class="rc-field-icon">${fieldData?.icon || ''}</span>
+                <span class="rc-project-name">${tech.name}</span>
+              </div>
+              <div class="rc-progress-bar">
+                <div class="rc-progress-fill" style="width: ${progressPercent}%"></div>
+              </div>
+              <div class="rc-progress-text">${progress}/${tech.cost} RP</div>
+            </div>
+          ` : `
+            <div class="rc-no-assignment">
+              <span>No project assigned</span>
+              <button class="rc-assign-btn" data-region="${regionId}">Assign Research</button>
+            </div>
+          `}
+          <div class="rc-actions">
+            ${tech ? `<button class="rc-change-btn" data-region="${regionId}">Change Project</button>` : ''}
+            <button class="rc-upgrade-btn" data-region="${regionId}" ${!canAffordUpgrade ? 'disabled' : ''}>
+              Upgrade ($${upgradeCost}B)
+            </button>
           </div>
         </div>
       `;
     });
-  });
+
+    html += '</div></div>';
+  }
+
+  // Section 2: Build New Centers
+  if (availableRegions.length > 0) {
+    html += '<div class="rc-section"><h4 class="rc-section-title">Build Research Center ($' + buildCost + 'B)</h4>';
+    html += '<p class="rc-section-desc">Build in allied regions to expand research capacity.</p>';
+    html += '<div class="rc-build-grid">';
+
+    availableRegions.forEach(regionId => {
+      const regionData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+      const regionName = regionData?.name || regionId;
+
+      html += `
+        <div class="rc-build-card ${!canAffordBuild ? 'unaffordable' : ''}">
+          <span class="rc-build-region">${regionName}</span>
+          <button class="rc-build-btn" data-region="${regionId}" ${!canAffordBuild ? 'disabled' : ''}>
+            Build
+          </button>
+        </div>
+      `;
+    });
+
+    html += '</div></div>';
+  } else if (centerRegions.length === 0) {
+    html += `
+      <div class="rc-no-allies">
+        <p>You need to form alliances with regions before building research centers.</p>
+        <p>Go to the Diplomacy tab to recruit allies!</p>
+      </div>
+    `;
+  }
 
   container.innerHTML = html;
 
-  // Wire up build buttons
+  // Wire up event listeners
   container.querySelectorAll('.rc-build-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const centerId = e.target.dataset.centerId;
-      if (centerId) {
-        buildResearchCenter(centerId);
-      }
+      const regionId = e.target.dataset.region;
+      if (regionId) buildRegionalCenter(regionId);
+    });
+  });
+
+  container.querySelectorAll('.rc-upgrade-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const regionId = e.target.dataset.region;
+      if (regionId) upgradeRegionalCenter(regionId);
+    });
+  });
+
+  container.querySelectorAll('.rc-assign-btn, .rc-change-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const regionId = e.target.dataset.region;
+      if (regionId) showAssignmentModal(regionId);
     });
   });
 }
 
-// Render tech categories navigation - shows research center coverage by category
-function renderTechCategories() {
-  const container = document.getElementById('tech-categories');
-  if (!container) return;
+// Show modal for assigning a research center to a field and project
+function showAssignmentModal(regionId) {
+  const center = state.regionalResearchCenters?.[regionId];
+  if (!center) return;
 
-  let html = '';
+  const regionData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+  const regionName = regionData?.name || regionId;
+  const currentField = center.field;
 
-  RESEARCH_CENTERS.categories.forEach(category => {
-    const builtCenters = state.researchCenters
-      ? state.researchCenters.filter(id => {
-          const center = getResearchCenterById(id);
-          return center && center.categoryId === category.id;
-        })
-      : [];
-    const builtCount = builtCenters.length;
-    const totalCount = category.centers.length;
+  // Create modal
+  const modal = document.createElement('div');
+  modal.className = 'assignment-modal-overlay';
 
-    // Calculate RP per month from built centers in this category
-    const categoryRP = builtCenters.reduce((sum, id) => {
-      const center = getResearchCenterById(id);
-      return sum + (center ? center.rpPerMonth : 0);
-    }, 0);
+  let html = `
+    <div class="assignment-modal">
+      <div class="assignment-modal-header">
+        <h3>Assign Research - ${regionName}</h3>
+        <button class="assignment-modal-close">&times;</button>
+      </div>
+      <div class="assignment-modal-body">
+  `;
 
-    // All data here comes from hardcoded RESEARCH_CENTERS constants, not user input
+  // Show fields
+  Object.entries(RESEARCH_FIELDS).forEach(([fieldId, field]) => {
+    const techs = getResearchableTechsInField(fieldId);
+    const isSwitchingField = currentField && currentField !== fieldId;
+    const switchCost = isSwitchingField ? field.switchCost : 0;
+    const switchTime = isSwitchingField ? field.switchTime : 0;
+    const canAffordSwitch = !isSwitchingField || state.funds >= switchCost;
+
     html += `
-      <div class="tech-category-item ${builtCount > 0 ? 'has-centers' : ''}">
-        <div class="category-icon">${category.icon}</div>
-        <div class="category-name">${category.name}</div>
-        <div class="category-count">${builtCount}/${totalCount} centers</div>
-        ${categoryRP > 0 ? `<div class="category-rp">+${categoryRP} RP/mo</div>` : ''}
+      <div class="assignment-field ${techs.length === 0 ? 'no-techs' : ''} ${!canAffordSwitch ? 'unaffordable' : ''}">
+        <div class="assignment-field-header">
+          <span class="field-icon">${field.icon}</span>
+          <span class="field-name">${field.name}</span>
+          ${isSwitchingField ? `<span class="field-switch-cost">Switch: $${switchCost}B, ${switchTime}mo cooldown</span>` : ''}
+        </div>
+        <p class="field-desc">${field.description}</p>
+        ${techs.length > 0 ? `
+          <div class="assignment-techs">
+            ${techs.map(tech => {
+              const progress = state.techProgress?.[tech.id] || 0;
+              const progressPercent = Math.min(100, (progress / tech.cost) * 100);
+              return `
+                <div class="assignment-tech">
+                  <div class="tech-info">
+                    <span class="tech-icon">${tech.icon}</span>
+                    <span class="tech-name">${tech.name}</span>
+                    <span class="tech-cost">${progress}/${tech.cost} RP</span>
+                  </div>
+                  <div class="tech-progress-mini">
+                    <div class="tech-progress-fill" style="width: ${progressPercent}%"></div>
+                  </div>
+                  <button class="tech-select-btn" data-region="${regionId}" data-field="${fieldId}" data-tech="${tech.id}"
+                    ${!canAffordSwitch ? 'disabled' : ''}>
+                    Select
+                  </button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : '<p class="no-techs-msg">No available technologies (unlock prerequisites first)</p>'}
       </div>
     `;
   });
 
-  container.innerHTML = html;
+  html += `
+      </div>
+    </div>
+  `;
+
+  modal.innerHTML = html;
+  document.body.appendChild(modal);
+
+  // Event listeners
+  modal.querySelector('.assignment-modal-close').addEventListener('click', () => {
+    modal.remove();
+  });
+
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+
+  modal.querySelectorAll('.tech-select-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const rId = e.target.dataset.region;
+      const fId = e.target.dataset.field;
+      const tId = e.target.dataset.tech;
+      if (rId && fId && tId) {
+        assignCenterToProject(rId, fId, tId);
+        modal.remove();
+      }
+    });
+  });
 }
 
 // Render active events panel
@@ -9171,6 +10422,96 @@ function initGraphTabs() {
   });
 }
 
+// ============================
+// COLLAPSIBLE SECTIONS SYSTEM
+// ============================
+
+const COLLAPSIBLE_SECTIONS = [
+  { headerClass: 'income-header', contentSelector: '.income-header ~ *:not(.power-header):not(.construction-header):not(.emissions-header):not(.effectiveness-header):not(.region-fact-section)', id: 'climate-finance' },
+  { headerClass: 'power-header', contentSelector: '#power-panel > *:not(.power-header)', id: 'power-grid' },
+  { headerClass: 'emissions-header', contentSelector: '.emissions-header ~ *:not(.effectiveness-header):not(.region-fact-section)', id: 'emissions' },
+  { headerClass: 'effectiveness-header', contentSelector: '.effectiveness-header ~ *:not(.region-fact-section)', id: 'effectiveness' },
+];
+
+// Get collapsed state from localStorage
+function getCollapsedSections() {
+  try {
+    const stored = localStorage.getItem('collapsedSections');
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
+
+// Save collapsed state to localStorage
+function saveCollapsedSection(sectionId, isCollapsed) {
+  try {
+    const collapsed = getCollapsedSections();
+    collapsed[sectionId] = isCollapsed;
+    localStorage.setItem('collapsedSections', JSON.stringify(collapsed));
+  } catch {
+    // Ignore localStorage errors
+  }
+}
+
+// Initialize collapsible behavior for region panel sections
+function initCollapsibleSections() {
+  const collapsed = getCollapsedSections();
+
+  // Process each collapsible section type
+  const sectionConfigs = [
+    { headerClass: 'income-header', containerId: 'region-income', sectionId: 'climate-finance' },
+    { headerClass: 'power-header', containerId: 'power-panel', sectionId: 'power-grid' },
+    { headerClass: 'emissions-header', containerId: 'climate-data-panel', sectionId: 'emissions' },
+  ];
+
+  sectionConfigs.forEach(config => {
+    const container = document.getElementById(config.containerId);
+    if (!container) return;
+
+    const header = container.querySelector(`.${config.headerClass}`);
+    if (!header || header.classList.contains('collapsible-initialized')) return;
+
+    // Mark as initialized to prevent duplicate handlers
+    header.classList.add('collapsible-initialized');
+    header.classList.add('collapsible-header');
+
+    // Get all siblings after header as content
+    const contentElements = [];
+    let sibling = header.nextElementSibling;
+    while (sibling) {
+      contentElements.push(sibling);
+      sibling = sibling.nextElementSibling;
+    }
+
+    // Wrap content in a collapsible container if not already wrapped
+    if (contentElements.length > 0 && !container.querySelector('.collapsible-content')) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'collapsible-content';
+      wrapper.dataset.sectionId = config.sectionId;
+
+      contentElements.forEach(el => wrapper.appendChild(el));
+      container.appendChild(wrapper);
+
+      // Apply initial collapsed state
+      if (collapsed[config.sectionId]) {
+        header.classList.add('collapsed');
+        wrapper.classList.add('collapsed');
+      }
+    }
+
+    // Add click handler
+    header.addEventListener('click', () => {
+      const content = container.querySelector('.collapsible-content');
+      if (!content) return;
+
+      const isCollapsed = header.classList.toggle('collapsed');
+      content.classList.toggle('collapsed', isCollapsed);
+      saveCollapsedSection(config.sectionId, isCollapsed);
+    });
+  });
+}
+
 function updateSelectedRegionPanel() {
   if (!selectedRegionId) {
     selectedRegionEl.textContent = "Select a region to take action.";
@@ -9238,6 +10579,9 @@ function updateSelectedRegionPanel() {
       renderPowerPanel(selectedRegionId);
       renderConstructionPanel(selectedRegionId);
     }
+
+    // Initialize collapsible sections after DOM is updated
+    setTimeout(initCollapsibleSections, 0);
   }
 }
 
@@ -10110,8 +11454,14 @@ function renderProjectButtons() {
   const climateData = getClimateDataForRegion(selectedRegionId);
   const difficulty = getDifficulty();
 
-  // Filter projects by category
+  // Filter projects by category and unlock status
   const projectEntries = Object.entries(PROJECT_TYPES).filter(([type, project]) => {
+    // First check if project is unlocked (via technology research)
+    if (!isProjectUnlocked(type)) {
+      return false;
+    }
+
+    // Then filter by category
     if (selectedProjectCategory === "economic") {
       return project.category === "economic";
     } else if (selectedProjectCategory === "power") {
@@ -10150,20 +11500,20 @@ function renderProjectButtons() {
     if (effectiveness.effectMultiplier !== 1 && effectiveness.effectMultiplier > 0) {
       const effectBadge = document.createElement("span");
       const mult = effectiveness.effectMultiplier;
-      effectBadge.className = `project-effectiveness ${mult > 1 ? "bonus" : "penalty"}`;
-      effectBadge.textContent = mult > 1 ? `${(mult * 100 - 100).toFixed(0)}% bonus` : `${(100 - mult * 100).toFixed(0)}% penalty`;
+      effectBadge.className = `project-effectiveness ${mult > 1 ? "bonus" : "penalty"} has-tooltip`;
+      effectBadge.textContent = mult > 1 ? `+${(mult * 100 - 100).toFixed(0)}% effective` : `-${(100 - mult * 100).toFixed(0)}% effective`;
 
       // Add tooltip explaining the effectiveness modifier
       let tooltipText = effectiveness.reason;
       if (!tooltipText) {
         // Generate explanation based on project type and regional conditions
         if (mult > 1) {
-          tooltipText = `This region has favorable conditions for ${project.label.toLowerCase()} projects, increasing effectiveness.`;
+          tooltipText = `Favorable regional conditions for ${project.label.toLowerCase()} projects`;
         } else {
-          const penaltyPct = (100 - mult * 100).toFixed(0);
-          tooltipText = `Regional conditions reduce ${project.label.toLowerCase()} effectiveness by ${penaltyPct}%. Factors include latitude, climate, and local resources.`;
+          tooltipText = `Less effective due to latitude, climate, or local resources`;
         }
       }
+      effectBadge.setAttribute("data-tooltip", tooltipText);
       effectBadge.title = tooltipText;
       button.appendChild(effectBadge);
     }
@@ -10370,7 +11720,15 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
     }
 
     // Building projects increases happiness slightly
-    const happinessBonus = project.category === "economic" ? 8 : 5;
+    // Nuclear is controversial and has neutral happiness effect
+    let happinessBonus = 0;
+    if (projectType === "nuclear") {
+      happinessBonus = 0; // Nuclear is controversial - neutral effect
+    } else if (project.category === "economic") {
+      happinessBonus = 8;
+    } else {
+      happinessBonus = 5;
+    }
     allianceData.happiness = Math.min(100, allianceData.happiness + happinessBonus);
   }
 
@@ -10868,17 +12226,19 @@ function updateMapLegend() {
       const itemEl = document.createElement("div");
       itemEl.style.display = "flex";
       itemEl.style.alignItems = "center";
-      itemEl.style.gap = "6px";
+      itemEl.style.gap = "8px";
 
       const colorBox = document.createElement("div");
-      colorBox.style.width = "16px";
-      colorBox.style.height = "16px";
+      colorBox.style.width = "20px";
+      colorBox.style.height = "20px";
       colorBox.style.backgroundColor = item.color;
-      colorBox.style.borderRadius = "3px";
+      colorBox.style.borderRadius = "4px";
+      colorBox.style.border = "1px solid rgba(255,255,255,0.2)";
 
       const labelEl = document.createElement("span");
       labelEl.textContent = item.label;
-      labelEl.style.fontSize = "11px";
+      labelEl.style.fontSize = "13px";
+      labelEl.style.fontWeight = "500";
 
       itemEl.append(colorBox, labelEl);
       binaryLegend.appendChild(itemEl);
@@ -10907,10 +12267,13 @@ function updateMapLegend() {
 }
 
 function checkWinLose() {
-  if (state.temperature <= GAME_CONFIG.winTemp) {
+  // Win condition: temperature stabilized below Paris target AND year is past 2050
+  // This ensures the player has maintained climate stability for a significant period
+  const minWinYear = 2050;
+  if (state.temperature <= GAME_CONFIG.winTemp && state.year >= minWinYear) {
     state.gameOver = true;
     state.won = true;
-    pushMessage("Victory! Temperature is back under control.", "good");
+    pushMessage("Victory! Temperature stabilized below 1.5°C through 2050!", "good");
   } else if (state.temperature >= GAME_CONFIG.loseTemp || state.year >= GAME_CONFIG.loseYear) {
     state.gameOver = true;
     state.won = false;
@@ -11246,6 +12609,16 @@ function wireSetupGranularityButtons() {
 
 // ============ SIDEBAR TABS ============
 
+// Helper function to programmatically switch sidebar tabs
+function switchToTab(tabName) {
+  const tabs = document.querySelectorAll('.sidebar-tab');
+  tabs.forEach(tab => {
+    if (tab.dataset.tab === tabName) {
+      tab.click(); // Trigger the existing click handler
+    }
+  });
+}
+
 function initSidebarTabs() {
   const tabs = document.querySelectorAll('.sidebar-tab');
   const worldContent = document.getElementById('world-tab-content');
@@ -11268,6 +12641,8 @@ function initSidebarTabs() {
         if (techPanel) {
           techPanel.style.display = 'block';
           renderTechTree();
+          // Redraw tech tree connections after panel is visible
+          setTimeout(() => drawTreeConnections(), 50);
         }
       } else {
         // Show map, hide tech panel
@@ -11321,7 +12696,7 @@ function renderGlobalStatsCard() {
   const campaignCount = state.activeCampaigns?.length || 0;
 
   // Color classes
-  const netCo2Class = netRate < 0 ? 'stat-good' : netRate > 0.3 ? 'stat-bad' : 'stat-warning';
+  const netCo2Class = netRate < -0.05 ? 'stat-good' : netRate > 0.05 ? 'stat-bad' : 'stat-warning';
   const feedbackClass = feedback === 0 ? 'stat-good' : feedback < 0.2 ? 'stat-warning' : 'stat-bad';
   const tippingClass = tippingCount === 0 ? 'stat-good' : tippingCount < 3 ? 'stat-warning' : 'stat-bad';
   const yearsClass = yearsLeft > 50 ? '' : yearsLeft > 25 ? 'stat-warning' : 'stat-bad';
@@ -11431,7 +12806,7 @@ function renderAllianceOverview() {
       </div>
       <div class="stat-item">
         <span class="label">CO2 Reduction</span>
-        <span class="value">-${totalEmissionsReduction.toFixed(2)}/mo</span>
+        <span class="value">${totalEmissionsReduction > 0 ? '-' : ''}${totalEmissionsReduction.toFixed(2)}/mo</span>
       </div>
     </div>
   `;
