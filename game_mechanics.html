@@ -26,9 +26,9 @@
               <h3>Temperature Calculation</h3>
               <div class="formula-box">
                 <p class="formula-label">Global Temperature:</p>
-                <code>temperature = (CO2 - 280) &times; 0.008&deg;C</code>
+                <code>T(c) = c &times; 0.0105 - 3.37&deg;C</code>
               </div>
-              <p>280 ppm is the pre-industrial CO2 baseline. Climate sensitivity is 0.008&deg;C per ppm.</p>
+              <p>where <code>c</code> is the CO2 concentration in ppm and <code>T</code> is the global temperature anomaly in &deg;C.</p>
               <table class="rules-table compact">
                 <thead>
                   <tr>
@@ -38,43 +38,47 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>405</td><td>+1.0&deg;C</td><td class="highlight-win">WIN</td></tr>
-                  <tr><td>420</td><td>+1.12&deg;C</td><td>Starting</td></tr>
-                  <tr><td>467</td><td>+1.5&deg;C</td><td>Tipping Point 1</td></tr>
-                  <tr><td>530</td><td>+2.0&deg;C</td><td>Tipping Point 2</td></tr>
-                  <tr><td>655</td><td>+3.0&deg;C</td><td class="highlight-lose">LOSE</td></tr>
+                  <tr><td>320</td><td>+0.0&deg;C</td><td class="highlight-win">Ultimate WIN</td></tr>
+                  <tr><td>416</td><td>+1.0&deg;C</td><td class="highlight-win">WIN</td></tr>
+                  <tr><td>423</td><td>+1.09&deg;C</td><td>Starting (2025)</td></tr>
+                  <tr><td>463</td><td>+1.5&deg;C</td><td>Tipping Point 1</td></tr>
+                  <tr><td>511</td><td>+2.0&deg;C</td><td class="highlight-lose">LOSE</td></tr>
+                  <tr><td>606</td><td>+3.0&deg;C</td><td class="highlight-lose">Extreme LOSE</td></tr>
                 </tbody>
               </table>
             </div>
 
             <div class="rules-card">
-              <h3>Monthly CO2 Change</h3>
+              <h3>Carbon Atmosphere System</h3>
+              <p>Each month, atmospheric CO2 changes based on the carbon balance between emissions and removals:</p>
               <div class="formula-box">
-                <code>newCO2 = currentCO2 + baseIncrease + feedbackEffects - projectReductions</code>
+                <p class="formula-label">CO2 Change:</p>
+                <code>&Delta;c = (m - 1.54) &times; 0.1277247</code>
+              </div>
+              <p>where <code>m</code> is net emissions in GT CO2/month. <strong>1.54 GT/month</strong> represents Earth's natural carbon storage (18.4 GT/year), distributed between ocean absorption (12.2 GT/year) and land absorption (8.9 GT/year).</p>
+              <div class="formula-box">
+                <p class="formula-label">Monthly Update:</p>
+                <code>CO2<sub>new</sub> = CO2<sub>current</sub> + &Delta;c + feedbackEffects</code>
               </div>
               <table class="rules-table">
                 <thead>
                   <tr>
                     <th>Component</th>
-                    <th>Value</th>
                     <th>Source</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr>
-                    <td>Base Increase</td>
-                    <td>0.3-0.7 ppm/month</td>
-                    <td>Difficulty setting</td>
+                    <td>Emissions</td>
+                    <td>Power, Industry, Transport, Buildings, Agriculture</td>
+                  </tr>
+                  <tr>
+                    <td>Removals</td>
+                    <td>Natural sinks + player projects (reforestation, CCS)</td>
                   </tr>
                   <tr>
                     <td>Feedback Effects</td>
-                    <td>Variable</td>
-                    <td>Tipping points + loops</td>
-                  </tr>
-                  <tr>
-                    <td>Project Reductions</td>
-                    <td>Sum of active projects</td>
-                    <td>Player actions</td>
+                    <td>Tipping points + feedback loops</td>
                   </tr>
                 </tbody>
               </table>
@@ -171,8 +175,32 @@
                   <tr><td>Wind Farm</td><td>$12 B</td><td>-1 ppm</td><td>+$2 B</td><td>wind</td></tr>
                   <tr><td>Research Center</td><td>$15 B</td><td>0</td><td>+$3 B</td><td>N/A</td></tr>
                   <tr><td>Offshore Wind</td><td>$30 B</td><td>-2 ppm</td><td>+$3 B</td><td>wind</td></tr>
-                  <tr><td>Carbon Capture</td><td>$35 B</td><td>-4 ppm</td><td>$0</td><td>carbonCapture</td></tr>
+                  <tr><td>Carbon Capture</td><td>$35 B</td><td>-0.001 ppm/mo</td><td>$0</td><td>carbonCapture</td></tr>
                   <tr><td>Nuclear Plant</td><td>$50 B</td><td>-3 ppm</td><td>+$4 B</td><td>N/A</td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 1rem; font-size: 0.9em; color: #888;"><strong>Note:</strong> Carbon Capture values are based on Sintef data ($332M per CCS unit capturing 1 Mt CO2/year). Research Center is based on Sintef Horizon project.</p>
+            </div>
+
+            <div class="rules-card">
+              <h3>Construction Times</h3>
+              <p>All projects require time to build before becoming operational:</p>
+              <table class="rules-table compact">
+                <thead>
+                  <tr>
+                    <th>Project</th>
+                    <th>Construction Time</th>
+                    <th>Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Reforestation</td><td>4 months</td><td>Planting phase</td></tr>
+                  <tr><td>Solar Farm</td><td>12 months</td><td>Industry average</td></tr>
+                  <tr><td>Wind Farm</td><td>18 months</td><td>Industry average</td></tr>
+                  <tr><td>Research Center</td><td>30 months</td><td>Sintef Horizon</td></tr>
+                  <tr><td>Offshore Wind</td><td>24 months</td><td>Industry average</td></tr>
+                  <tr><td>Carbon Capture</td><td>42 months</td><td>Northern Lights (Equinor)</td></tr>
+                  <tr><td>Nuclear Plant</td><td>60 months</td><td>Industry average</td></tr>
                 </tbody>
               </table>
             </div>
@@ -759,14 +787,15 @@ effectiveCost = baseCost * (2 - potentialScore) * techCostMultiplier
                   <tr>
                     <th>Interest Level</th>
                     <th>Cost Multiplier</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr><td>Very High (80+)</td><td>0.5x (cheaper)</td></tr>
-                  <tr><td>High (60-79)</td><td>0.7x</td></tr>
-                  <tr><td>Moderate (40-59)</td><td>1.0x</td></tr>
-                  <tr><td>Low (20-39)</td><td>1.2x</td></tr>
-                  <tr><td>Very Low (&lt;20)</td><td>1.5x (expensive)</td></tr>
+                  <tr><td>Very High (80+)</td><td>0.5x</td><td>Eager to join</td></tr>
+                  <tr><td>High (60-79)</td><td>0.7x</td><td>Favorable negotiations</td></tr>
+                  <tr><td>Moderate (40-59)</td><td>1.0x</td><td>Standard cost</td></tr>
+                  <tr><td>Low (20-39)</td><td>1.5x</td><td>Skeptical, harder to convince</td></tr>
+                  <tr><td>Very Low (&lt;20)</td><td>1.5x</td><td>Resistant, max 50% success</td></tr>
                 </tbody>
               </table>
             </div>
@@ -843,20 +872,35 @@ effectiveCost = baseCost * (2 - potentialScore) * techCostMultiplier
             </div>
 
             <div class="rules-card">
-              <h3>Success Probability</h3>
+              <h3>Election-Style Probability</h3>
+              <p>Negotiation success uses an <strong>election-style</strong> system where interest represents public support for joining the coalition. The outcome includes uncertainty similar to real-world polling error.</p>
               <div class="formula-box">
-                <code>baseChance = interest &times; 0.8</code>
-                <br>
-                <code>termsPenalty = sum of all term impacts</code>
-                <br>
-                <code>finalChance = max(10, baseChance - termsPenalty)</code>
+                <p class="formula-label">How it works:</p>
+                <ol style="margin: 0.5rem 0; padding-left: 1.2rem;">
+                  <li>Interest = base voter support (e.g., 40% interest = 40% support)</li>
+                  <li>Polling uncertainty of &plusmn;15% is applied</li>
+                  <li>Success if simulated election result exceeds 50%</li>
+                  <li>Very Low interest regions capped at 50% max success</li>
+                </ol>
               </div>
-              <p><strong>Example:</strong> Interest 70, terms at default:</p>
-              <ul>
-                <li>Base chance: 70 &times; 0.8 = <strong>56%</strong></li>
-                <li>Terms penalty: 0 (all at default)</li>
-                <li>Final chance: <strong>56%</strong></li>
-              </ul>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Interest</th>
+                    <th>Success Chance</th>
+                    <th>Interpretation</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>30%</td><td>~5%</td><td>Need +20 swing, very unlikely</td></tr>
+                  <tr><td>40%</td><td>~25%</td><td>Need +10 swing, unlikely</td></tr>
+                  <tr><td>50%</td><td>~50%</td><td>Coin flip</td></tr>
+                  <tr><td>60%</td><td>~75%</td><td>Favorable odds</td></tr>
+                  <tr><td>70%</td><td>~95%</td><td>Very likely, small upset chance</td></tr>
+                  <tr><td>80%+</td><td>~99%</td><td>Near certain</td></tr>
+                </tbody>
+              </table>
+              <p style="margin-top: 1rem;"><strong>Note:</strong> Even favorable negotiations can fail due to political uncertainty, and seemingly hopeless cases occasionally succeed through unexpected shifts in public opinion.</p>
             </div>
 
             <!-- TERM COMPLIANCE -->
@@ -973,6 +1017,26 @@ effectiveCost = baseCost * (2 - potentialScore) * techCostMultiplier
                     <td>-2 to -8 based on shortage</td>
                     <td>Infrastructure failure</td>
                   </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="rules-card">
+              <h3>Project Happiness Effects</h3>
+              <p>Building projects in allied regions increases happiness by demonstrating commitment to climate action. However, <strong>nuclear projects are politically controversial</strong> and have a neutral effect.</p>
+              <table class="rules-table">
+                <thead>
+                  <tr>
+                    <th>Project Type</th>
+                    <th>Happiness Effect</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr><td>Renewable Energy (Solar, Wind, Offshore Wind)</td><td style="color: #2ecc71;"><strong>+5</strong></td></tr>
+                  <tr><td>Reforestation</td><td style="color: #2ecc71;"><strong>+5</strong></td></tr>
+                  <tr><td>Carbon Capture</td><td style="color: #2ecc71;"><strong>+5</strong></td></tr>
+                  <tr><td>Research Center</td><td style="color: #2ecc71;"><strong>+5</strong></td></tr>
+                  <tr><td>Nuclear Plant</td><td><strong>0 (neutral)</strong></td></tr>
                 </tbody>
               </table>
             </div>
