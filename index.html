@@ -77,6 +77,8 @@
       document.getElementById('start-game-btn').addEventListener('click', function() {
         const difficulty = document.getElementById('difficulty').value;
         localStorage.setItem('gameDifficulty', difficulty);
+        // Clear any existing saved game to ensure a fresh start
+        localStorage.removeItem('carbonCaptureGameSave');
         window.location.href = 'game.html';
       });
     </script>
