@@ -1,0 +1,264 @@
+/**
+ * Map Styles
+ * SVG map, map controls, overlays, and legend
+ */
+
+/* ========================================
+   MAP CONTAINER
+   ======================================== */
+
+.map-stage {
+  flex: 1;
+  min-height: 0;
+  padding: 0;
+  display: flex;
+  position: relative;
+}
+
+.map-container {
+  flex: 1;
+  background: rgba(6, 12, 18, 0.5);
+  border-radius: 0;
+  padding: 0;
+  min-height: 0;
+  animation: rise-in 0.7s ease-out;
+  display: flex;
+  position: relative;
+}
+
+#map-object {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  display: block;
+}
+
+/* ========================================
+   MAP HEADER & TOOLS
+   ======================================== */
+
+.map-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.map-header h2,
+.action-panel h2,
+.news-panel h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  letter-spacing: 0.03em;
+}
+
+.map-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.map-label {
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.map-select {
+  background: rgba(10, 20, 30, 0.8);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-family: var(--font-body);
+  font-weight: 600;
+}
+
+.map-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.sidebar .map-label {
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.65rem;
+}
+
+.sidebar .map-select {
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border-radius: 8px;
+}
+
+/* ========================================
+   MAP VIEW OVERLAY
+   ======================================== */
+
+.map-view-overlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 100;
+}
+
+.map-mode-select {
+  background: rgba(10, 20, 30, 0.85);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  font-weight: 500;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.map-mode-select:hover {
+  background: rgba(20, 35, 50, 0.9);
+  border-color: var(--accent);
+}
+
+.map-mode-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(94, 214, 138, 0.2);
+}
+
+/* ========================================
+   MAP LEGEND OVERLAY
+   ======================================== */
+
+.map-legend-overlay {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 100;
+  background: rgba(10, 20, 30, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  padding: 12px 16px;
+  backdrop-filter: blur(12px);
+  min-width: 160px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.map-legend-overlay .legend-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 10px;
+}
+
+.map-legend-overlay .legend-binary {
+  display: flex;
+  gap: 12px;
+}
+
+.map-legend-overlay .legend-gradient {
+  height: 10px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+
+.map-legend-overlay .legend-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ========================================
+   SETUP MODE MAP STYLES
+   ======================================== */
+
+.setup-mode .map-tools,
+.setup-mode .map-legend {
+  display: none;
+}
+
+/* Region Search */
+.region-search {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.region-search-input {
+  width: 100%;
+  padding: 10px 14px;
+  background: rgba(10, 20, 30, 0.8);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.region-search-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.region-search-input::placeholder {
+  color: var(--muted);
+}
+
+.region-search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 100;
+  display: none;
+  margin-top: 4px;
+}
+
+.region-search-results.active {
+  display: block;
+}
+
+.search-result-item .region-type {
+  font-size: 0.65rem;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.search-result-item:hover .region-type {
+  color: var(--accent);
+}
+
+/* ========================================
+   RESPONSIVE MAP
+   ======================================== */
+
+@media (max-width: 900px) {
+  .map-stage {
+    min-height: 60vh;
+    padding: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .map-tools {
+    width: 100%;
+  }
+
+  .map-select {
+    width: 100%;
+  }
+}

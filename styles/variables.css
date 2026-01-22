@@ -1,0 +1,60 @@
+/**
+ * CSS Variables
+ * Global design tokens and CSS custom properties
+ */
+
+:root {
+  /* Color scheme */
+  color-scheme: dark;
+
+  /* Background colors */
+  --bg-top: #0b1824;
+  --bg-bottom: #132c3f;
+  --bg-primary: #0b1824;
+  --bg-secondary: #132c3f;
+  --bg-tertiary: #1a3a52;
+
+  /* Panel colors */
+  --panel: rgba(9, 17, 27, 0.86);
+  --panel-bg: rgba(9, 17, 27, 0.86);
+  --panel-border: rgba(240, 214, 140, 0.24);
+  --card: rgba(10, 20, 30, 0.7);
+
+  /* Text colors */
+  --text: #f4f7fb;
+  --text-color: #f4f7fb;
+  --text-primary: #f4f7fb;
+  --text-secondary: #a9b4c3;
+  --text-tertiary: #7a8a9a;
+  --text-muted: #a9b4c3;
+  --muted: #a9b4c3;
+
+  /* Accent colors */
+  --accent: #f0c66f;
+  --accent-strong: #f5dd9a;
+  --accent-color: #f0c66f;
+  --accent-bright: #f5dd9a;
+  --accent-green: #52c489;
+  --accent-rgb: 240, 198, 111;
+
+  /* Status colors - region temperatures */
+  --region-good: #5ed68a;
+  --region-mild: #f4d370;
+  --region-warm: #f2a45b;
+  --region-hot: #e46370;
+
+  /* Borders and effects */
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --shadow: 0 22px 40px rgba(5, 12, 18, 0.45);
+  --radius: 18px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+
+  /* Typography */
+  --font-display: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  --font-body: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  --font-mono: "Monaco", "Consolas", monospace;
+
+  /* Layout */
+  --sidebar-width: min(360px, 30vw);
+}

@@ -1,3 +1,64 @@
+// ═══════════════════════════════════════════════════════════════
+// MODULE IMPORTS (ES Module version)
+// ═══════════════════════════════════════════════════════════════
+// Import climate data from modular structure
+import {
+  ISO_TO_KEY,
+  MAJOR_REGIONS,
+  CONTINENTS,
+  COUNTRY_DATA,
+  REGION_AGGREGATES,
+  ADVANCED_PROJECT_TYPES,
+  SECTOR_POLICIES,
+  EMISSION_SECTORS,
+  getClimateData,
+  aggregateRegionData,
+  calculateProjectEffectiveness,
+  getRandomFact,
+  getCountryByIso,
+  createDefaultCountryData,
+  aggregateCountriesToRegion,
+  getMajorRegionData,
+  getContinentData,
+  getDataForGranularity,
+  getRegionIdsForGranularity,
+  getParentRegion,
+} from "./public/modules/data/index.js";
+
+// Create global CLIMATE_DATA object for backward compatibility
+const CLIMATE_DATA = {
+  ISO_TO_KEY,
+  MAJOR_REGIONS,
+  CONTINENTS,
+  COUNTRY_DATA,
+  REGION_AGGREGATES,
+  ADVANCED_PROJECT_TYPES,
+  SECTOR_POLICIES,
+  EMISSION_SECTORS,
+  getClimateData,
+  aggregateRegionData,
+  calculateProjectEffectiveness,
+  getRandomFact,
+  getCountryByIso,
+  createDefaultCountryData,
+  aggregateCountriesToRegion,
+  getMajorRegionData,
+  getContinentData,
+  getDataForGranularity,
+  getRegionIdsForGranularity,
+  getParentRegion,
+};
+
+// Expose CLIMATE_DATA globally for map region detection
+if (typeof window !== "undefined") {
+  window.CLIMATE_DATA = CLIMATE_DATA;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GAME CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
+// Note: Modular versions available in ./public/modules/config/
+// and ./public/modules/systems/ for future migration
 const GAME_CONFIG = {
   // Currency settings (real-world billions USD)
   startingFunds: 25,            // $25 billion starting budget (reduced for balance)
@@ -1078,9 +1139,9 @@ const FEEDBACK_LOOPS = {
 const DEMAND_TYPES = {
   carbonTaxLimit: {
     id: "carbonTaxLimit",
-    text: "Limit carbon tax to {value}%",
-    generateValue: () => 20 + Math.floor(Math.random() * 20), // 20-40%
-    check: (region, value) => region.carbonTax <= value,
+    text: "Limit carbon tax to ${value}/ton",
+    generateValue: () => 20 + Math.floor(Math.random() * 30), // $20-50/ton
+    check: (region, value) => (region.carbonTax?.ratePerTon || 0) <= value,
     difficulty: "easy",
   },
   localSpending: {
@@ -1147,45 +1208,78 @@ const INTEREST_THRESHOLDS = {
 
 // Terms that can be set when negotiating with regions
 const NEGOTIABLE_TERMS = {
-  carbonCommitment: {
-    label: "Carbon Reduction Commitment",
-    description: "Required CO2 reduction as % of GDP annually",
-    min: 0.5,
-    max: 3.0,
-    step: 0.5,
-    default: 1.0,
-    unit: "%",
-    impactPerStep: -8,  // Success penalty per step above default
-  },
-  renewableTarget: {
-    label: "Renewable Energy Target",
-    description: "% of power from renewables within 10 years",
-    min: 20,
-    max: 80,
-    step: 10,
-    default: 40,
+  climateDedicationMin: {
+    label: "Minimum Climate Dedication",
+    description: "Minimum % of GDP dedicated to climate action",
+    min: 1,
+    max: 10,
+    step: 1,
+    default: 3,
     unit: "%",
     impactPerStep: -5,
   },
-  ccsRequirement: {
-    label: "Carbon Capture Requirement",
-    description: "Minimum CCS/DAC projects to build",
-    min: 0,
-    max: 5,
+  climateDedicationMax: {
+    label: "Maximum Climate Dedication",
+    description: "Maximum % of GDP dedicated to climate action",
+    min: 5,
+    max: 20,
     step: 1,
-    default: 0,
-    unit: "",
-    impactPerStep: -10,
-  },
-  carbonTaxLevel: {
-    label: "Carbon Tax Commitment",
-    description: "Minimum carbon tax rate",
-    min: 0,
-    max: 50,
-    step: 5,
     default: 10,
     unit: "%",
     impactPerStep: -3,
+  },
+  powerStabilityGoal: {
+    label: "Power Stability Goal",
+    description: "Alliance commitment to improve grid stability",
+    min: 50,
+    max: 95,
+    step: 5,
+    default: 70,
+    unit: "%",
+    impactPerStep: 3, // Higher = more attractive (we're promising to help more)
+    higherIsBetter: true,
+  },
+  powerSupplyGoal: {
+    label: "Power Supply Goal",
+    description: "Alliance commitment to improve power supply",
+    min: 90,
+    max: 120,
+    step: 5,
+    default: 100,
+    unit: "%",
+    impactPerStep: 3, // Higher = more attractive (we're promising to help more)
+    higherIsBetter: true,
+  },
+  goalDeadlineYears: {
+    label: "Goal Deadline",
+    description: "Years to achieve power goals (shorter = more attractive)",
+    min: 5,
+    max: 25,
+    step: 5,
+    default: 15,
+    unit: " years",
+    impactPerStep: 2, // Shorter deadline = more attractive
+    shorterIsBetter: true,
+  },
+  carbonTaxRate: {
+    label: "Carbon Tax Rate",
+    description: "Tax rate per ton of CO2 emissions",
+    min: 10,
+    max: 100,
+    step: 5,
+    default: 25,
+    unit: "$/ton",
+    impactPerStep: -2, // Higher tax = harder to negotiate
+  },
+  carbonTaxGrowth: {
+    label: "Carbon Tax Growth",
+    description: "Yearly increase in carbon tax rate",
+    min: 0,
+    max: 10,
+    step: 1,
+    default: 5,
+    unit: "%/year",
+    impactPerStep: -1, // Higher growth = harder to negotiate
   },
 };
 
@@ -2374,6 +2468,27 @@ function getTotalRegionalRPPerMonth() {
     total += getCenterRPPerMonth(center.level);
   }
   return total;
+}
+
+// Get RP/month from centers that are assigned to projects (actively researching)
+function getAssignedRPPerMonth() {
+  if (!state.regionalResearchCenters) return 0;
+
+  let assigned = 0;
+  for (const regionId in state.regionalResearchCenters) {
+    const center = state.regionalResearchCenters[regionId];
+
+    // Skip if on cooldown
+    if (state.centerCooldowns && state.centerCooldowns[regionId] > 0) {
+      continue;
+    }
+
+    // Only count if assigned to a project
+    if (center.projectId) {
+      assigned += getCenterRPPerMonth(center.level);
+    }
+  }
+  return assigned;
 }
 
 // Destroy a research center when alliance is lost
@@ -3831,6 +3946,176 @@ function closeCarbonBalancePopup() {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// INCOME BREAKDOWN POPUP
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Open the income breakdown popup
+ */
+function showIncomeBreakdownPopup() {
+  const container = document.getElementById("income-breakdown-popup");
+  if (!container) return;
+
+  const breakdown = calculateIncomeBreakdown();
+
+  // Populate climate budget list
+  const climateList = document.getElementById("income-climate-list");
+  if (climateList) {
+    climateList.textContent = "";
+    const regions = Object.entries(breakdown.climateBudget.byRegion);
+    if (regions.length === 0) {
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "income-item income-empty";
+      emptyDiv.textContent = "No allied regions contributing climate budget";
+      climateList.appendChild(emptyDiv);
+    } else {
+      regions.forEach(([regionId, data]) => {
+        const div = document.createElement("div");
+        div.className = "income-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "income-item-name";
+        nameSpan.textContent = data.name;
+
+        const detailSpan = document.createElement("span");
+        detailSpan.className = "income-item-detail";
+        detailSpan.textContent = `$${data.gdp.toFixed(1)}T × ${data.dedication.toFixed(1)}%`;
+
+        const valueSpan = document.createElement("span");
+        valueSpan.className = "income-item-value";
+        valueSpan.textContent = formatCurrency(data.amount);
+
+        div.append(nameSpan, detailSpan, valueSpan);
+        climateList.appendChild(div);
+      });
+    }
+  }
+
+  // Populate climate budget total
+  const climateTotal = document.getElementById("income-climate-total");
+  if (climateTotal) {
+    climateTotal.textContent = `Subtotal: ${formatCurrency(breakdown.climateBudget.total)}`;
+  }
+
+  // Populate carbon tax list
+  const taxList = document.getElementById("income-tax-list");
+  if (taxList) {
+    taxList.textContent = "";
+    const regions = Object.entries(breakdown.carbonTax.byRegion);
+    if (regions.length === 0) {
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "income-item income-empty";
+      emptyDiv.textContent = "No allied regions paying carbon tax";
+      taxList.appendChild(emptyDiv);
+    } else {
+      regions.forEach(([regionId, data]) => {
+        const div = document.createElement("div");
+        div.className = "income-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "income-item-name";
+        nameSpan.textContent = data.name;
+
+        const detailSpan = document.createElement("span");
+        detailSpan.className = "income-item-detail";
+        detailSpan.textContent = `${(data.emissions * 12).toFixed(2)} Gt/yr × $${data.rate.toFixed(0)}/ton`;
+
+        const valueSpan = document.createElement("span");
+        valueSpan.className = "income-item-value";
+        valueSpan.textContent = formatCurrency(data.amount);
+
+        div.append(nameSpan, detailSpan, valueSpan);
+        taxList.appendChild(div);
+      });
+    }
+  }
+
+  // Populate carbon tax total
+  const taxTotal = document.getElementById("income-tax-total");
+  if (taxTotal) {
+    taxTotal.textContent = `Subtotal: ${formatCurrency(breakdown.carbonTax.total)}`;
+  }
+
+  // Populate project income list
+  const projectList = document.getElementById("income-project-list");
+  if (projectList) {
+    projectList.textContent = "";
+    const projects = Object.entries(breakdown.projects.byType);
+    if (projects.length === 0) {
+      const emptyDiv = document.createElement("div");
+      emptyDiv.className = "income-item income-empty";
+      emptyDiv.textContent = "No income-generating projects";
+      projectList.appendChild(emptyDiv);
+    } else {
+      projects.forEach(([projectType, data]) => {
+        const div = document.createElement("div");
+        div.className = "income-item";
+
+        const nameSpan = document.createElement("span");
+        nameSpan.className = "income-item-name";
+        nameSpan.textContent = data.name;
+
+        const detailSpan = document.createElement("span");
+        detailSpan.className = "income-item-detail";
+        detailSpan.textContent = `×${data.count}`;
+
+        const valueSpan = document.createElement("span");
+        valueSpan.className = "income-item-value";
+        valueSpan.textContent = formatCurrency(data.amount);
+
+        div.append(nameSpan, detailSpan, valueSpan);
+        projectList.appendChild(div);
+      });
+    }
+  }
+
+  // Populate project income total
+  const projectTotal = document.getElementById("income-project-total");
+  if (projectTotal) {
+    projectTotal.textContent = `Subtotal: ${formatCurrency(breakdown.projects.total)}`;
+  }
+
+  // Populate totals
+  const grossTotal = document.getElementById("income-gross-total");
+  if (grossTotal) {
+    grossTotal.textContent = formatCurrency(breakdown.grossTotal);
+  }
+
+  const costs = document.getElementById("income-costs");
+  if (costs) {
+    costs.textContent = `-${formatCurrency(breakdown.costs.researchCenters)}`;
+  }
+
+  const netTotal = document.getElementById("income-net-total");
+  if (netTotal) {
+    netTotal.textContent = formatCurrency(breakdown.netTotal);
+  }
+
+  // Event multiplier note
+  const multiplierNote = document.getElementById("income-multiplier-note");
+  if (multiplierNote) {
+    if (breakdown.eventMultiplier !== 1) {
+      multiplierNote.textContent = `Event modifier: ×${breakdown.eventMultiplier.toFixed(2)}`;
+      multiplierNote.classList.remove("hidden");
+    } else {
+      multiplierNote.classList.add("hidden");
+    }
+  }
+
+  container.classList.remove("hidden");
+}
+
+/**
+ * Close the income breakdown popup
+ */
+function closeIncomeBreakdownPopup() {
+  const container = document.getElementById("income-breakdown-popup");
+  if (container) {
+    container.classList.add("hidden");
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // STAT DETAIL POPUP
 // ═══════════════════════════════════════════════════════════════
 
@@ -4951,6 +5236,8 @@ let selectedRegionId = null;
 let regionOffsets = {};
 let svgDoc = null;
 let svgRegions = new Map();
+let pendingColorUpdate = false; // Flag to ensure color update after SVG loads
+let svgClickHandler = null; // Reference for event delegation cleanup
 let svgGeoBounds = null;
 let svgSize = null;
 let regionGeoCache = new Map();
@@ -4999,6 +5286,7 @@ function loadGame() {
     currentMapMode = saveData.currentMapMode || "alliance";
     currentDifficulty = saveData.currentDifficulty || "normal";
     isSetupMode = false;
+    console.log('[Map] Game loaded, isSetupMode:', isSetupMode);
 
     // Migration: Add underConstruction array if missing
     if (!state.underConstruction) {
@@ -5667,78 +5955,10 @@ function calculateTemperature(co2) {
  * Used to display income in stats bar - mirrors nextMonth() calculation
  */
 function calculateProjectedIncome() {
-  let totalIncome = 0;
-
-  // Calculate income from each country's climate finance and projects
-  // ALLIANCE SYSTEM: Only allied regions contribute income
-  Object.entries(state.regions).forEach(([regionId, region]) => {
-    const countryData = CLIMATE_DATA[regionId];
-    const aggregateData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
-
-    // Check if region is allied - only allied regions contribute income
-    const allianceData = state.alliance?.[regionId];
-    const isAllied = allianceData?.status === ALLIANCE_STATUS.ALLIED;
-
-    // Climate finance income (GDP × climate%) - only from allied regions
-    if (isAllied) {
-      // Get GDP contribution modifier from alliance
-      const gdpContributionMod = allianceData?.gdpContribution || 1.0;
-
-      if (countryData && countryData.climateFinance) {
-        // Country-level: use direct country data
-        const gdpTrillions = countryData.gdp || 1;
-        const climatePercent = countryData.climateFinance.currentPercent;
-        let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000;
-        // Apply disaster reduction
-        monthlyClimateIncome *= getDisasterIncomeMultiplier(regionId);
-        // Apply alliance GDP contribution modifier
-        monthlyClimateIncome *= gdpContributionMod;
-        totalIncome += monthlyClimateIncome;
-      } else if (aggregateData && aggregateData.countries) {
-        // Continent-level: aggregate climate finance from constituent countries
-        aggregateData.countries.forEach(countryKey => {
-          const countryInfo = CLIMATE_DATA.COUNTRY_DATA?.[countryKey];
-          if (countryInfo && countryInfo.climateFinance) {
-            const gdpTrillions = countryInfo.gdp || 1;
-            const climatePercent = countryInfo.climateFinance.currentPercent;
-            let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000;
-            monthlyClimateIncome *= getDisasterIncomeMultiplier(countryKey);
-            // Apply alliance GDP contribution modifier
-            monthlyClimateIncome *= gdpContributionMod;
-            totalIncome += monthlyClimateIncome;
-          }
-        });
-      }
-    }
-
-    // Project income - only from allied regions
-    if (isAllied) {
-      const disasterMult = getDisasterIncomeMultiplier(regionId);
-      region.projects.forEach((proj) => {
-        const projectType = typeof proj === "string" ? proj : proj.type;
-        const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
-        const project = PROJECT_TYPES[projectType];
-        if (!project) return;
-
-        const incomeBonus = getTechIncomeBonus(projectType) * getEventBonusForProject(projectType, "income");
-        totalIncome += project.income * effectMult * incomeBonus * disasterMult;
-      });
-    }
-  });
-
-  // Fallback minimum income
-  if (totalIncome === 0) {
-    totalIncome = GAME_CONFIG.baseIncome;
-  }
-
-  // Apply global event multiplier (recession, boom, etc.)
-  totalIncome *= getEventIncomeMultiplier();
-
-  // Deduct global research center operating costs
-  const rcMonthlyCost = getResearchCenterMonthlyCost();
-  totalIncome -= rcMonthlyCost;
-
-  return totalIncome;
+  // Use calculateIncomeBreakdown which properly handles all granularity levels
+  // and includes all income sources (climate budget, carbon tax, projects)
+  const breakdown = calculateIncomeBreakdown();
+  return breakdown.netTotal;
 }
 
 /**
@@ -6200,6 +6420,8 @@ function ensureSvgStyles() {
     : `
     .region-group {
       filter: url(#region-outline-filter);
+      pointer-events: auto;
+      cursor: pointer;
     }
   `;
 
@@ -6212,6 +6434,7 @@ function ensureSvgStyles() {
       transition: fill 0.2s ease, transform 0.2s ease, stroke 0.2s ease;
       transform-origin: center;
       outline: none;
+      pointer-events: auto;
     }
     ${hoverSelector} {
       filter: brightness(1.12);
@@ -6375,7 +6598,7 @@ function initializeAllianceState(regions) {
       },
       lastApproached: null, // Month timestamp when last negotiation attempted
       // Terms system (set when joining)
-      acceptedTerms: null, // Will hold { carbonCommitment, renewableTarget, ccsRequirement, carbonTaxLevel }
+      acceptedTerms: null, // Will hold { climateDedicationMin, climateDedicationMax, powerStabilityGoal, powerSupplyGoal, goalDeadlineYears }
       termCompliance: {}, // Track compliance status for each term
       // Enhanced tracking
       grievances: [], // List of current complaints (for UI display)
@@ -6565,6 +6788,7 @@ function getInterestClass(interest) {
 // Enter setup mode for initial game configuration
 function enterSetupMode() {
   isSetupMode = true;
+  console.log('[Map] Entered setup mode, isSetupMode:', isSetupMode);
   selectedRegionId = null;
 
   // Add setup mode class to body for CSS control
@@ -6592,6 +6816,39 @@ function enterSetupMode() {
   // Reset CO2 rate display
   const co2RateEl = document.querySelector('.co2-rate');
   if (co2RateEl) co2RateEl.textContent = '+0.00/mo';
+
+  // Reset income display
+  const incomeDisplayEl = document.getElementById('income-display');
+  if (incomeDisplayEl) {
+    incomeDisplayEl.textContent = '+$0.0 B/mo';
+    incomeDisplayEl.classList.remove('income-negative');
+  }
+
+  // Reset RP display
+  const rpDisplayEl = document.getElementById('rp-display');
+  if (rpDisplayEl) rpDisplayEl.textContent = '0/0';
+
+  // Reset header secondary stats to initial values
+  const allianceProgressEl = document.getElementById('alliance-progress');
+  if (allianceProgressEl) allianceProgressEl.textContent = '0/6';
+
+  const projectsDisplayEl = document.getElementById('projects-display');
+  if (projectsDisplayEl) projectsDisplayEl.textContent = '0';
+
+  const buildingDisplayEl = document.getElementById('building-display');
+  if (buildingDisplayEl) buildingDisplayEl.textContent = '0';
+
+  const captureRateEl = document.getElementById('capture-rate');
+  if (captureRateEl) captureRateEl.textContent = '0';
+
+  const techDisplayEl = document.getElementById('tech-display');
+  if (techDisplayEl) techDisplayEl.textContent = '0/19';
+
+  const riskDisplayEl = document.getElementById('risk-display');
+  if (riskDisplayEl) riskDisplayEl.textContent = '0';
+
+  // Reset Global Status panel to initial values
+  renderGlobalStatsCardSetup();
 }
 
 // Update setup UI when a region is selected
@@ -6610,7 +6867,7 @@ function updateSetupUI() {
   // Get region data
   const regionName = getRegionName(selectedRegionId);
   const climateData = getClimateDataForRegion(selectedRegionId);
-  const region = state.regions[selectedRegionId];
+  const region = state?.regions?.[selectedRegionId];
 
   // Build region info HTML
   let html = `
@@ -6676,18 +6933,30 @@ function updateSetupUI() {
 function confirmSetupAndStartGame() {
   if (!selectedRegionId) return;
 
+  // Save the selected region before initGame() clears it
+  const homeRegion = selectedRegionId;
+
+  // Reinitialize game state with current granularity's region IDs
+  // This ensures state.regions matches availableRegionIds when granularity changed in setup
+  initGame();
+
   // Set this region as home and allied
-  state.homeRegion = selectedRegionId;
-  state.alliance[selectedRegionId] = {
-    ...state.alliance[selectedRegionId],
+  state.homeRegion = homeRegion;
+  state.alliance[homeRegion] = {
+    ...state.alliance[homeRegion],
     status: ALLIANCE_STATUS.ALLIED,
     happiness: 100, // Start at max happiness for home region
     isHomeRegion: true,
     turnsInAlliance: 1,
+    carbonTax: {
+      ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default,
+      yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default,
+    },
   };
 
   // Exit setup mode
   isSetupMode = false;
+  console.log('[Map] Game started, isSetupMode:', isSetupMode);
 
   // Remove setup mode class from body
   document.body.classList.remove("setup-mode");
@@ -6702,7 +6971,7 @@ function confirmSetupAndStartGame() {
   showSidebarTabs();
 
   // Get region name for message
-  const regionName = getRegionName(selectedRegionId);
+  const regionName = getRegionName(homeRegion);
 
   clearNews();
   const difficulty = getDifficulty();
@@ -6778,76 +7047,117 @@ function checkTermCompliance(regionId, alliance) {
   const terms = alliance.acceptedTerms;
   if (!terms) return { compliant: true, details: {} };
 
-  const regionData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+  const region = state.regions?.[regionId];
+  // Get climate data using direct methods (granularity-independent)
+  // Try continent, then major region, then country
+  const climateData = CLIMATE_DATA.getContinentData?.(regionId) ||
+                      CLIMATE_DATA.getMajorRegionData?.(regionId) ||
+                      CLIMATE_DATA.getCountryByIso?.(regionId) ||
+                      CLIMATE_DATA.COUNTRY_DATA?.[regionId];
   const details = {};
 
-  // Check carbon commitment (CO2 reduction as % of GDP annually)
-  if (terms.carbonCommitment !== undefined) {
-    const baselineEmissions = regionData?.co2EmissionsBaseline || 0;
-    const currentEmissions = calculateRegionEmissions(regionId);
-    const baselineGdp = regionData?.gdp || 1;
-    const currentGdp = alliance.gdp || baselineGdp;
+  // Check climate dedication minimum (% of GDP dedicated to climate action)
+  if (terms.climateDedicationMin !== undefined) {
+    const currentDedication = climateData?.climateFinance?.currentPercent || 3;
+    const compliant = currentDedication >= terms.climateDedicationMin;
 
-    // Calculate carbon intensity (CO2/GDP) reduction
-    const baseIntensity = baselineEmissions / baselineGdp;
-    const currentIntensity = currentEmissions / currentGdp;
-    const intensityReduction = baseIntensity > 0 ? ((baseIntensity - currentIntensity) / baseIntensity) * 100 : 0;
+    details.climateDedicationMin = {
+      compliant,
+      required: terms.climateDedicationMin,
+      actual: currentDedication.toFixed(1),
+      reason: `Climate dedication: ${currentDedication.toFixed(1)}% vs ${terms.climateDedicationMin}% minimum`,
+    };
+  }
 
-    // They should be reducing at least the committed % per year
-    // Simplified: check if they're on track based on turns in alliance
+  // Check climate dedication maximum (% of GDP dedicated to climate action)
+  if (terms.climateDedicationMax !== undefined) {
+    const currentDedication = climateData?.climateFinance?.currentPercent || 3;
+    const compliant = currentDedication <= terms.climateDedicationMax;
+
+    details.climateDedicationMax = {
+      compliant,
+      required: terms.climateDedicationMax,
+      actual: currentDedication.toFixed(1),
+      reason: `Climate dedication: ${currentDedication.toFixed(1)}% vs ${terms.climateDedicationMax}% maximum`,
+    };
+  }
+
+  // Check power stability goal progress
+  if (terms.powerStabilityGoal !== undefined) {
+    const currentStability = region?.power?.stability || 70;
     const yearsInAlliance = alliance.turnsInAlliance / 12;
-    const expectedReduction = terms.carbonCommitment * Math.max(1, yearsInAlliance);
-    const compliant = intensityReduction >= expectedReduction * 0.5; // Give some leeway (50% of target)
+    const deadlineYears = terms.goalDeadlineYears || 15;
 
-    details.carbonCommitment = {
+    // Calculate progress ratio (how much time has passed vs deadline)
+    const timeProgress = Math.min(1, yearsInAlliance / deadlineYears);
+
+    // Check if stability meets goal, or if we're on track (linear progress)
+    const startingStability = alliance.startingStability || 70;
+    const neededProgress = terms.powerStabilityGoal - startingStability;
+    const expectedStability = startingStability + (neededProgress * timeProgress);
+
+    // Compliant if at goal OR making good progress (within 10% of expected)
+    const compliant = currentStability >= terms.powerStabilityGoal ||
+                      currentStability >= expectedStability - 10;
+
+    details.powerStabilityGoal = {
       compliant,
-      required: terms.carbonCommitment,
-      actual: intensityReduction.toFixed(1),
-      reason: `Carbon reduction: ${intensityReduction.toFixed(1)}% vs ${terms.carbonCommitment}% target`,
+      required: terms.powerStabilityGoal,
+      actual: currentStability.toFixed(0),
+      reason: `Grid stability: ${currentStability.toFixed(0)}% vs ${terms.powerStabilityGoal}% goal`,
     };
   }
 
-  // Check renewable target (% of power from renewables)
-  if (terms.renewableTarget !== undefined) {
-    const regionPower = state.powerByRegion?.[regionId] || { renewable: 0, total: 0 };
-    const renewablePercent = regionPower.total > 0 ? (regionPower.renewable / regionPower.total) * 100 : 0;
+  // Check power supply goal progress (supply/demand ratio)
+  if (terms.powerSupplyGoal !== undefined) {
+    const supply = region?.power?.supply || 100;
+    const demand = region?.power?.demand || 100;
+    const supplyRatio = demand > 0 ? (supply / demand) * 100 : 100;
 
-    // Give partial credit based on years in alliance (10-year target)
     const yearsInAlliance = alliance.turnsInAlliance / 12;
-    const progressTarget = terms.renewableTarget * Math.min(1, yearsInAlliance / 10);
-    const compliant = renewablePercent >= progressTarget * 0.7; // 70% leeway for gradual progress
+    const deadlineYears = terms.goalDeadlineYears || 15;
+    const timeProgress = Math.min(1, yearsInAlliance / deadlineYears);
 
-    details.renewableTarget = {
+    // Check if supply ratio meets goal, or if we're on track
+    const startingRatio = alliance.startingSupplyRatio || 85;
+    const neededProgress = terms.powerSupplyGoal - startingRatio;
+    const expectedRatio = startingRatio + (neededProgress * timeProgress);
+
+    const compliant = supplyRatio >= terms.powerSupplyGoal ||
+                      supplyRatio >= expectedRatio - 5;
+
+    details.powerSupplyGoal = {
       compliant,
-      required: terms.renewableTarget,
-      actual: renewablePercent.toFixed(1),
-      reason: `Renewable energy: ${renewablePercent.toFixed(1)}% vs ${terms.renewableTarget}% target`,
+      required: terms.powerSupplyGoal,
+      actual: supplyRatio.toFixed(0),
+      reason: `Power supply: ${supplyRatio.toFixed(0)}% vs ${terms.powerSupplyGoal}% goal`,
     };
   }
 
-  // Check CCS requirement (minimum CCS/DAC projects)
-  if (terms.ccsRequirement !== undefined && terms.ccsRequirement > 0) {
-    const ccsProjects = countProjectsInRegion(regionId, ["ccs", "dac", "beccs"]);
-    const compliant = ccsProjects >= terms.ccsRequirement;
+  // Check deadline - if past deadline, goals MUST be met
+  if (terms.goalDeadlineYears !== undefined) {
+    const yearsInAlliance = alliance.turnsInAlliance / 12;
+    const deadlineReached = yearsInAlliance >= terms.goalDeadlineYears;
 
-    details.ccsRequirement = {
-      compliant,
-      required: terms.ccsRequirement,
-      actual: ccsProjects,
-      reason: `CCS/DAC projects: ${ccsProjects} vs ${terms.ccsRequirement} required`,
-    };
-  }
+    if (deadlineReached) {
+      // Override compliance - must meet actual goals
+      if (details.powerStabilityGoal) {
+        const currentStability = region?.power?.stability || 70;
+        details.powerStabilityGoal.compliant = currentStability >= terms.powerStabilityGoal;
+      }
+      if (details.powerSupplyGoal) {
+        const supply = region?.power?.supply || 100;
+        const demand = region?.power?.demand || 100;
+        const supplyRatio = demand > 0 ? (supply / demand) * 100 : 100;
+        details.powerSupplyGoal.compliant = supplyRatio >= terms.powerSupplyGoal;
+      }
+    }
 
-  // Check carbon tax level (minimum rate)
-  if (terms.carbonTaxLevel !== undefined) {
-    const currentTax = alliance.carbonTax || 0;
-    const compliant = currentTax >= terms.carbonTaxLevel;
-
-    details.carbonTaxLevel = {
-      compliant,
-      required: terms.carbonTaxLevel,
-      actual: currentTax,
-      reason: `Carbon tax: ${currentTax}% vs ${terms.carbonTaxLevel}% minimum`,
+    details.goalDeadline = {
+      compliant: !deadlineReached || (details.powerStabilityGoal?.compliant !== false && details.powerSupplyGoal?.compliant !== false),
+      required: terms.goalDeadlineYears,
+      actual: yearsInAlliance.toFixed(1),
+      reason: deadlineReached ? `Deadline reached (${terms.goalDeadlineYears} years)` : `${(terms.goalDeadlineYears - yearsInAlliance).toFixed(1)} years remaining`,
     };
   }
 
@@ -7064,6 +7374,419 @@ function updateAllianceHappiness() {
   regionsToLeave.forEach(regionId => {
     handleRegionLeaving(regionId);
   });
+}
+
+/**
+ * Calculate happiness factors breakdown for a region (for display purposes)
+ * Returns an object with all factors affecting happiness
+ */
+function calculateHappinessFactors(regionId) {
+  const alliance = state.alliance?.[regionId];
+  if (!alliance || alliance.status !== ALLIANCE_STATUS.ALLIED) return null;
+
+  const factors = [];
+  const alliedCount = getAlliedRegionsCount();
+  const allianceAvgImprovement = calculateAllianceAvgIntensityReduction();
+
+  // High carbon tax
+  const taxRate = alliance.carbonTax?.ratePerTon || alliance.acceptedTerms?.carbonTaxRate || 0;
+  if (taxRate > 30) {
+    const penalty = -((taxRate - 30) * 0.2);
+    factors.push({ label: "High carbon tax", value: penalty, icon: "💸" });
+  }
+
+  // Spending ratio
+  const spendRatio = alliance.spendRatio || 0.5;
+  if (spendRatio < 0.3) {
+    factors.push({ label: "Low reinvestment in region", value: -5, icon: "📤" });
+  }
+
+  // Unmet demands
+  if (alliance.demands && alliance.demands.length > 0) {
+    const unmetDemands = alliance.demands.filter(d => {
+      const demandType = DEMAND_TYPES[d.type];
+      return demandType && !demandType.check(alliance, d.value);
+    });
+    if (unmetDemands.length > 0) {
+      factors.push({ label: `Unmet demands (${unmetDemands.length})`, value: -(unmetDemands.length * 3), icon: "📋" });
+    }
+  }
+
+  // Term compliance
+  if (alliance.acceptedTerms && alliance.termCompliance) {
+    const failedTerms = Object.values(alliance.termCompliance).filter(t => !t.compliant).length;
+    if (failedTerms > 0) {
+      factors.push({ label: `Failed agreement terms (${failedTerms})`, value: -(failedTerms * 3), icon: "⚠️" });
+    }
+  }
+
+  // Carbon intensity performance
+  if (allianceAvgImprovement > 0 && alliedCount > 1) {
+    const regionImprovement = calculateCarbonIntensityImprovement(regionId);
+    const performanceRatio = regionImprovement / allianceAvgImprovement;
+
+    if (performanceRatio < 0.5) {
+      factors.push({ label: "Far below alliance emissions avg", value: -8, icon: "📉" });
+    } else if (performanceRatio < 0.8) {
+      factors.push({ label: "Below alliance emissions avg", value: -3, icon: "📉" });
+    } else if (performanceRatio > 1.2) {
+      factors.push({ label: "Above alliance emissions avg", value: +3, icon: "📈" });
+    }
+  }
+
+  // Loyalty bonus
+  if (alliance.turnsInAlliance > 12) {
+    factors.push({ label: "Long-term member loyalty", value: +0.5, icon: "🏆" });
+  }
+
+  // Safety in numbers
+  if (alliedCount > 3) {
+    factors.push({ label: "Strong alliance (4+ members)", value: +2, icon: "🤝" });
+  }
+
+  // Home region bonus
+  if (alliance.isHomeRegion) {
+    factors.push({ label: "Home region", value: +1, icon: "🏠" });
+  }
+
+  // Power grid impact
+  const powerHappiness = calculatePowerHappinessImpact(regionId);
+  if (powerHappiness !== 0) {
+    const region = state.regions?.[regionId];
+    const stability = region?.power?.stability || 100;
+    const price = region?.power?.pricePerKwh || POWER_CONFIG.basePrice;
+
+    if (stability >= POWER_CONFIG.stabilityThresholds.excellent) {
+      factors.push({ label: "Excellent grid stability", value: +2, icon: "⚡" });
+    } else if (stability < POWER_CONFIG.stabilityThresholds.critical) {
+      factors.push({ label: "Critical grid instability", value: -10, icon: "⚡" });
+    } else if (stability < POWER_CONFIG.stabilityThresholds.warning) {
+      factors.push({ label: "Poor grid stability", value: -5, icon: "⚡" });
+    }
+
+    if (price > POWER_CONFIG.priceThresholds.expensive) {
+      factors.push({ label: "High electricity prices", value: Math.round(-((price - POWER_CONFIG.priceThresholds.expensive) / 0.05) * POWER_CONFIG.happinessHighPricePenalty), icon: "💡" });
+    }
+  }
+
+  // Global temperature penalty
+  const tempPenalty = Math.max(0, (state.temperature - 1.5) * 5);
+  if (tempPenalty > 0) {
+    factors.push({ label: `Global warming (+${state.temperature.toFixed(1)}°C)`, value: -tempPenalty, icon: "🌡️" });
+  }
+
+  // Generate tips based on current state
+  const tips = [];
+  const region = state.regions?.[regionId];
+
+  // Tip: Build projects in the region
+  tips.push({
+    icon: "🏗️",
+    label: "Build projects in this region",
+    value: "+5 to +8",
+    description: "Economic projects give +8, others give +5 (nuclear: +0)"
+  });
+
+  // Tip: If spending ratio is low
+  if (spendRatio < 0.5) {
+    tips.push({
+      icon: "💰",
+      label: "Spend more of their contributions here",
+      value: "+5",
+      description: "Currently only " + Math.round(spendRatio * 100) + "% spent back"
+    });
+  }
+
+  // Tip: If grid stability is poor
+  if (region?.power?.stability < 70) {
+    tips.push({
+      icon: "🔋",
+      label: "Build storage or baseload power",
+      value: "+2 to +10",
+      description: "Improves grid stability (currently " + Math.round(region.power.stability) + "%)"
+    });
+  }
+
+  // Tip: If there are unmet demands
+  if (alliance.demands && alliance.demands.length > 0) {
+    const unmetDemands = alliance.demands.filter(d => {
+      const demandType = DEMAND_TYPES[d.type];
+      return demandType && !demandType.check(alliance, d.value);
+    });
+    if (unmetDemands.length > 0) {
+      tips.push({
+        icon: "📋",
+        label: "Meet their demands",
+        value: "+" + (unmetDemands.length * 3),
+        description: unmetDemands.length + " unmet demand(s)"
+      });
+    }
+  }
+
+  // Tip: If failed terms
+  if (alliance.termCompliance) {
+    const failedTerms = Object.entries(alliance.termCompliance).filter(([k, t]) => !t.compliant);
+    if (failedTerms.length > 0) {
+      failedTerms.forEach(([key, detail]) => {
+        if (key === 'powerStability') {
+          tips.push({
+            icon: "⚡",
+            label: "Improve grid stability to " + alliance.acceptedTerms?.powerStabilityGoal + "%",
+            value: "+3",
+            description: "Build storage or nuclear plants"
+          });
+        } else if (key === 'powerSupply') {
+          tips.push({
+            icon: "🔌",
+            label: "Increase power supply to " + alliance.acceptedTerms?.powerSupplyGoal + "%",
+            value: "+3",
+            description: "Build more power generation"
+          });
+        }
+      });
+    }
+  }
+
+  // Tip: Grow the alliance
+  if (alliedCount <= 3) {
+    tips.push({
+      icon: "🤝",
+      label: "Recruit more allies (need 4+)",
+      value: "+2",
+      description: "Currently " + alliedCount + " allies"
+    });
+  }
+
+  // Tip: Reduce global temperature
+  if (state.temperature > 1.5) {
+    tips.push({
+      icon: "🌡️",
+      label: "Reduce global temperature below 1.5°C",
+      value: "+" + Math.round((state.temperature - 1.5) * 5),
+      description: "Build carbon capture & renewables"
+    });
+  }
+
+  return {
+    factors,
+    tips,
+    currentHappiness: alliance.happiness,
+    totalChange: factors.reduce((sum, f) => sum + f.value, 0),
+  };
+}
+
+/**
+ * Update carbon tax rate for a region
+ */
+function updateCarbonTaxRate(regionId, newRate) {
+  const alliance = state.alliance?.[regionId];
+  if (!alliance || alliance.status !== ALLIANCE_STATUS.ALLIED) return;
+
+  newRate = parseFloat(newRate);
+  if (!alliance.carbonTax) {
+    alliance.carbonTax = {
+      ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default,
+      yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default,
+    };
+  }
+  alliance.carbonTax.ratePerTon = newRate;
+
+  // Update display
+  const rateDisplay = document.getElementById(`carbon-tax-rate-display-${regionId}`);
+  if (rateDisplay) {
+    // Check if there's a carbon tax limit demand
+    const taxLimitDemand = alliance.demands?.find(d => d.type === 'carbonTaxLimit');
+    const taxLimitWarning = taxLimitDemand && newRate > taxLimitDemand.value;
+    rateDisplay.textContent = `$${newRate}/ton`;
+    rateDisplay.style.color = taxLimitWarning ? 'var(--warning-color)' : 'var(--text-primary)';
+  }
+
+  // Re-render the region panel to update revenue display
+  renderRegionPanel();
+}
+
+/**
+ * Update carbon tax yearly growth rate for a region
+ */
+function updateCarbonTaxGrowth(regionId, newGrowth) {
+  const alliance = state.alliance?.[regionId];
+  if (!alliance || alliance.status !== ALLIANCE_STATUS.ALLIED) return;
+
+  newGrowth = parseFloat(newGrowth);
+  if (!alliance.carbonTax) {
+    alliance.carbonTax = {
+      ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default,
+      yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default,
+    };
+  }
+  alliance.carbonTax.yearlyGrowthRate = newGrowth;
+
+  // Update display
+  const growthDisplay = document.getElementById(`carbon-tax-growth-display-${regionId}`);
+  if (growthDisplay) {
+    growthDisplay.textContent = `+${newGrowth}%/yr`;
+  }
+}
+
+/**
+ * Show popup with happiness factors breakdown
+ */
+function showHappinessFactorsPopup(regionId) {
+  const breakdown = calculateHappinessFactors(regionId);
+  if (!breakdown) return;
+
+  const regionName = getRegionName(regionId);
+
+  let factorsHtml = breakdown.factors.length > 0
+    ? breakdown.factors.map(f => {
+        const valueClass = f.value >= 0 ? 'positive' : 'negative';
+        const sign = f.value >= 0 ? '+' : '';
+        return `<div class="factor-row">
+          <span class="factor-icon">${f.icon}</span>
+          <span class="factor-label">${f.label}</span>
+          <span class="factor-value ${valueClass}">${sign}${f.value.toFixed(1)}/mo</span>
+        </div>`;
+      }).join('')
+    : '<div class="factor-row"><span class="factor-label">No active modifiers</span></div>';
+
+  const totalClass = breakdown.totalChange >= 0 ? 'positive' : 'negative';
+  const totalSign = breakdown.totalChange >= 0 ? '+' : '';
+
+  // Build tips HTML
+  let tipsHtml = '';
+  if (breakdown.tips && breakdown.tips.length > 0) {
+    tipsHtml = `
+      <div class="factors-tips">
+        <div class="tips-header">💡 How to Increase Happiness</div>
+        <div class="tips-list">
+          ${breakdown.tips.map(tip => `
+            <div class="tip-row">
+              <span class="tip-icon">${tip.icon}</span>
+              <div class="tip-content">
+                <span class="tip-label">${tip.label}</span>
+                <span class="tip-desc">${tip.description}</span>
+              </div>
+              <span class="tip-value">${tip.value}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+  }
+
+  const content = `
+    <div class="factors-breakdown">
+      <div class="factors-header">
+        <span>Current Happiness: <strong>${Math.round(breakdown.currentHappiness)}%</strong></span>
+      </div>
+      <div class="factors-section-label">Current Factors</div>
+      <div class="factors-list">
+        ${factorsHtml}
+      </div>
+      <div class="factors-total">
+        <span>Monthly Change:</span>
+        <span class="factor-value ${totalClass}">${totalSign}${breakdown.totalChange.toFixed(1)}/mo</span>
+      </div>
+      ${tipsHtml}
+      <div class="factors-note">
+        Happiness affects alliance stability. Below 20% risks departure.
+      </div>
+    </div>
+  `;
+
+  showGenericFactorsPopup("😊", `${regionName} Happiness Factors`, content);
+}
+
+/**
+ * Show popup with interest factors breakdown
+ */
+function showInterestFactorsPopup(regionId) {
+  const alliance = state.alliance?.[regionId];
+  if (!alliance || alliance.status === ALLIANCE_STATUS.ALLIED) return;
+
+  const regionName = getRegionName(regionId);
+  const factors = alliance.interestFactors || {};
+  const factorsList = [];
+
+  if (factors.globalTemp > 0) {
+    factorsList.push({ icon: "🌡️", label: "Climate urgency", value: factors.globalTemp, description: "Higher global temps increase concern" });
+  }
+  if (factors.allianceSuccess > 0) {
+    factorsList.push({ icon: "🤝", label: "Alliance momentum", value: factors.allianceSuccess, description: "More allies = bandwagon effect" });
+  }
+  if (factors.neighborInfluence > 0) {
+    factorsList.push({ icon: "🏘️", label: "Allied neighbors", value: factors.neighborInfluence, description: "Nearby allies encourage joining" });
+  }
+  if (factors.economicBenefit > 0) {
+    factorsList.push({ icon: "📈", label: "Alliance succeeding", value: factors.economicBenefit, description: "Alliance is reducing CO2" });
+  } else if (factors.economicBenefit < 0) {
+    factorsList.push({ icon: "📉", label: "Alliance struggling", value: factors.economicBenefit, description: "Alliance not reducing CO2" });
+  }
+  if (factors.disasterAwareness > 0) {
+    factorsList.push({ icon: "🌪️", label: "Disaster awareness", value: factors.disasterAwareness, description: "Recent climate disasters in region" });
+  }
+
+  let factorsHtml = factorsList.length > 0
+    ? factorsList.map(f => {
+        const valueClass = f.value >= 0 ? 'positive' : 'negative';
+        const sign = f.value >= 0 ? '+' : '';
+        return `<div class="factor-row">
+          <span class="factor-icon">${f.icon}</span>
+          <span class="factor-label">${f.label}</span>
+          <span class="factor-value ${valueClass}">${sign}${f.value}</span>
+        </div>`;
+      }).join('')
+    : '<div class="factor-row"><span class="factor-label">No active factors</span></div>';
+
+  const content = `
+    <div class="factors-breakdown">
+      <div class="factors-header">
+        <span>Current Interest: <strong>${Math.round(alliance.interest || 50)}%</strong></span>
+      </div>
+      <div class="factors-list">
+        ${factorsHtml}
+      </div>
+      <div class="factors-note">
+        Higher interest = better negotiation odds. At 80%+, they may request to join!
+      </div>
+    </div>
+  `;
+
+  showGenericFactorsPopup("🎯", `${regionName} Interest Factors`, content);
+}
+
+/**
+ * Generic popup for showing factors
+ */
+function showGenericFactorsPopup(icon, title, content) {
+  // Remove any existing popup
+  const existing = document.getElementById('factors-popup');
+  if (existing) existing.remove();
+
+  const popup = document.createElement('div');
+  popup.id = 'factors-popup';
+  popup.className = 'popup-container';
+  popup.innerHTML = `
+    <div class="popup-overlay" onclick="closeFactorsPopup()"></div>
+    <div class="factors-popup-dialog">
+      <div class="popup-header">
+        <span class="popup-icon">${icon}</span>
+        <h3 class="popup-title">${title}</h3>
+        <button class="popup-close" onclick="closeFactorsPopup()">&times;</button>
+      </div>
+      <div class="popup-body">
+        ${content}
+      </div>
+      <button class="popup-dismiss" onclick="closeFactorsPopup()">Close</button>
+    </div>
+  `;
+
+  document.body.appendChild(popup);
+}
+
+function closeFactorsPopup() {
+  const popup = document.getElementById('factors-popup');
+  if (popup) popup.remove();
 }
 
 // Handle a region leaving the alliance
@@ -7442,10 +8165,10 @@ function showNegotiationPopup(regionId, demands) {
   const alliance = state.alliance?.[regionId];
   const interest = alliance?.interest || 50;
 
-  // Initialize terms with defaults
+  // Initialize terms with minimum values to maximize acceptance probability
   state.pendingNegotiation.terms = {};
   Object.entries(NEGOTIABLE_TERMS).forEach(([key, config]) => {
-    state.pendingNegotiation.terms[key] = config.default;
+    state.pendingNegotiation.terms[key] = config.min;
   });
 
   const overlay = document.createElement("div");
@@ -7458,8 +8181,10 @@ function showNegotiationPopup(regionId, demands) {
     isolationist: "They are skeptical of international cooperation.",
   };
 
-  // Generate terms sliders HTML
-  const termsHTML = Object.entries(NEGOTIABLE_TERMS).map(([key, config]) => `
+  // Generate terms sliders HTML - start at min values to maximize acceptance
+  const termsHTML = Object.entries(NEGOTIABLE_TERMS).map(([key, config]) => {
+    const displayValue = config.step % 1 === 0 ? config.min : config.min.toFixed(1);
+    return `
     <div class="term-slider-row">
       <div class="term-info">
         <span class="term-label">${config.label}</span>
@@ -7472,13 +8197,14 @@ function showNegotiationPopup(regionId, demands) {
           min="${config.min}"
           max="${config.max}"
           step="${config.step}"
-          value="${config.default}"
+          value="${config.min}"
           oninput="updateTermValue('${key}', this.value)"
         />
-        <span id="term-value-${key}" class="term-value">${config.default}${config.unit}</span>
+        <span id="term-value-${key}" class="term-value">${displayValue}${config.unit}</span>
       </div>
     </div>
-  `).join("");
+  `;
+  }).join("");
 
   overlay.innerHTML = `
     <div class="popup negotiation-popup">
@@ -7496,6 +8222,27 @@ function showNegotiationPopup(regionId, demands) {
           <h4>Your Alliance Terms:</h4>
           <p style="font-size: 0.85rem; color: var(--muted); margin-bottom: 12px;">Set the requirements for joining. Higher demands reduce success chance.</p>
           ${termsHTML}
+        </div>
+
+        <div class="income-preview-section">
+          <h4>Projected Monthly Income</h4>
+          <div class="income-preview-grid">
+            <div class="income-preview-row">
+              <span class="income-label">Climate Budget</span>
+              <span class="income-detail" id="income-climate-detail">GDP × Dedication</span>
+              <span class="income-value" id="income-climate-value">$0B - $0B</span>
+            </div>
+            <div class="income-preview-row">
+              <span class="income-label">Carbon Tax Revenue</span>
+              <span class="income-detail" id="income-tax-detail">Emissions × Rate</span>
+              <span class="income-value" id="income-tax-value">$0B</span>
+            </div>
+            <div class="income-preview-row income-total">
+              <span class="income-label">Total Projected</span>
+              <span class="income-detail"></span>
+              <span class="income-value" id="income-total-value">$0B - $0B/mo</span>
+            </div>
+          </div>
         </div>
 
         <div class="demands-section">
@@ -7532,6 +8279,9 @@ function showNegotiationPopup(regionId, demands) {
 
   // Calculate and display the actual probability (not the hardcoded 90%)
   updateNegotiationProbability();
+
+  // Calculate and display income preview
+  updateIncomePreview();
 }
 
 // Update term value when slider changes
@@ -7541,23 +8291,48 @@ function updateTermValue(termKey, value) {
   const config = NEGOTIABLE_TERMS[termKey];
   if (!config) return;
 
-  state.pendingNegotiation.terms[termKey] = parseFloat(value);
+  // Round to step to avoid floating point issues during slider drag
+  const numValue = parseFloat(value);
+  const snappedValue = Math.round(numValue / config.step) * config.step;
+  state.pendingNegotiation.terms[termKey] = snappedValue;
 
-  // Update display
+  // Update display with snapped value
   const valueEl = document.getElementById(`term-value-${termKey}`);
   if (valueEl) {
-    valueEl.textContent = `${value}${config.unit}`;
+    // Format display: show decimals only if step has decimals
+    const displayValue = config.step % 1 === 0 ? snappedValue : snappedValue.toFixed(1);
+    valueEl.textContent = `${displayValue}${config.unit}`;
 
-    // Highlight if above default
-    if (parseFloat(value) > config.default) {
-      valueEl.classList.add("above-default");
+    // Highlight based on term type and whether it helps or hurts probability
+    valueEl.classList.remove("above-default", "beneficial", "detrimental");
+
+    if (config.higherIsBetter) {
+      // Power goals: higher = better for region
+      if (snappedValue > config.default) {
+        valueEl.classList.add("beneficial");
+      } else if (snappedValue < config.default) {
+        valueEl.classList.add("detrimental");
+      }
+    } else if (config.shorterIsBetter) {
+      // Deadline: shorter = better for region
+      if (snappedValue < config.default) {
+        valueEl.classList.add("beneficial");
+      } else if (snappedValue > config.default) {
+        valueEl.classList.add("detrimental");
+      }
     } else {
-      valueEl.classList.remove("above-default");
+      // Climate dedication: higher demands = worse for success rate
+      if (snappedValue > config.default) {
+        valueEl.classList.add("above-default");
+      }
     }
   }
 
   // Recalculate probability
   updateNegotiationProbability();
+
+  // Update income preview
+  updateIncomePreview();
 }
 
 // Toggle a demand's acceptance
@@ -7606,19 +8381,39 @@ function updateNegotiationProbability() {
   const difficultyPenalty = (joinDifficulty - 5) * 2; // -8 to +8
   effectiveSupport -= difficultyPenalty;
 
-  // Each rejected demand reduces effective support
-  const rejectedCount = state.pendingNegotiation.demands.filter(d => !d.accepted).length;
-  effectiveSupport -= rejectedCount * 5;
+  // Demands: accepting gives bonus, rejecting gives penalty
+  const demands = state.pendingNegotiation.demands;
+  const acceptedCount = demands.filter(d => d.accepted).length;
+  const rejectedCount = demands.filter(d => !d.accepted).length;
+  effectiveSupport += acceptedCount * 3;  // Bonus for accepting their demands
+  effectiveSupport -= rejectedCount * 5;  // Penalty for rejecting
 
-  // Terms bonus (if terms are set above defaults, it increases support)
+  // Terms: impact depends on term type
   const terms = state.pendingNegotiation.terms;
   if (terms) {
     Object.entries(terms).forEach(([termKey, value]) => {
       const termConfig = NEGOTIABLE_TERMS[termKey];
-      if (termConfig && value > termConfig.default) {
-        const stepsAboveDefault = (value - termConfig.default) / termConfig.step;
-        // Positive terms increase effective support (impactPerStep is negative, so we subtract)
-        effectiveSupport -= termConfig.impactPerStep * stepsAboveDefault;
+      if (!termConfig) return;
+
+      const stepsFromDefault = Math.round((value - termConfig.default) / termConfig.step);
+
+      if (termConfig.higherIsBetter) {
+        // Power goals: higher values = more attractive (we're promising to help more)
+        // Above default = bonus, below default = penalty
+        effectiveSupport += termConfig.impactPerStep * stepsFromDefault;
+      } else if (termConfig.shorterIsBetter) {
+        // Deadline: shorter = more attractive (faster help)
+        // Below default = bonus, above default = penalty
+        effectiveSupport -= termConfig.impactPerStep * stepsFromDefault;
+      } else {
+        // Climate dedication terms: higher demands = less attractive
+        // Below default = bonus (lenient), above default = penalty (strict)
+        if (value < termConfig.default) {
+          const stepsBelowDefault = Math.abs(stepsFromDefault);
+          effectiveSupport += Math.abs(termConfig.impactPerStep) * 0.5 * stepsBelowDefault;
+        } else if (value > termConfig.default) {
+          effectiveSupport += termConfig.impactPerStep * stepsFromDefault;
+        }
       }
     });
   }
@@ -7665,6 +8460,63 @@ function updateNegotiationProbability() {
   state.pendingNegotiation.effectiveSupport = effectiveSupport;
 
   return probability;
+}
+
+// Update income preview in negotiation popup
+function updateIncomePreview() {
+  if (!state.pendingNegotiation) return;
+
+  const regionId = state.pendingNegotiation.regionId;
+  const climateData = getClimateDataForRegion(regionId);
+  const terms = state.pendingNegotiation.terms;
+  if (!climateData || !terms) return;
+
+  // Get region's economic data (same source as region info panel)
+  const gdpTrillions = climateData.gdp || 0;
+  // Handle both emissions formats (direct number or object with .total)
+  const emissionsGtYear = climateData.emissions?.total || climateData.emissions || 0;
+
+  // Get current term values
+  const dedicationMin = terms.climateDedicationMin || NEGOTIABLE_TERMS.climateDedicationMin.min;
+  const dedicationMax = terms.climateDedicationMax || NEGOTIABLE_TERMS.climateDedicationMax.min;
+  const carbonTaxRate = terms.carbonTaxRate || NEGOTIABLE_TERMS.carbonTaxRate.default;
+
+  // Calculate climate budget income range (in billions/month)
+  // Formula: (GDP_trillions × dedication%) / 12 × 1000 = billions/month
+  const climateBudgetMin = (gdpTrillions * dedicationMin / 100) / 12 * 1000;
+  const climateBudgetMax = (gdpTrillions * dedicationMax / 100) / 12 * 1000;
+
+  // Calculate carbon tax revenue (in billions/month)
+  // Formula: (emissions_Gt/year / 12) × rate_$/ton = billions/month
+  // 1 GtCO2 = 1 billion tons, so emissions × rate = billions
+  const carbonTaxRevenue = (emissionsGtYear / 12) * carbonTaxRate;
+
+  // Calculate totals
+  const totalMin = climateBudgetMin + carbonTaxRevenue;
+  const totalMax = climateBudgetMax + carbonTaxRevenue;
+
+  // Update UI elements
+  const climateDetailEl = document.getElementById("income-climate-detail");
+  const climateValueEl = document.getElementById("income-climate-value");
+  const taxDetailEl = document.getElementById("income-tax-detail");
+  const taxValueEl = document.getElementById("income-tax-value");
+  const totalValueEl = document.getElementById("income-total-value");
+
+  if (climateDetailEl) {
+    climateDetailEl.textContent = `$${gdpTrillions.toFixed(1)}T × ${dedicationMin}-${dedicationMax}%`;
+  }
+  if (climateValueEl) {
+    climateValueEl.textContent = `$${climateBudgetMin.toFixed(1)}B - $${climateBudgetMax.toFixed(1)}B`;
+  }
+  if (taxDetailEl) {
+    taxDetailEl.textContent = `${emissionsGtYear.toFixed(1)} Gt × $${carbonTaxRate}/ton`;
+  }
+  if (taxValueEl) {
+    taxValueEl.textContent = `$${carbonTaxRevenue.toFixed(1)}B`;
+  }
+  if (totalValueEl) {
+    totalValueEl.textContent = `$${totalMin.toFixed(1)}B - $${totalMax.toFixed(1)}B/mo`;
+  }
 }
 
 // Cancel the negotiation
@@ -7727,6 +8579,13 @@ function submitNegotiationOffer() {
     // Store the negotiated terms
     const acceptedTerms = state.pendingNegotiation.terms ? { ...state.pendingNegotiation.terms } : null;
 
+    // Get starting values for power goals tracking
+    const region = state.regions?.[regionId];
+    const startingStability = region?.power?.stability || 70;
+    const supply = region?.power?.supply || 100;
+    const demand = region?.power?.demand || 100;
+    const startingSupplyRatio = demand > 0 ? (supply / demand) * 100 : 85;
+
     state.alliance[regionId] = {
       ...state.alliance[regionId],
       status: ALLIANCE_STATUS.ALLIED,
@@ -7735,7 +8594,58 @@ function submitNegotiationOffer() {
       turnsInAlliance: 1,
       acceptedTerms: acceptedTerms, // Store the terms they agreed to
       termCompliance: {}, // Track compliance status for each term
+      startingStability: startingStability, // For power stability goal tracking
+      startingSupplyRatio: startingSupplyRatio, // For power supply goal tracking
+      carbonTax: {
+        ratePerTon: acceptedTerms?.carbonTaxRate || NEGOTIABLE_TERMS.carbonTaxRate.default,
+        yearlyGrowthRate: acceptedTerms?.carbonTaxGrowth || NEGOTIABLE_TERMS.carbonTaxGrowth.default,
+      },
     };
+
+    // Apply negotiated climate dedication to the region
+    // Handle three cases: continents, major regions, and single countries
+    if (acceptedTerms?.climateDedicationMin) {
+      const continent = CLIMATE_DATA.CONTINENTS?.[regionId];
+      const majorRegion = CLIMATE_DATA.MAJOR_REGIONS?.[regionId];
+
+      if (continent && continent.majorRegions) {
+        // Continent: get all ISO codes from all major regions, then update via getCountryByIso
+        continent.majorRegions.forEach(mrId => {
+          const mr = CLIMATE_DATA.MAJOR_REGIONS?.[mrId];
+          if (mr && mr.countries) {
+            mr.countries.forEach(isoCode => {
+              const countryData = CLIMATE_DATA.getCountryByIso?.(isoCode);
+              if (countryData?.climateFinance) {
+                countryData.climateFinance.currentPercent = acceptedTerms.climateDedicationMin;
+                if (acceptedTerms?.climateDedicationMax) {
+                  countryData.climateFinance.maxPercent = acceptedTerms.climateDedicationMax;
+                }
+              }
+            });
+          }
+        });
+      } else if (majorRegion && majorRegion.countries) {
+        // Major region: update all countries in this region
+        majorRegion.countries.forEach(isoCode => {
+          const countryData = CLIMATE_DATA.getCountryByIso?.(isoCode);
+          if (countryData?.climateFinance) {
+            countryData.climateFinance.currentPercent = acceptedTerms.climateDedicationMin;
+            if (acceptedTerms?.climateDedicationMax) {
+              countryData.climateFinance.maxPercent = acceptedTerms.climateDedicationMax;
+            }
+          }
+        });
+      } else {
+        // Single country: try direct lookup
+        const countryData = CLIMATE_DATA.getCountryByIso?.(regionId) || CLIMATE_DATA.COUNTRY_DATA?.[regionId];
+        if (countryData?.climateFinance) {
+          countryData.climateFinance.currentPercent = acceptedTerms.climateDedicationMin;
+          if (acceptedTerms?.climateDedicationMax) {
+            countryData.climateFinance.maxPercent = acceptedTerms.climateDedicationMax;
+          }
+        }
+      }
+    }
 
     pushMessage(`${regionName} has joined the Climate Alliance!`, "good");
 
@@ -7836,7 +8746,7 @@ function getAllianceStatusHTML(regionId) {
   };
 
   let html = `
-    <div class="alliance-status-section" style="margin-bottom: 12px;">
+    <div class="alliance-status-section" style="margin-bottom: 12px; position: relative;">
       <span class="alliance-status-badge ${alliance.status}">
         ${statusLabels[alliance.status] || alliance.status}
       </span>
@@ -7845,14 +8755,123 @@ function getAllianceStatusHTML(regionId) {
 
   // Show happiness meter for allied regions
   if (alliance.status === ALLIANCE_STATUS.ALLIED) {
+    // Show accepted terms and compliance status FIRST (at top) if any
+    if (alliance.acceptedTerms) {
+      const compliance = alliance.termCompliance || {};
+      const yearsInAlliance = (alliance.turnsInAlliance || 0) / 12;
+      const deadlineYears = alliance.acceptedTerms.goalDeadlineYears || 15;
+      const yearsRemaining = Math.max(0, deadlineYears - yearsInAlliance);
+
+      const helpTooltip = `Alliance Term Goals:
+• Climate Dedication: The region's GDP % for climate action must stay within the agreed range
+• Power Stability: Build baseload plants (nuclear) and storage to stabilize the grid
+• Power Supply: Build more power generation to meet demand (solar, wind, nuclear)
+• Deadline: You have ${yearsRemaining.toFixed(1)} years to achieve the power goals
+
+Tip: Check Project Effectiveness ratings to see which projects work best in each region!`;
+
+      html += `<div style="margin-bottom: 12px; font-size: 0.8rem; color: var(--text-secondary); position: relative; background: var(--bg-tertiary); padding: 10px; border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong style="color: var(--text-primary);">Alliance Commitments</strong>
+          <span class="terms-help-icon" title="${helpTooltip.replace(/"/g, '&quot;')}" style="cursor: help; color: var(--accent-color); font-size: 0.9rem; width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--accent-color); border-radius: 50%;">?</span>
+        </div>
+        <ul style="margin: 0; padding: 0 0 0 16px;">
+          ${Object.entries(alliance.acceptedTerms).map(([key, value]) => {
+            const term = NEGOTIABLE_TERMS[key];
+            if (!term) return '';
+            const complianceStatus = compliance[key];
+            const isCompliant = complianceStatus?.compliant ?? true;
+            const actual = complianceStatus?.actual ?? '?';
+            const color = isCompliant ? 'var(--success-color)' : 'var(--warning-color)';
+            const icon = isCompliant ? '✓' : '✗';
+            return `<li style="color: ${color}; margin: 2px 0;">
+              ${term.label}: ${actual}${term.unit} / ${value}${term.unit} ${icon}
+            </li>`;
+          }).join("")}
+        </ul>
+      </div>`;
+
+      // Show grievances if any
+      if (alliance.grievances && alliance.grievances.length > 0) {
+        html += `<div style="margin-bottom: 12px; font-size: 0.8rem; color: var(--warning-color); background: rgba(255, 152, 0, 0.1); padding: 8px 10px; border-radius: 6px;">
+          <strong>⚠️ Concerns:</strong>
+          <ul style="margin: 4px 0 0 16px; padding: 0;">
+            ${alliance.grievances.map(g => `<li>${g}</li>`).join("")}
+          </ul>
+        </div>`;
+      }
+    }
+
     const happinessClass = getHappinessClass(alliance.happiness);
     html += `
       <div class="happiness-meter">
-        <span style="color: var(--text-secondary); font-size: 0.85rem;">Happiness:</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 0.85rem;">Happiness:</span>
+          <button class="factor-help-btn" onclick="showHappinessFactorsPopup('${regionId}')" title="View happiness factors">?</button>
+        </div>
         <div class="happiness-bar">
           <div class="happiness-fill ${happinessClass}" style="width: ${alliance.happiness}%"></div>
         </div>
         <span class="happiness-value">${Math.round(alliance.happiness)}%</span>
+      </div>
+    `;
+
+    // Carbon Tax Control Section
+    const carbonTax = alliance.carbonTax || { ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default, yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default };
+    const currentRate = carbonTax.ratePerTon || NEGOTIABLE_TERMS.carbonTaxRate.default;
+    const currentGrowth = carbonTax.yearlyGrowthRate || NEGOTIABLE_TERMS.carbonTaxGrowth.default;
+
+    // Calculate monthly revenue from this region
+    const climateData = getClimateDataForRegion(regionId);
+    let monthlyRevenue = 0;
+    if (climateData && climateData.emissions) {
+      const emissionValue = typeof climateData.emissions === 'number' ? climateData.emissions : climateData.emissions.total || 0;
+      monthlyRevenue = (emissionValue / 12) * currentRate;
+    }
+
+    // Check if there's a carbon tax limit demand
+    const taxLimitDemand = alliance.demands?.find(d => d.type === 'carbonTaxLimit');
+    const taxLimitWarning = taxLimitDemand && currentRate > taxLimitDemand.value;
+
+    html += `
+      <div class="carbon-tax-control" style="margin-top: 12px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <strong style="color: var(--text-primary); font-size: 0.85rem;">💰 Carbon Tax</strong>
+          <span style="color: var(--accent-green); font-size: 0.8rem;">+${formatCurrency(monthlyRevenue)}/mo</span>
+        </div>
+
+        <div style="margin-bottom: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">Rate:</span>
+            <span id="carbon-tax-rate-display-${regionId}" style="color: ${taxLimitWarning ? 'var(--warning-color)' : 'var(--text-primary)'}; font-size: 0.85rem; font-weight: 500;">$${currentRate}/ton</span>
+          </div>
+          <input type="range"
+            id="carbon-tax-rate-${regionId}"
+            min="${NEGOTIABLE_TERMS.carbonTaxRate.min}"
+            max="${NEGOTIABLE_TERMS.carbonTaxRate.max}"
+            step="${NEGOTIABLE_TERMS.carbonTaxRate.step}"
+            value="${currentRate}"
+            style="width: 100%; cursor: pointer;"
+            oninput="updateCarbonTaxRate('${regionId}', this.value)"
+          >
+          ${taxLimitWarning ? `<div style="color: var(--warning-color); font-size: 0.75rem; margin-top: 2px;">⚠️ Demand: Keep below $${taxLimitDemand.value}/ton</div>` : ''}
+        </div>
+
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="color: var(--text-secondary); font-size: 0.8rem;">Yearly Growth:</span>
+            <span id="carbon-tax-growth-display-${regionId}" style="color: var(--text-primary); font-size: 0.85rem; font-weight: 500;">+${currentGrowth}%/yr</span>
+          </div>
+          <input type="range"
+            id="carbon-tax-growth-${regionId}"
+            min="${NEGOTIABLE_TERMS.carbonTaxGrowth.min}"
+            max="${NEGOTIABLE_TERMS.carbonTaxGrowth.max}"
+            step="${NEGOTIABLE_TERMS.carbonTaxGrowth.step}"
+            value="${currentGrowth}"
+            style="width: 100%; cursor: pointer;"
+            oninput="updateCarbonTaxGrowth('${regionId}', this.value)"
+          >
+        </div>
       </div>
     `;
 
@@ -7870,38 +8889,6 @@ function getAllianceStatusHTML(regionId) {
         </ul>
       </div>`;
     }
-
-    // Show accepted terms and compliance status if any
-    if (alliance.acceptedTerms) {
-      const compliance = alliance.termCompliance || {};
-      html += `<div style="margin-top: 8px; font-size: 0.8rem; color: var(--text-secondary);">
-        <strong>Alliance Terms Compliance:</strong>
-        <ul style="margin: 4px 0 0 16px; padding: 0;">
-          ${Object.entries(alliance.acceptedTerms).map(([key, value]) => {
-            const term = NEGOTIABLE_TERMS[key];
-            if (!term) return '';
-            const complianceStatus = compliance[key];
-            const isCompliant = complianceStatus?.compliant ?? true;
-            const actual = complianceStatus?.actual ?? '?';
-            const color = isCompliant ? 'var(--success-color)' : 'var(--warning-color)';
-            const icon = isCompliant ? '✓' : '✗';
-            return `<li style="color: ${color}">
-              ${term.label}: ${actual}${term.unit} / ${value}${term.unit} ${icon}
-            </li>`;
-          }).join("")}
-        </ul>
-      </div>`;
-
-      // Show grievances if any
-      if (alliance.grievances && alliance.grievances.length > 0) {
-        html += `<div style="margin-top: 8px; font-size: 0.8rem; color: var(--warning-color);">
-          <strong>Concerns:</strong>
-          <ul style="margin: 4px 0 0 16px; padding: 0;">
-            ${alliance.grievances.map(g => `<li>${g}</li>`).join("")}
-          </ul>
-        </div>`;
-      }
-    }
   }
 
   // Show interest meter for non-allied regions (NEUTRAL and HOSTILE)
@@ -7912,7 +8899,10 @@ function getAllianceStatusHTML(regionId) {
 
     html += `
       <div class="interest-meter" style="margin-top: 8px;">
-        <span style="color: var(--text-secondary); font-size: 0.85rem;">Interest in Joining:</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="color: var(--text-secondary); font-size: 0.85rem;">Interest in Joining:</span>
+          <button class="factor-help-btn" onclick="showInterestFactorsPopup('${regionId}')" title="View interest factors">?</button>
+        </div>
         <div class="interest-bar" style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
           <div style="flex: 1; height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden;">
             <div class="${interestClass}" style="width: ${interest}%; height: 100%; transition: width 0.3s;"></div>
@@ -8092,6 +9082,11 @@ function initGame() {
     pendingNegotiation: null, // Current negotiation in progress
     // Construction system
     underConstruction: [], // Projects currently being built
+    // Global carbon tax system
+    globalCarbonTax: {
+      ratePerTon: 25,        // $/ton CO2 (starting value)
+      monthlyGrowthRate: 0.5 // % increase per month
+    },
   };
 
   // Recalculate power stats for all regions (calculates stability from power mix)
@@ -8103,6 +9098,127 @@ function initGame() {
 
   // Enter setup mode for region selection
   enterSetupMode();
+}
+
+/**
+ * Calculate detailed income breakdown for next month (without modifying state)
+ * @returns {Object} Breakdown of all income sources
+ */
+function calculateIncomeBreakdown() {
+  const breakdown = {
+    climateBudget: { total: 0, byRegion: {} },
+    carbonTax: { total: 0, byRegion: {} },
+    projects: { total: 0, byType: {} },
+    costs: { researchCenters: 0 },
+    eventMultiplier: getEventIncomeMultiplier(),
+    grossTotal: 0,
+    netTotal: 0,
+  };
+
+  // Calculate climate budget income from each allied region
+  Object.entries(state.regions).forEach(([regionId, region]) => {
+    // Use getClimateDataForRegion which properly handles all granularity levels
+    const climateData = getClimateDataForRegion(regionId);
+    const allianceData = state.alliance?.[regionId];
+    const isAllied = allianceData?.status === ALLIANCE_STATUS.ALLIED;
+
+    if (!isAllied) return;
+
+    // Get modifiers
+    const gdpContributionMod = allianceData?.gdpContribution || 1.0;
+    const powerGdpMod = region.power?.gdpModifier || 1.0;
+    const disasterMult = getDisasterIncomeMultiplier(regionId);
+
+    // Climate budget income
+    let regionClimateBudget = 0;
+    let gdpTrillions = 0;
+    let climatePercent = 0;
+
+    if (climateData && climateData.climateFinance) {
+      gdpTrillions = climateData.gdp || 1;
+      climatePercent = climateData.climateFinance.currentPercent;
+      regionClimateBudget = (gdpTrillions * climatePercent / 100) / 12 * 1000;
+      regionClimateBudget *= disasterMult * gdpContributionMod * powerGdpMod;
+    }
+
+    if (regionClimateBudget > 0) {
+      const regionName = getRegionName(regionId);
+      breakdown.climateBudget.byRegion[regionId] = {
+        name: regionName,
+        amount: regionClimateBudget,
+        gdp: gdpTrillions,
+        dedication: climatePercent,
+      };
+      breakdown.climateBudget.total += regionClimateBudget;
+    }
+
+    // Carbon tax revenue
+    let emissions = 0;
+    if (climateData && climateData.emissions) {
+      // Handle emissions as either a number or an object with .total
+      const emissionValue = typeof climateData.emissions === 'number'
+        ? climateData.emissions
+        : climateData.emissions.total || 0;
+      emissions = emissionValue / 12;
+    }
+
+    const taxRate = allianceData.carbonTax?.ratePerTon || NEGOTIABLE_TERMS.carbonTaxRate.default;
+    const taxRevenue = emissions * taxRate;
+
+    if (taxRevenue > 0) {
+      const regionName = getRegionName(regionId);
+      breakdown.carbonTax.byRegion[regionId] = {
+        name: regionName,
+        amount: taxRevenue,
+        emissions: emissions,
+        rate: taxRate,
+      };
+      breakdown.carbonTax.total += taxRevenue;
+    }
+
+    // Project income
+    region.projects.forEach((proj) => {
+      const projectType = typeof proj === "string" ? proj : proj.type;
+      const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
+      const project = PROJECT_TYPES[projectType];
+      if (!project) return;
+
+      const incomeBonus = getTechIncomeBonus(projectType) * getEventBonusForProject(projectType, "income");
+      const projectIncome = project.income * effectMult * incomeBonus * disasterMult;
+
+      if (projectIncome > 0) {
+        if (!breakdown.projects.byType[projectType]) {
+          breakdown.projects.byType[projectType] = {
+            name: project.name,
+            count: 0,
+            amount: 0,
+          };
+        }
+        breakdown.projects.byType[projectType].count++;
+        breakdown.projects.byType[projectType].amount += projectIncome;
+        breakdown.projects.total += projectIncome;
+      }
+    });
+  });
+
+  // Research center costs
+  breakdown.costs.researchCenters = getResearchCenterMonthlyCost();
+
+  // Calculate totals
+  let grossIncome = breakdown.climateBudget.total + breakdown.carbonTax.total + breakdown.projects.total;
+
+  // Apply minimum income if needed
+  if (grossIncome === 0) {
+    grossIncome = GAME_CONFIG.baseIncome;
+  }
+
+  // Apply event multiplier
+  grossIncome *= breakdown.eventMultiplier;
+
+  breakdown.grossTotal = grossIncome;
+  breakdown.netTotal = grossIncome - breakdown.costs.researchCenters;
+
+  return breakdown;
 }
 
 function nextMonth() {
@@ -8167,8 +9283,8 @@ function nextMonth() {
   // Calculate income from each country's climate finance (GDP × climate%)
   // ALLIANCE SYSTEM: Only allied regions contribute income
   Object.entries(state.regions).forEach(([regionId, region]) => {
-    const countryData = CLIMATE_DATA[regionId];
-    const aggregateData = CLIMATE_DATA.REGION_AGGREGATES?.[regionId];
+    // Use getClimateDataForRegion which properly handles all granularity levels
+    const climateData = getClimateDataForRegion(regionId);
 
     // Check if region is allied - only allied regions contribute income
     const allianceData = state.alliance?.[regionId];
@@ -8182,44 +9298,22 @@ function nextMonth() {
       // Get power grid GDP modifier (power shortages, high prices, instability)
       const powerGdpMod = region.power?.gdpModifier || 1.0;
 
-      if (countryData && countryData.climateFinance) {
-        // Country-level: use direct country data
+      // Get disaster multiplier
+      const disasterMult = getDisasterIncomeMultiplier(regionId);
+
+      if (climateData && climateData.climateFinance) {
         // Monthly income = (GDP in trillions × climate% / 100) / 12
         // Result is in billions per month
-        const gdpTrillions = countryData.gdp || 1;
-        const climatePercent = countryData.climateFinance.currentPercent;
+        const gdpTrillions = climateData.gdp || 1;
+        const climatePercent = climateData.climateFinance.currentPercent;
         let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000; // Convert to billions
-        // Apply disaster income reduction if region has active disaster
-        monthlyClimateIncome *= getDisasterIncomeMultiplier(regionId);
-        // Apply alliance GDP contribution modifier
-        monthlyClimateIncome *= gdpContributionMod;
-        // Apply power grid GDP modifier
-        monthlyClimateIncome *= powerGdpMod;
+        // Apply all modifiers
+        monthlyClimateIncome *= disasterMult * gdpContributionMod * powerGdpMod;
         // Track contribution for happiness calculations
         if (allianceData) {
           allianceData.totalContributed += monthlyClimateIncome;
         }
         totalIncome += monthlyClimateIncome;
-      } else if (aggregateData && aggregateData.countries) {
-        // Continent-level: aggregate climate finance from constituent countries
-        aggregateData.countries.forEach(countryKey => {
-          const countryInfo = CLIMATE_DATA.COUNTRY_DATA?.[countryKey];
-          if (countryInfo && countryInfo.climateFinance) {
-            const gdpTrillions = countryInfo.gdp || 1;
-            const climatePercent = countryInfo.climateFinance.currentPercent;
-            let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000;
-            monthlyClimateIncome *= getDisasterIncomeMultiplier(countryKey);
-            // Apply alliance GDP contribution modifier
-            monthlyClimateIncome *= gdpContributionMod;
-            // Apply power grid GDP modifier
-            monthlyClimateIncome *= powerGdpMod;
-            totalIncome += monthlyClimateIncome;
-          }
-        });
-        // Track total contribution for the region
-        if (allianceData) {
-          allianceData.totalContributed += totalIncome; // This is approximate
-        }
       }
     }
 
@@ -8269,6 +9363,45 @@ function nextMonth() {
       allianceData.turnsInAlliance++;
     }
   });
+
+  // Calculate carbon tax revenue from allied regions (using per-region tax rates)
+  let carbonTaxRevenue = 0;
+  Object.entries(state.regions).forEach(([regionId, region]) => {
+    // Use getClimateDataForRegion which properly handles all granularity levels
+    const climateData = getClimateDataForRegion(regionId);
+    const allianceData = state.alliance?.[regionId];
+    const isAllied = allianceData?.status === ALLIANCE_STATUS.ALLIED;
+
+    if (isAllied && climateData) {
+      // Get regional emissions (GtCO2/year, convert to monthly)
+      let emissions = 0;
+      if (climateData.emissions) {
+        // Handle emissions as either a number or an object with .total
+        const emissionValue = typeof climateData.emissions === 'number'
+          ? climateData.emissions
+          : climateData.emissions.total || 0;
+        emissions = emissionValue / 12; // Monthly GtCO2
+      }
+
+      // Get per-region carbon tax rate (fallback to default if not set)
+      const regionTaxRate = allianceData.carbonTax?.ratePerTon || NEGOTIABLE_TERMS.carbonTaxRate.default;
+
+      // Revenue = emissions (GtCO2) * rate ($/ton)
+      // 1 GtCO2 = 1 billion tons, so emissions * rate gives billions of dollars
+      carbonTaxRevenue += emissions * regionTaxRate;
+    }
+  });
+  totalIncome += carbonTaxRevenue;
+
+  // Apply yearly carbon tax growth in January for all allied regions
+  if (state.month === 1) {
+    Object.entries(state.alliance).forEach(([regionId, alliance]) => {
+      if (alliance.status === ALLIANCE_STATUS.ALLIED && alliance.carbonTax) {
+        const yearlyGrowth = alliance.carbonTax.yearlyGrowthRate || NEGOTIABLE_TERMS.carbonTaxGrowth.default;
+        alliance.carbonTax.ratePerTon *= (1 + yearlyGrowth / 100);
+      }
+    });
+  }
 
   // Fallback minimum income
   if (totalIncome === 0) {
@@ -8607,6 +9740,8 @@ function updateRegionTemps() {
 }
 
 function selectRegion(regionId) {
+  console.log('[Map] selectRegion:', regionId, 'isSetupMode:', isSetupMode);
+
   // In setup mode, allow selection without state.regions check
   if (isSetupMode) {
     selectedRegionId = regionId;
@@ -8615,10 +9750,20 @@ function selectRegion(regionId) {
     return;
   }
 
-  // Normal game mode - require region to exist in state
-  if (!state?.regions || !state.regions[regionId]) {
+  // Normal game mode - check state availability
+  if (!state?.regions) {
+    console.warn('[Map] selectRegion: state.regions not initialized');
     return;
   }
+
+  if (!state.regions[regionId]) {
+    console.warn('[Map] selectRegion: region not in state:', regionId);
+    // Still update selection visually even if region not in state
+    selectedRegionId = regionId;
+    updateMapColors();
+    return;
+  }
+
   selectedRegionId = regionId;
   updateUI();
 
@@ -9312,10 +10457,12 @@ function updateUI() {
     allianceProgressEl.textContent = `${alliedCount}/${totalRegions}`;
   }
 
-  // Research Points
+  // Research Points - show assigned/total RP per month
   const rpDisplayEl = document.getElementById('rp-display');
   if (rpDisplayEl) {
-    rpDisplayEl.textContent = state.researchPoints;
+    const assignedRP = getAssignedRPPerMonth();
+    const totalRP = getTotalRegionalRPPerMonth();
+    rpDisplayEl.textContent = `${assignedRP}/${totalRP}`;
   }
 
   // Active Projects
@@ -9638,25 +10785,27 @@ function getResearchRPPerMonth(techId) {
   return total;
 }
 
-// Render a tree section (CCS or Other technologies)
+// Render a tree section (CCS or Other technologies) - VERTICAL LAYOUT
+// Basic techs at TOP, higher tiers flow DOWN, spread horizontally
 function renderTreeSection(title, depthMap, icon) {
   const maxDepth = Math.max(...Object.keys(depthMap).map(Number), 0);
 
-  // Build tier labels row
-  let tierLabelsHtml = "";
-  for (let depth = 0; depth <= maxDepth; depth++) {
-    const tierName = depth === 0 ? "Basic" : `Tier ${depth}`;
-    tierLabelsHtml += `<div class="tech-tier-label">${tierName}</div>`;
-  }
-
-  let columnsHtml = "";
+  // Build rows (Basic at top, higher tiers below)
+  let rowsHtml = "";
   for (let depth = 0; depth <= maxDepth; depth++) {
     const techs = depthMap[depth] || [];
+    if (techs.length === 0) continue;
+
+    const tierName = depth === 0 ? "START" : `TIER ${depth}`;
     let nodesHtml = "";
     techs.forEach((tech) => {
       nodesHtml += renderTechNode(tech);
     });
-    columnsHtml += `<div class="tech-tree-column" data-depth="${depth}">${nodesHtml}</div>`;
+    rowsHtml += `
+      <div class="tech-tree-row" data-depth="${depth}">
+        <div class="tech-row-label">${tierName}</div>
+        <div class="tech-row-items">${nodesHtml}</div>
+      </div>`;
   }
 
   const sectionHtml = `
@@ -9664,9 +10813,8 @@ function renderTreeSection(title, depthMap, icon) {
       <h4 class="tech-tree-section-title">${icon} ${title}</h4>
       <div class="tech-tree-graph" data-section="${title.toLowerCase().replace(/ /g, '-')}">
         <svg class="tech-tree-connections"></svg>
-        <div class="tech-tier-labels">${tierLabelsHtml}</div>
-        <div class="tech-tree-columns">
-          ${columnsHtml}
+        <div class="tech-tree-rows">
+          ${rowsHtml}
         </div>
       </div>
     </div>
@@ -9674,36 +10822,47 @@ function renderTreeSection(title, depthMap, icon) {
   return sectionHtml;
 }
 
-// Draw SVG connection lines between prerequisite techs
+// Draw SVG connection lines between prerequisite techs - VERTICAL LAYOUT
+// Parents (prerequisites) are ABOVE, children (higher tier) are BELOW
 function drawTreeConnections() {
   document.querySelectorAll(".tech-tree-graph").forEach((graph) => {
     const svg = graph.querySelector(".tech-tree-connections");
     const nodes = graph.querySelectorAll(".tech-hex");
 
-    // Use offsetLeft/offsetTop for scroll-independent positioning
-    // Get the columns container as the reference point
-    const columnsContainer = graph.querySelector(".tech-tree-columns");
-    if (!columnsContainer) return;
+    // Get the rows container as the reference point
+    const rowsContainer = graph.querySelector(".tech-tree-rows");
+    if (!rowsContainer) return;
 
-    let paths = "";
+    // Get graph padding to offset coordinates (SVG is at 0,0 of graph, content is padded)
+    const graphStyle = getComputedStyle(graph);
+    const paddingTop = parseFloat(graphStyle.paddingTop) || 0;
+    const paddingLeft = parseFloat(graphStyle.paddingLeft) || 0;
+
+    // Clear existing paths
+    while (svg.firstChild) {
+      svg.removeChild(svg.firstChild);
+    }
 
     nodes.forEach((node) => {
       const requires = node.dataset.requires?.split(",").filter(Boolean) || [];
       if (requires.length === 0) return;
 
-      // Get position relative to the columns container using offset properties
+      // Get position relative to the rows container
       const hexInner = node.querySelector(".hex-inner");
       const targetEl = hexInner || node;
 
-      // Calculate position by walking up the offset parent chain
-      let endX = targetEl.offsetLeft;
-      let endY = targetEl.offsetTop + targetEl.offsetHeight / 2;
+      // Calculate position - child node connects from TOP (parent is above)
+      let endX = targetEl.offsetLeft + targetEl.offsetWidth / 2;
+      let endY = targetEl.offsetTop;
       let el = targetEl.offsetParent;
-      while (el && el !== columnsContainer && columnsContainer.contains(el)) {
+      while (el && el !== rowsContainer && rowsContainer.contains(el)) {
         endX += el.offsetLeft;
         endY += el.offsetTop;
         el = el.offsetParent;
       }
+      // Add padding offset since SVG starts at graph origin
+      endX += paddingLeft;
+      endY += paddingTop;
 
       requires.forEach((reqId) => {
         const parentNode = graph.querySelector(`[data-tech-id="${reqId}"]`);
@@ -9712,30 +10871,41 @@ function drawTreeConnections() {
         const parentHex = parentNode.querySelector(".hex-inner");
         const parentEl = parentHex || parentNode;
 
-        // Calculate parent position the same way
-        let startX = parentEl.offsetLeft + parentEl.offsetWidth;
-        let startY = parentEl.offsetTop + parentEl.offsetHeight / 2;
+        // Parent node connects from BOTTOM (child is below)
+        let startX = parentEl.offsetLeft + parentEl.offsetWidth / 2;
+        let startY = parentEl.offsetTop + parentEl.offsetHeight;
         let pel = parentEl.offsetParent;
-        while (pel && pel !== columnsContainer && columnsContainer.contains(pel)) {
+        while (pel && pel !== rowsContainer && rowsContainer.contains(pel)) {
           startX += pel.offsetLeft;
           startY += pel.offsetTop;
           pel = pel.offsetParent;
         }
+        // Add padding offset since SVG starts at graph origin
+        startX += paddingLeft;
+        startY += paddingTop;
 
         // Check if connection should be "unlocked" style
         const isUnlockedPath = node.classList.contains("unlocked");
         const isParentUnlocked = parentNode.classList.contains("unlocked");
 
-        // Curved bezier path with thicker lines
-        const midX = (startX + endX) / 2;
+        // Calculate vertical distance for smoother curves
+        const vertDist = endY - startY;
+
+        // Use smoother bezier with control points that create natural S-curves
+        // Control points extend vertically based on distance
+        const controlOffset = Math.min(vertDist * 0.4, 60);
+        const ctrl1Y = startY + controlOffset;
+        const ctrl2Y = endY - controlOffset;
+
         const pathClass = isUnlockedPath ? "unlocked" : (isParentUnlocked ? "partial" : "");
-        paths += `<path d="M${startX},${startY} C${midX},${startY} ${midX},${endY} ${endX},${endY}"
-                        class="tech-connection ${pathClass}"/>`;
+
+        // Create path element using DOM API for safety
+        const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("d", `M${startX},${startY} C${startX},${ctrl1Y} ${endX},${ctrl2Y} ${endX},${endY}`);
+        path.setAttribute("class", `tech-connection ${pathClass}`);
+        svg.appendChild(path);
       });
     });
-
-    // Note: Using innerHTML here for SVG paths - data comes from internal game state
-    svg.innerHTML = paths;
   });
 }
 
@@ -9766,11 +10936,8 @@ function renderTechTreePanel() {
     </div>`;
   }
 
-  // Render Other Technologies section first (simpler, mostly standalone)
+  // Render Technologies section (all techs in one tree)
   html += renderTreeSection("Energy & Nature", otherDepths, "⚡");
-
-  // Render CCS Technologies section (complex tree)
-  html += renderTreeSection("Carbon Capture & Storage", ccsDepths, "🏭");
 
   // Note: Using innerHTML here - all content from internal game data, not user input
   listEl.innerHTML = html;
@@ -10463,6 +11630,7 @@ function initCollapsibleSections() {
     { headerClass: 'income-header', containerId: 'region-income', sectionId: 'climate-finance' },
     { headerClass: 'power-header', containerId: 'power-panel', sectionId: 'power-grid' },
     { headerClass: 'emissions-header', containerId: 'climate-data-panel', sectionId: 'emissions' },
+    { headerClass: 'construction-header', containerId: 'construction-panel', sectionId: 'construction', defaultCollapsed: true },
   ];
 
   sectionConfigs.forEach(config => {
@@ -10493,8 +11661,11 @@ function initCollapsibleSections() {
       contentElements.forEach(el => wrapper.appendChild(el));
       container.appendChild(wrapper);
 
-      // Apply initial collapsed state
-      if (collapsed[config.sectionId]) {
+      // Apply initial collapsed state (use stored state, or default if not set)
+      const isCollapsed = config.sectionId in collapsed
+        ? collapsed[config.sectionId]
+        : (config.defaultCollapsed || false);
+      if (isCollapsed) {
         header.classList.add('collapsed');
         wrapper.classList.add('collapsed');
       }
@@ -10559,6 +11730,10 @@ function updateSelectedRegionPanel() {
     clearClimateDataPanels();
     if (regionIncomeEl) regionIncomeEl.innerHTML = "";
 
+    // Hide construction panel for non-allied regions
+    const constructionEl = document.getElementById("construction-panel");
+    if (constructionEl) constructionEl.style.display = "none";
+
   } else {
     // ALLIED: Current order (title, temp, alliance, then all panels)
     selectedRegionEl.append(title, temp, allianceSection);
@@ -10568,15 +11743,17 @@ function updateSelectedRegionPanel() {
     if (climateData) {
       renderRegionIncome(region, climateData);
       renderPowerPanel(selectedRegionId);
-      renderConstructionPanel(selectedRegionId);
       renderEmissionsBreakdown(climateData, selectedRegionId);
       renderEffectivenessPanel(climateData);
       renderRegionFact(climateData);
       appendPerCapitaInfo(selectedRegionEl, climateData);
+      // Construction panel at the bottom
+      renderConstructionPanel(selectedRegionId);
     } else {
       clearClimateDataPanels();
       if (regionIncomeEl) regionIncomeEl.innerHTML = "";
       renderPowerPanel(selectedRegionId);
+      // Construction panel at the bottom
       renderConstructionPanel(selectedRegionId);
     }
 
@@ -10586,40 +11763,30 @@ function updateSelectedRegionPanel() {
 }
 
 function renderConstructionPanel(regionId) {
-  // Find or create construction panel container
-  let constructionEl = document.getElementById("construction-panel");
-  if (!constructionEl) {
-    constructionEl = document.createElement("div");
-    constructionEl.id = "construction-panel";
-    // Insert after power panel if it exists
-    const powerPanel = document.getElementById("power-panel");
-    if (powerPanel && powerPanel.parentNode) {
-      powerPanel.parentNode.insertBefore(constructionEl, powerPanel.nextSibling);
-    } else {
-      selectedRegionEl.appendChild(constructionEl);
-    }
-  }
+  // Find construction panel container (exists in HTML at bottom of region tab)
+  const constructionEl = document.getElementById("construction-panel");
+  if (!constructionEl) return;
 
   constructionEl.innerHTML = "";
 
   const constructions = getConstructionForRegion(regionId);
   if (constructions.length === 0) {
+    constructionEl.style.display = "none";
     return; // Don't show section if nothing under construction
   }
 
-  const section = document.createElement("div");
-  section.className = "construction-section";
+  constructionEl.style.display = "block";
 
-  // Header
+  // Header (collapsible - chevron added by collapsible system)
   const header = document.createElement("div");
   header.className = "construction-header";
   header.innerHTML = `
     <h4>Under Construction</h4>
     <span class="construction-count">${constructions.length}</span>
   `;
-  section.appendChild(header);
+  constructionEl.appendChild(header);
 
-  // Construction items
+  // Construction items (appended directly so collapsible system can wrap them)
   constructions.forEach(c => {
     const project = PROJECT_TYPES[c.type];
     if (!project) return;
@@ -10649,10 +11816,8 @@ function renderConstructionPanel(regionId) {
       </div>
     `;
 
-    section.appendChild(item);
+    constructionEl.appendChild(item);
   });
-
-  constructionEl.appendChild(section);
 }
 
 function renderRegionIncome(region, climateData) {
@@ -10879,53 +12044,8 @@ function appendBasicRegionInfo(container, climateData, regionId) {
       </div>`;
   }
 
-  // Climate Finance % and Monthly Contribution
-  if (climateData.climateFinance && climateData.gdp) {
-    const climatePercent = climateData.climateFinance.currentPercent || 0;
-    const monthlyContribution = (climateData.gdp * climatePercent / 100) / 12 * 1000; // billions
-
-    html += `
-      <div class="region-stat">
-        <span class="region-stat-label">Climate Budget %</span>
-        <span class="region-stat-value">${climatePercent.toFixed(1)}%</span>
-      </div>
-      <div class="region-stat highlight">
-        <span class="region-stat-label">Potential Income</span>
-        <span class="region-stat-value income-value">+$${monthlyContribution.toFixed(1)}B/mo</span>
-      </div>`;
-  } else if (climateData.gdp) {
-    // For aggregate regions, calculate from constituent countries
-    let totalMonthlyContribution = 0;
-    let avgClimatePercent = 0;
-
-    if (climateData.countries && window.CLIMATE_DATA?.COUNTRY_DATA) {
-      let countryCount = 0;
-      climateData.countries.forEach(countryKey => {
-        const countryInfo = window.CLIMATE_DATA.COUNTRY_DATA[countryKey];
-        if (countryInfo && countryInfo.climateFinance && countryInfo.gdp) {
-          const percent = countryInfo.climateFinance.currentPercent || 0;
-          avgClimatePercent += percent;
-          totalMonthlyContribution += (countryInfo.gdp * percent / 100) / 12 * 1000;
-          countryCount++;
-        }
-      });
-      if (countryCount > 0) {
-        avgClimatePercent /= countryCount;
-      }
-    }
-
-    if (totalMonthlyContribution > 0) {
-      html += `
-        <div class="region-stat">
-          <span class="region-stat-label">Avg Climate %</span>
-          <span class="region-stat-value">${avgClimatePercent.toFixed(1)}%</span>
-        </div>
-        <div class="region-stat highlight">
-          <span class="region-stat-label">Potential Income</span>
-          <span class="region-stat-value income-value">+$${totalMonthlyContribution.toFixed(1)}B/mo</span>
-        </div>`;
-    }
-  }
+  // Climate dedication is now set through alliance negotiation terms
+  // So we don't show "Climate Budget %" or "Potential Income" for non-allied regions
 
   // Emissions if available (emissions.total is already in Gt)
   if (climateData.emissions?.total) {
@@ -11784,49 +12904,7 @@ function renderRegionProjects() {
 
   const region = state.regions[selectedRegionId];
 
-  // Show Under Construction section if there are projects being built
-  const construction = getConstructionForRegion(selectedRegionId);
-  if (construction.length > 0) {
-    const constructionSection = document.createElement("div");
-    constructionSection.className = "construction-section";
-
-    const constructionTitle = document.createElement("div");
-    constructionTitle.className = "panel-subtitle";
-    constructionTitle.textContent = "Under Construction";
-    constructionSection.appendChild(constructionTitle);
-
-    const constructionList = document.createElement("div");
-    constructionList.className = "construction-list";
-
-    construction.forEach(item => {
-      const project = PROJECT_TYPES[item.type];
-      if (!project) return;
-
-      const constructionItem = document.createElement("div");
-      constructionItem.className = "construction-item";
-
-      // Project name and time remaining
-      const header = document.createElement("div");
-      header.className = "construction-header";
-      const progressPct = ((item.monthsTotal - item.monthsRemaining) / item.monthsTotal * 100).toFixed(0);
-      const timeRemaining = formatConstructionTime(item.monthsRemaining);
-      header.innerHTML = `<span class="construction-name">${project.label}</span><span class="construction-time">${timeRemaining} left</span>`;
-
-      // Progress bar
-      const progressBar = document.createElement("div");
-      progressBar.className = "construction-progress";
-      const progressFill = document.createElement("div");
-      progressFill.className = "construction-progress-fill";
-      progressFill.style.width = `${progressPct}%`;
-      progressBar.appendChild(progressFill);
-
-      constructionItem.append(header, progressBar);
-      constructionList.appendChild(constructionItem);
-    });
-
-    constructionSection.appendChild(constructionList);
-    regionProjectsEl.appendChild(constructionSection);
-  }
+  // Construction is now rendered in construction-panel at the bottom via renderConstructionPanel()
 
   const subtitle = document.createElement("div");
   subtitle.className = "panel-subtitle";
@@ -11870,6 +12948,7 @@ function renderRegionProjects() {
 
 function updateMapColors() {
   if (!svgDoc || !svgRegions.size) {
+    console.warn('[Map] updateMapColors skipped: SVG not ready, svgRegions size:', svgRegions.size);
     return;
   }
 
@@ -11888,17 +12967,24 @@ function updateMapColors() {
 
   // Normal game mode - need state.regions
   if (!state?.regions) {
+    console.warn('[Map] updateMapColors skipped: state.regions not available');
     return;
   }
 
   svgRegions.forEach((regionElements, regionId) => {
     const region = state.regions[regionId];
-    if (!region) {
-      return;
-    }
+    let color;
+    let tooltipText;
 
-    const color = getColorForMode(regionId, region);
-    const tooltipText = getTooltipForMode(regionId, region);
+    if (!region) {
+      // Region not in state - use neutral dark color
+      console.warn('[Map] Region not in state:', regionId);
+      color = "#1a1a2e";
+      tooltipText = getRegionName(regionId);
+    } else {
+      color = getColorForMode(regionId, region);
+      tooltipText = getTooltipForMode(regionId, region);
+    }
 
     regionElements.forEach((regionEl) => {
       regionEl.style.fill = color;
@@ -12327,6 +13413,72 @@ function clearNews() {
   newsLogEl.innerHTML = "";
 }
 
+// Delegated click handler for SVG regions
+function handleSvgClick(event) {
+  console.log('[Map] handleSvgClick called, target:', event.target.tagName, event.target.id);
+  let target = event.target;
+
+  // If clicked on a group element, use its data-region attribute directly
+  if (target.tagName === 'g' && target.classList.contains('region-group')) {
+    const regionId = target.getAttribute('data-region');
+    console.log('[Map] Clicked on region-group, regionId:', regionId);
+    if (regionId && svgRegions.has(regionId)) {
+      selectRegion(regionId);
+      return;
+    }
+  }
+
+  // Walk up to find a path if we clicked on something inside a group
+  while (target && target.tagName !== 'path' && target !== event.currentTarget) {
+    target = target.parentElement;
+  }
+
+  if (!target || target.tagName !== 'path') return;
+
+  // Get region ID from data attribute or find which region contains this element
+  const config = GRANULARITY_CONFIG[currentGranularity] || GRANULARITY_CONFIG.continents;
+  const grouping = config.grouping || currentGranularity;
+  const regionId = getRegionIdForGranularity(target, grouping);
+  console.log('[Map] handleSvgClick regionId:', regionId, 'svgRegions.has:', svgRegions.has(regionId));
+
+  if (regionId && svgRegions.has(regionId)) {
+    selectRegion(regionId);
+  }
+}
+
+// Delegated keydown handler for SVG regions (accessibility)
+function handleSvgKeydown(event) {
+  if (event.key !== 'Enter' && event.key !== ' ') return;
+
+  let target = event.target;
+
+  // Handle keydown on group elements
+  if (target.tagName === 'g' && target.classList.contains('region-group')) {
+    const regionId = target.getAttribute('data-region');
+    if (regionId && svgRegions.has(regionId)) {
+      event.preventDefault();
+      selectRegion(regionId);
+      return;
+    }
+  }
+
+  // Walk up to find a path
+  while (target && target.tagName !== 'path' && target !== event.currentTarget) {
+    target = target.parentElement;
+  }
+
+  if (!target || target.tagName !== 'path') return;
+
+  event.preventDefault();
+  const config = GRANULARITY_CONFIG[currentGranularity] || GRANULARITY_CONFIG.continents;
+  const grouping = config.grouping || currentGranularity;
+  const regionId = getRegionIdForGranularity(target, grouping);
+
+  if (regionId && svgRegions.has(regionId)) {
+    selectRegion(regionId);
+  }
+}
+
 function wireMap() {
   if (!mapObject) {
     return;
@@ -12371,13 +13523,7 @@ function wireMap() {
       regionEl.setAttribute("role", "button");
       regionEl.setAttribute("tabindex", "0");
       regionEl.setAttribute("aria-label", `${nextRegionNames[groupedRegionId] || groupedRegionId} region`);
-      regionEl.addEventListener("click", () => selectRegion(groupedRegionId));
-      regionEl.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") {
-          event.preventDefault();
-          selectRegion(groupedRegionId);
-        }
-      });
+      // Note: Click/keydown handlers are now delegated to SVG root (see below)
 
       // For non-country granularities, add group hover effect
       // Hovering any country in a region highlights ALL countries in that region
@@ -12399,12 +13545,30 @@ function wireMap() {
     // Apply grouping and outline filter for higher granularity levels
     applyRegionGrouping();
 
+    // Attach delegated event listeners to SVG root (single listener for all regions)
+    // This prevents listener leaks when SVG reloads
+    svgClickHandler = handleSvgClick;
+    svgDoc.documentElement.addEventListener('click', svgClickHandler);
+    svgDoc.documentElement.addEventListener('keydown', handleSvgKeydown);
+    console.log('[Map] Delegated event listeners attached to SVG');
+
+    // Verify isSetupMode matches actual game state (Phase 3 guard)
+    // Only correct if there's evidence of actual gameplay (history has entries)
+    if (state?.history?.length > 0 && isSetupMode) {
+      console.warn('[Map] Correcting isSetupMode: game has history, must be in progress');
+      isSetupMode = false;
+    }
+
     if (pendingInit) {
       pendingInit = false;
       initGame();
-      return;
+      // Fall through to ensure colors are updated after SVG loads
     }
 
+    // Always update colors after SVG loads (handles race condition)
+    if (pendingColorUpdate) {
+      pendingColorUpdate = false;
+    }
     updateMapColors();
     updateMapSelection();
   };
@@ -12423,8 +13587,16 @@ function setMapSource(source, force = false) {
   if (!force && currentBase === source) {
     return;
   }
+  // Clean up delegated event listeners before clearing SVG reference
+  if (svgDoc && svgClickHandler) {
+    svgDoc.documentElement.removeEventListener('click', svgClickHandler);
+    svgDoc.documentElement.removeEventListener('keydown', handleSvgKeydown);
+    console.log('[Map] Cleaned up SVG event listeners');
+  }
   svgDoc = null;
   svgRegions = new Map();
+  svgClickHandler = null;
+  pendingColorUpdate = true; // Ensure colors update after new SVG loads
   if (force && currentBase === source) {
     // Use query parameter instead of hash to force actual reload
     const cacheBuster = `?g=${Date.now()}`;
@@ -12552,6 +13724,13 @@ function restoreGameUI() {
   const mapModeSelect = document.getElementById("map-mode");
   if (mapModeSelect) mapModeSelect.value = currentMapMode;
 
+  // Sync granularity buttons with loaded state
+  const granularityButtons = document.querySelectorAll(".granularity-btn");
+  granularityButtons.forEach(btn => {
+    const isActive = btn.dataset.granularity === currentGranularity;
+    btn.classList.toggle("active", isActive);
+  });
+
   // Show game panel, header controls, and sidebar tabs, hide setup panel
   const setupPanel = document.getElementById("setup-panel");
   const gamePanel = document.getElementById("game-panel");
@@ -12678,6 +13857,80 @@ function showSidebarTabs() {
   if (sidebarTabs) sidebarTabs.style.display = 'flex';
 }
 
+// Render Global Status panel with initial/default values for setup mode
+function renderGlobalStatsCardSetup() {
+  const container = document.getElementById('global-stats-card');
+  if (!container) return;
+
+  const yearsLeft = 2100 - GAME_CONFIG.startYear;
+  const defaultTaxRate = NEGOTIABLE_TERMS.carbonTaxRate.default;
+  const defaultGrowthRate = NEGOTIABLE_TERMS.carbonTaxGrowth.default;
+
+  // Build HTML with safe template values from GAME_CONFIG constants
+  const html = `
+    <h3>Global Status</h3>
+    <div class="global-stats-grid">
+      <div class="stat-item">
+        <span class="label">Temperature</span>
+        <span class="value">+${GAME_CONFIG.startingTemp.toFixed(2)}°C</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">CO2</span>
+        <span class="value">${GAME_CONFIG.startingCo2.toFixed(1)} ppm</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Net CO2/mo</span>
+        <span class="value stat-good">+0.00</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Feedback</span>
+        <span class="value stat-good">+0.00</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Budget</span>
+        <span class="value">${formatCurrency(GAME_CONFIG.startingFunds)}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Income/mo</span>
+        <span class="value">+${formatCurrency(0)}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Avg Tax Rate</span>
+        <span class="value">$${defaultTaxRate.toFixed(0)}/ton</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Avg Tax Growth</span>
+        <span class="value">+${defaultGrowthRate.toFixed(0)}%/yr</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Projects</span>
+        <span class="value">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Research</span>
+        <span class="value">0 RP</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Tipping Points</span>
+        <span class="value stat-good">0/4</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Disasters</span>
+        <span class="value stat-good">0</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Date</span>
+        <span class="value">${MONTHS[GAME_CONFIG.startMonth - 1]} ${GAME_CONFIG.startYear}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Years Left</span>
+        <span class="value">${yearsLeft}</span>
+      </div>
+    </div>
+  `;
+  container.innerHTML = html;
+}
+
 function renderGlobalStatsCard() {
   const container = document.getElementById('global-stats-card');
   if (!container) return;
@@ -12694,6 +13947,20 @@ function renderGlobalStatsCard() {
   const yearsLeft = 2100 - state.year;
   const disasterCount = countActiveDisasters();
   const campaignCount = state.activeCampaigns?.length || 0;
+
+  // Calculate average carbon tax rate and growth across all allied regions
+  let totalTaxRate = 0;
+  let totalGrowthRate = 0;
+  let allyCount = 0;
+  Object.entries(state.alliance || {}).forEach(([regionId, alliance]) => {
+    if (alliance.status === ALLIANCE_STATUS.ALLIED && alliance.carbonTax) {
+      totalTaxRate += alliance.carbonTax.ratePerTon || NEGOTIABLE_TERMS.carbonTaxRate.default;
+      totalGrowthRate += alliance.carbonTax.yearlyGrowthRate || NEGOTIABLE_TERMS.carbonTaxGrowth.default;
+      allyCount++;
+    }
+  });
+  const avgTaxRate = allyCount > 0 ? totalTaxRate / allyCount : NEGOTIABLE_TERMS.carbonTaxRate.default;
+  const avgGrowthRate = allyCount > 0 ? totalGrowthRate / allyCount : NEGOTIABLE_TERMS.carbonTaxGrowth.default;
 
   // Color classes
   const netCo2Class = netRate < -0.05 ? 'stat-good' : netRate > 0.05 ? 'stat-bad' : 'stat-warning';
@@ -12728,6 +13995,14 @@ function renderGlobalStatsCard() {
       <div class="stat-item">
         <span class="label">Income/mo</span>
         <span class="value">+${formatCurrency(projectedIncome)}</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Avg Tax Rate</span>
+        <span class="value">$${avgTaxRate.toFixed(0)}/ton</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Avg Tax Growth</span>
+        <span class="value">+${avgGrowthRate.toFixed(0)}%/yr</span>
       </div>
       <div class="stat-item">
         <span class="label">Projects</span>
@@ -12789,6 +14064,39 @@ function renderAllianceOverview() {
     }
   });
 
+  // Build happiness bars for each allied region
+  let happinessBarsHtml = '';
+  const alliedRegions = Object.entries(state.alliance || {})
+    .filter(([regionId, alliance]) => alliance.status === ALLIANCE_STATUS.ALLIED)
+    .sort((a, b) => a[1].happiness - b[1].happiness); // Sort by happiness (lowest first)
+
+  if (alliedRegions.length > 0) {
+    happinessBarsHtml = `
+      <div class="alliance-happiness-section">
+        <div class="alliance-happiness-header">Member Happiness</div>
+        <div class="alliance-happiness-list">
+          ${alliedRegions.map(([regionId, alliance]) => {
+            const regionName = getRegionName(regionId);
+            const happiness = Math.round(alliance.happiness || 50);
+            // Calculate color: red (0%) -> yellow (50%) -> green (100%)
+            const red = Math.round(255 * Math.max(0, Math.min(1, 2 - happiness / 50)));
+            const green = Math.round(255 * Math.max(0, Math.min(1, happiness / 50)));
+            const barColor = `rgb(${red}, ${green}, 50)`;
+            return `
+              <div class="alliance-happiness-row" onclick="showHappinessFactorsPopup('${regionId}')" title="Click for details">
+                <span class="alliance-happiness-name">${regionName}</span>
+                <div class="alliance-happiness-bar-container">
+                  <div class="alliance-happiness-bar" style="width: ${happiness}%; background: ${barColor};"></div>
+                </div>
+                <span class="alliance-happiness-value">${happiness}%</span>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `;
+  }
+
   container.innerHTML = `
     <h3>Climate Alliance</h3>
     <div class="alliance-stats">
@@ -12809,5 +14117,38 @@ function renderAllianceOverview() {
         <span class="value">${totalEmissionsReduction > 0 ? '-' : ''}${totalEmissionsReduction.toFixed(2)}/mo</span>
       </div>
     </div>
+    ${happinessBarsHtml}
   `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EXPOSE FUNCTIONS TO GLOBAL SCOPE FOR ONCLICK HANDLERS
+// ═══════════════════════════════════════════════════════════════
+// Since game.js is loaded as an ES Module, functions are not available
+// in the global scope by default. Expose functions used in onclick handlers.
+if (typeof window !== "undefined") {
+  window.startNegotiation = startNegotiation;
+  window.cancelNegotiation = cancelNegotiation;
+  window.submitNegotiationOffer = submitNegotiationOffer;
+  window.toggleDemand = toggleDemand;
+  window.acceptSpontaneousRequest = acceptSpontaneousRequest;
+  window.rejectSpontaneousRequest = rejectSpontaneousRequest;
+  window.closeFactorsPopup = closeFactorsPopup;
+  window.showHappinessFactorsPopup = showHappinessFactorsPopup;
+  window.showInterestFactorsPopup = showInterestFactorsPopup;
+  window.cancelBuildModeDialog = cancelBuildModeDialog;
+  window.confirmBuildModeDialog = confirmBuildModeDialog;
+  window.setProjectCategory = setProjectCategory;
+  // Slider update functions for negotiation terms
+  window.updateTermValue = updateTermValue;
+  window.updateCarbonTaxRate = updateCarbonTaxRate;
+  window.updateCarbonTaxGrowth = updateCarbonTaxGrowth;
+  // Header popup functions
+  window.showIncomeBreakdownPopup = showIncomeBreakdownPopup;
+  window.closeIncomeBreakdownPopup = closeIncomeBreakdownPopup;
+  window.openCarbonBalancePopup = openCarbonBalancePopup;
+  window.closeCarbonBalancePopup = closeCarbonBalancePopup;
+  window.openStatDetail = openStatDetail;
+  window.closeStatDetailPopup = closeStatDetailPopup;
+  window.switchCarbonTab = switchCarbonTab;
 }

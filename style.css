@@ -3440,11 +3440,13 @@ body::before {
 
 .tech-tree-graph {
   position: relative;
-  overflow-x: auto;
-  padding: 30px 20px 40px;
+  overflow: visible;
+  padding: 40px 30px 50px;
   background: linear-gradient(180deg, rgba(0, 0, 0, 0.35) 0%, rgba(0, 20, 40, 0.25) 100%);
   border-radius: 12px;
   border: 1px solid rgba(126, 184, 218, 0.1);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 /* Tier Labels Row */
@@ -3478,8 +3480,9 @@ body::before {
 
 .tech-connection {
   fill: none;
-  stroke: rgba(126, 184, 218, 0.35);
+  stroke: rgba(126, 184, 218, 0.55);
   stroke-width: 3;
+  filter: drop-shadow(0 0 2px rgba(126, 184, 218, 0.2));
   stroke-linecap: round;
 }
 
@@ -3494,7 +3497,7 @@ body::before {
   filter: drop-shadow(0 0 4px rgba(94, 214, 138, 0.5));
 }
 
-/* Tree Columns Layout - More Spacing */
+/* Tree Columns Layout - DEPRECATED (keeping for fallback) */
 .tech-tree-columns {
   display: flex;
   gap: 60px;
@@ -3512,14 +3515,73 @@ body::before {
   align-items: center;
 }
 
+/* ===== VERTICAL TREE LAYOUT (NEW) ===== */
+/* Basic techs at TOP, higher tiers flow DOWN, spread horizontally */
+.tech-tree-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 50px;
+  position: relative;
+  z-index: 2;
+  width: 100%;
+}
+
+.tech-tree-row {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.tech-row-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: rgba(126, 184, 218, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding-left: 8px;
+  border-left: 2px solid rgba(126, 184, 218, 0.3);
+}
+
+.tech-row-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: space-around;
+  padding: 0 20px;
+  width: 100%;
+}
+
 /* ===== HEXAGONAL TECH NODES ===== */
+
+/* Entrance animation for nodes */
+@keyframes nodeEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.85) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
 .tech-hex {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   cursor: pointer;
+  animation: nodeEnter 0.4s ease-out backwards;
 }
+
+/* Stagger animation by row */
+.tech-tree-row:nth-child(1) .tech-hex { animation-delay: 0ms; }
+.tech-tree-row:nth-child(2) .tech-hex { animation-delay: 100ms; }
+.tech-tree-row:nth-child(3) .tech-hex { animation-delay: 200ms; }
+.tech-tree-row:nth-child(4) .tech-hex { animation-delay: 300ms; }
+.tech-tree-row:nth-child(5) .tech-hex { animation-delay: 400ms; }
+.tech-tree-row:nth-child(6) .tech-hex { animation-delay: 500ms; }
 
 .hex-inner {
   width: 70px;
@@ -3542,13 +3604,14 @@ body::before {
 
 .hex-label {
   margin-top: 8px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  color: var(--muted);
+  color: rgba(200, 215, 230, 0.95);
   text-align: center;
   max-width: 90px;
   line-height: 1.2;
   transition: color 0.25s;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
 /* Hexagon States */
@@ -3557,7 +3620,7 @@ body::before {
 }
 
 .tech-hex.locked .hex-inner {
-  opacity: 0.35;
+  opacity: 0.5;
   border-color: rgba(150, 150, 150, 0.3);
   border-style: dashed;
 }
@@ -3579,7 +3642,7 @@ body::before {
 }
 
 .tech-hex.prereq-locked .hex-inner {
-  opacity: 0.35;
+  opacity: 0.5;
   border-color: rgba(150, 150, 150, 0.3);
   border-style: dashed;
 }
@@ -3620,12 +3683,12 @@ body::before {
 
 @keyframes hex-pulse {
   0%, 100% {
-    box-shadow: 0 0 15px rgba(240, 198, 111, 0.3), inset 0 0 10px rgba(240, 198, 111, 0.05);
+    box-shadow: 0 0 12px rgba(240, 198, 111, 0.4), inset 0 0 10px rgba(240, 198, 111, 0.05);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 25px rgba(240, 198, 111, 0.5), inset 0 0 20px rgba(240, 198, 111, 0.15);
-    transform: scale(1.03);
+    box-shadow: 0 0 28px rgba(240, 198, 111, 0.65), inset 0 0 20px rgba(240, 198, 111, 0.15);
+    transform: scale(1.04);
   }
 }
 
@@ -3665,8 +3728,14 @@ body::before {
 }
 
 @keyframes research-pulse {
-  0%, 100% { box-shadow: 0 0 8px rgba(33, 150, 243, 0.3); }
-  50% { box-shadow: 0 0 16px rgba(33, 150, 243, 0.5); }
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(33, 150, 243, 0.4);
+    border-color: rgba(33, 150, 243, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(33, 150, 243, 0.6);
+    border-color: rgba(33, 150, 243, 1);
+  }
 }
 
 .tech-hex.researching .hex-label {
@@ -3691,8 +3760,10 @@ body::before {
 
 /* Hover Effect */
 .tech-hex:hover .hex-inner {
-  transform: scale(1.08);
+  transform: scale(1.12);
   border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: 0 0 25px rgba(255, 255, 255, 0.25);
+  filter: brightness(1.1);
 }
 
 .tech-hex:hover .hex-label {
@@ -3700,29 +3771,42 @@ body::before {
 }
 
 /* ===== TOOLTIP (on hover) ===== */
+
+/* Tooltip slide-in animation */
+@keyframes tooltipSlideIn {
+  from {
+    transform: translateX(-50%) translateY(-8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+  }
+}
+
 .hex-tooltip {
   position: absolute;
   top: 100%;
   left: 50%;
   transform: translateX(-50%);
   margin-top: 15px;
-  width: 240px;
+  width: 260px;
   background: rgba(15, 25, 35, 0.98);
   border: 1px solid rgba(126, 184, 218, 0.3);
   border-radius: 10px;
   padding: 14px;
   opacity: 0;
   visibility: hidden;
-  transition: all 0.2s ease;
   z-index: 100;
   pointer-events: none;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .tech-hex:hover .hex-tooltip {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  animation: tooltipSlideIn 0.25s ease-out;
 }
 
 /* Tooltip arrow */
@@ -4483,7 +4567,7 @@ body::before {
   border-radius: 8px;
   padding: 12px 14px;
   margin: 8px 0;
-  animation: infoSlideIn 0.2s ease-out;
+  animation: infoSlideIn 0.2s ease-out backwards;
 }
 
 @keyframes infoSlideIn {
@@ -4590,6 +4674,10 @@ details summary .section-info-btn {
   display: none;
 }
 
+.popup-container.hidden .popup-overlay {
+  pointer-events: none;
+}
+
 .popup-overlay {
   position: absolute;
   top: 0;
@@ -4599,6 +4687,7 @@ details summary .section-info-btn {
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(4px);
   animation: overlayFadeIn 0.3s ease;
+  pointer-events: auto;
 }
 
 @keyframes overlayFadeIn {
@@ -4615,7 +4704,7 @@ details summary .section-info-btn {
   border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 @keyframes popupSlideIn {
@@ -4813,7 +4902,7 @@ details summary .section-info-btn {
   border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 .carbon-balance-dialog .popup-header {
@@ -5180,7 +5269,7 @@ details summary .section-info-btn {
   border-radius: var(--radius);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 .stat-detail-dialog .popup-header {
@@ -5600,7 +5689,7 @@ details summary .section-info-btn {
   padding: 24px;
   padding-bottom: 16px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  animation: popupSlideIn 0.3s ease;
+  animation: negotiationSlideIn 0.3s ease backwards;
   overflow: hidden;
 }
 
@@ -5644,7 +5733,7 @@ details summary .section-info-btn {
   padding-top: 12px;
 }
 
-@keyframes popupSlideIn {
+@keyframes negotiationSlideIn {
   from {
     opacity: 0;
     transform: translate(-50%, -45%);
@@ -5765,6 +5854,85 @@ details summary .section-info-btn {
 
 .term-value.above-default {
   color: var(--region-warm);
+}
+
+.term-value.beneficial {
+  color: var(--region-cool);
+}
+
+.term-value.detrimental {
+  color: var(--region-warm);
+}
+
+/* Income preview section in negotiation popup */
+.income-preview-section {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+  border: 1px solid var(--panel-border);
+}
+
+.income-preview-section h4 {
+  color: var(--text);
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.income-preview-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.income-preview-row {
+  display: grid;
+  grid-template-columns: 140px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.income-preview-row:last-child {
+  border-bottom: none;
+}
+
+.income-preview-row.income-total {
+  border-top: 1px solid var(--panel-border);
+  padding-top: 12px;
+  margin-top: 4px;
+}
+
+.income-label {
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.income-detail {
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.income-value {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.income-total .income-label {
+  font-weight: 700;
+}
+
+.income-total .income-value {
+  color: var(--region-cool);
+  font-weight: 700;
+  font-size: 1rem;
 }
 
 /* Interest display in negotiation header */
@@ -6375,7 +6543,7 @@ details summary .section-info-btn {
   border: 1px solid var(--panel-border);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
 .build-mode-header {
@@ -6631,11 +6799,21 @@ details summary .section-info-btn {
   gap: 8px;
 }
 
+/* Construction Panel */
+.construction-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 12px;
+}
+
 .construction-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  padding-right: 20px;
 }
 
 .construction-header h4 {
@@ -7600,4 +7778,499 @@ details summary .section-info-btn {
   padding-bottom: 8px;
   border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
   margin-bottom: 8px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INCOME BREAKDOWN POPUP
+   ═══════════════════════════════════════════════════════════════ */
+
+.income-breakdown-dialog {
+  position: relative;
+  z-index: 1;
+  min-width: 420px;
+  max-width: 520px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, rgba(15, 25, 35, 0.98) 0%, rgba(25, 40, 55, 0.98) 100%);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.income-breakdown-dialog .popup-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(180, 130, 0, 0.2) 100%);
+  border-bottom: 2px solid rgba(255, 193, 7, 0.4);
+}
+
+.income-breakdown-dialog .popup-icon {
+  font-size: 1.5rem;
+}
+
+.income-breakdown-dialog .popup-title {
+  flex: 1;
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-primary);
+}
+
+.income-breakdown-dialog .popup-close {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.income-breakdown-dialog .popup-close:hover {
+  color: var(--text-primary);
+}
+
+.income-breakdown-dialog .popup-body {
+  padding: 16px 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.income-section {
+  margin-bottom: 16px;
+}
+
+.income-section h4 {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--panel-border);
+  padding-bottom: 6px;
+}
+
+.income-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.income-item {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.income-item-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.income-item-detail {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-family: var(--font-mono);
+}
+
+.income-item-value {
+  color: var(--accent-green);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+  min-width: 80px;
+}
+
+.income-item.income-empty {
+  color: var(--text-secondary);
+  font-style: italic;
+  justify-content: center;
+  padding: 12px;
+}
+
+.income-subtotal {
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  text-align: right;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+}
+
+.income-section.income-totals {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.2) 100%);
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 12px;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.income-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.income-row .income-label {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.income-row .income-value {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.income-row.income-cost .income-value {
+  color: #e07474;
+}
+
+.income-row.income-net {
+  margin-top: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.income-row.income-net .income-label {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.income-row.income-net .income-value {
+  font-size: 1.1rem;
+  color: #ffc107;
+}
+
+.income-note {
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.income-note.hidden {
+  display: none;
+}
+
+/* Make header finance clickable */
+.header-finance .clickable {
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.header-finance .clickable:hover {
+  color: var(--accent-green);
+  text-shadow: 0 0 8px rgba(82, 196, 137, 0.5);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   FACTOR HELP BUTTON & POPUP
+   ═══════════════════════════════════════════════════════════════ */
+
+.factor-help-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--accent-color);
+  background: transparent;
+  color: var(--accent-color);
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.2s;
+}
+
+.factor-help-btn:hover {
+  background: var(--accent-color);
+  color: var(--bg-primary);
+}
+
+/* Factors Popup Dialog */
+.factors-popup-dialog {
+  position: relative;
+  z-index: 10002;
+  background: linear-gradient(145deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  max-width: 400px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  animation: popup-appear 0.2s ease-out;
+}
+
+.factors-breakdown {
+  padding: 4px 0;
+}
+
+.factors-header {
+  padding: 8px 0 12px;
+  border-bottom: 1px solid var(--panel-border);
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.factors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.factor-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+}
+
+.factor-icon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+}
+
+.factor-label {
+  flex: 1;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.factor-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  min-width: 60px;
+  text-align: right;
+}
+
+.factor-value.positive {
+  color: var(--accent-green);
+}
+
+.factor-value.negative {
+  color: #e07474;
+}
+
+.factors-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding: 12px 10px;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.factors-note {
+  margin-top: 12px;
+  padding: 10px;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  color: var(--text-tertiary);
+  text-align: center;
+}
+
+.factors-section-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  margin-bottom: 8px;
+}
+
+/* Tips Section */
+.factors-tips {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.tips-header {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent-green);
+  margin-bottom: 10px;
+}
+
+.tips-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tip-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background: rgba(82, 196, 137, 0.1);
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-green);
+}
+
+.tip-icon {
+  font-size: 1.1rem;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.tip-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tip-label {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.tip-desc {
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+.tip-value {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-green);
+  flex-shrink: 0;
+  min-width: 50px;
+  text-align: right;
+}
+
+/* Alliance Happiness Bars in World Tab */
+.alliance-happiness-section {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.alliance-happiness-header {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+}
+
+.alliance-happiness-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.alliance-happiness-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: var(--bg-tertiary);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.alliance-happiness-row:hover {
+  background: var(--bg-secondary);
+}
+
+.alliance-happiness-name {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  min-width: 80px;
+  flex-shrink: 0;
+}
+
+.alliance-happiness-bar-container {
+  flex: 1;
+  height: 8px;
+  background: var(--bg-primary);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.alliance-happiness-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease, background 0.3s ease;
+}
+
+/* Carbon Tax Control Sliders */
+.carbon-tax-control input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--bg-primary);
+  border-radius: 3px;
+  outline: none;
+}
+
+.carbon-tax-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.carbon-tax-control input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--accent-bright);
+  transform: scale(1.1);
+}
+
+.carbon-tax-control input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.carbon-tax-control input[type="range"]::-moz-range-thumb:hover {
+  background: var(--accent-bright);
+  transform: scale(1.1);
+}
+
+.alliance-happiness-value {
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-secondary);
+  min-width: 32px;
+  text-align: right;
 }

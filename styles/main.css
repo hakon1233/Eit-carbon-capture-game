@@ -1,0 +1,19 @@
+/**
+ * Main CSS Entry Point
+ * Imports all modular CSS files in the correct order
+ *
+ * Import order matters:
+ * 1. Variables (CSS custom properties) - must come first
+ * 2. Base (resets, body, utilities)
+ * 3. Layout (structural elements)
+ * 4. Components (buttons, forms, cards)
+ * 5. Panels (game-specific panels)
+ * 6. Map (map-specific styles)
+ */
+
+@import "./variables.css";
+@import "./base.css";
+@import "./layout.css";
+@import "./components.css";
+@import "./panels.css";
+@import "./map.css";
