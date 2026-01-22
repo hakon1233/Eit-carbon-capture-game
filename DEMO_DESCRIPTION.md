@@ -16,34 +16,34 @@ Before starting the demo:
 ## Section 1: Launch & Introduction (~2 min)
 
 ### What to Show
-- The game launch screen with title "Carbon Capture" and difficulty selector
+- The game launch screen with title "Carbon Capture: Climate Overseer" and difficulty selector
 
 ### What to Explain
 
 **Opening:**
-> "Welcome to Carbon Capture, a climate strategy game where you play as a global climate organization tasked with preventing catastrophic climate change."
+> "Welcome to Carbon Capture: Climate Overseer, a climate strategy game where you play as a global climate organization tasked with preventing catastrophic climate change."
 
 **The Goal:**
-> "Your mission is to reduce global temperature from the current +1.4°C anomaly down to +1.0°C or below by the year 2100. You'll do this by forming international alliances, funding climate projects, and developing new technologies."
+> "Your mission is to reduce global temperature from the current +1.09°C anomaly down to +1.0°C or below by the year 2100. You'll do this by forming international alliances, funding climate projects, and developing new technologies."
 
 **Difficulty Modes:**
 Point out the 5 difficulty options and explain each:
 - **Tutorial**: Generous budget, slow warming, helpful hints
-- **Standard**: Balanced gameplay experience
-- **Challenging**: Tighter budget, faster warming
+- **Easy**: Relaxed gameplay experience
+- **Normal**: Balanced challenge
 - **Hard**: Minimal budget, aggressive warming
 - **Extreme**: Near-impossible conditions for expert players
 
 ### Action
 - Select **Tutorial** mode
-- Click "Start Game"
+- Click "New Game"
 
 **After Game Loads:**
 Point out the initial state in the header:
-- **Budget**: Your available funds (starts at $500B in Tutorial)
+- **Budget**: Your available funds (starts at $50B in Tutorial)
 - **Date**: January 2025 - you have 75 years
 - **CO2**: Current atmospheric concentration (~420 ppm)
-- **Temperature**: Current global anomaly (+1.4°C)
+- **Temperature**: Current global anomaly (+1.09°C)
 
 ---
 
@@ -61,10 +61,12 @@ Point out the initial state in the header:
 
 **Map Granularity:**
 Point to the granularity selector (Continents | Regions | Countries):
-> "You can view the map at different levels of detail. Continents gives you 6 major regions. Regions breaks these into sub-regions. Countries shows individual nations."
+> "During initial setup, you can view the map at different levels of detail. Continents gives you 6 major regions. Regions breaks these into sub-regions. Countries shows individual nations."
+
+Note: The granularity selector is only available during the initial game setup phase, not during regular gameplay.
 
 ### Action
-- Click through each granularity option to demonstrate
+- Click through each granularity option to demonstrate (during setup)
 
 **Visualization Modes:**
 Point to the visualization mode selector:
@@ -81,12 +83,12 @@ Cycle through key modes and explain:
 > "Click any region to select it and see detailed information."
 
 ### Action
-- Click on **Europe** on the map
+- Click on **North America** on the map
 - Point out that it highlights and shows in the Region panel
 
 **Alliance Legend:**
 Point to the map legend:
-> "Green regions are your allies - you can build projects there. Gray regions are not allied yet - you'll need to negotiate with them first. Europe starts as your only ally."
+> "Green regions are your allies - you can build projects there. Gray regions are not allied yet - you'll need to negotiate with them first. North America starts as your only ally (your home region)."
 
 ---
 
@@ -100,10 +102,10 @@ Point to the map legend:
 ### What to Explain
 
 **Why Alliances Matter:**
-> "To take climate action in a region, you need them in your alliance. Without an alliance, you can't build projects or receive funding from that region. Currently, only Europe is allied with us."
+> "To take climate action in a region, you need them in your alliance. Without an alliance, you can't build projects or receive funding from that region. Currently, only North America is allied with us as our home region."
 
 ### Action
-- Click on **Asia** (or another non-allied region)
+- Click on **Europe** (or another non-allied region)
 
 **Region Interest:**
 Point to the Alliance Interest indicator:
@@ -115,11 +117,13 @@ Point to the Alliance Interest indicator:
 **Negotiation Popup:**
 > "This is the negotiation screen. At the top you see the success probability - this is your chance of the region accepting."
 
-Point out the four alliance terms sliders:
-1. **Carbon Reduction Target**: How much they must reduce emissions
-2. **Renewable Energy Target**: Minimum % of renewables in their power grid
-3. **CCS Requirement**: Minimum carbon capture projects they must host
-4. **Carbon Tax Rate**: The carbon tax they must implement
+Point out the alliance terms sliders:
+1. **Min/Max Climate Dedication**: The range of GDP percentage the region commits to climate action
+2. **Power Stability Goal**: Target grid stability percentage
+3. **Power Supply Goal**: Target power supply sufficiency
+4. **Goal Deadline**: Years to achieve the targets
+5. **Carbon Tax Rate**: The carbon tax they must implement
+6. **Carbon Tax Growth**: Annual increase in carbon tax
 
 > "You can adjust these terms. Lower targets make the deal more attractive (higher success chance), but mean less climate action. Higher targets are harder to negotiate but create more impact."
 
@@ -156,7 +160,7 @@ If failed:
 ### What to Explain
 
 ### Action
-- Click on **Europe** to select an allied region
+- Click on **North America** to select an allied region
 - Click the **Region** tab to see full details
 
 **Climate Finance Section:**
@@ -186,7 +190,8 @@ Point out:
 **Emissions by Sector:**
 > "This breaks down where the region's CO2 emissions come from."
 
-Point out the four sectors:
+Point out the five sectors:
+- **Power Generation**: Electricity production from fossil fuels
 - **Industry**: Manufacturing, mining, construction
 - **Transport**: Cars, trucks, planes, ships
 - **Buildings**: Heating, cooling, electricity use
@@ -209,11 +214,10 @@ Point out:
 - **Duration**: Months until completion
 - **Effectiveness Badge**: Regional multiplier (look for ★ ratings)
 
-> "Different project categories do different things:"
-- **Renewable Energy**: Solar, wind, nuclear - clean power
-- **Carbon Capture (CCS)**: Captures CO2 from atmosphere or industry
-- **Research**: Generates Research Points to unlock technologies
-- **Nature-Based**: Reforestation, ocean restoration
+> "Projects are organized into three tabs:"
+- **Climate**: Carbon capture, reforestation, and emission reduction projects
+- **Power**: Energy generation including renewables, nuclear, and grid infrastructure
+- **Economic**: Research centers and economic development projects
 
 ### Action
 - Click on a **Research Center** project
@@ -244,7 +248,7 @@ Point to the Research Points indicator:
 > "Research Points (RP) are earned from Research Centers. You spend RP to unlock new technologies."
 
 **Tech Tree Structure:**
-> "Technologies are organized in tiers. BASIC tier is available from the start. Higher tiers require unlocking with RP."
+> "Technologies are organized in tiers. START tier is available from the beginning. Higher tiers require unlocking with RP."
 
 Point out the visual elements:
 - **Gold border**: Available to research now
@@ -299,10 +303,10 @@ Scroll to the Tipping Points section:
 > "Tipping points are critical temperature thresholds. If crossed, they trigger irreversible changes that accelerate warming."
 
 Explain each tipping point:
-1. **+1.5°C - Arctic Sea Ice**: Ice reflects sunlight. Without it, oceans absorb more heat.
-2. **+2.0°C - Permafrost Methane**: Frozen ground releases trapped methane (powerful greenhouse gas).
-3. **+2.5°C - Amazon Dieback**: Rainforest dies and releases stored carbon.
-4. **+2.8°C - Ocean Circulation**: Ocean currents that regulate climate slow or stop.
+1. **+1.4°C - Arctic Sea Ice Decline**: Ice reflects sunlight. Without it, oceans absorb more heat.
+2. **+1.7°C - Permafrost Methane Release**: Frozen ground releases trapped methane (powerful greenhouse gas).
+3. **+2.1°C - Amazon Rainforest Dieback**: Rainforest dies and releases stored carbon.
+4. **+2.4°C - Ocean Circulation Weakening**: Ocean currents that regulate climate slow or stop.
 
 > "Once triggered, these cannot be undone. Avoiding tipping points is crucial - they create runaway warming that makes your job much harder."
 
@@ -323,7 +327,8 @@ Click through the tabs:
 
 ### What to Show
 - Explain the event system
-- News Briefing panel
+- Global Briefing panel
+- Active Disasters section
 
 ### What to Explain
 
@@ -333,7 +338,7 @@ Click through the tabs:
 Explain event categories:
 
 **Climate Events:**
-> "Heat waves, hurricanes, floods, droughts. These affect regional income and can cause damage. However, they also increase public awareness, making climate campaigns more effective."
+> "Heat waves, hurricanes, floods, droughts, volcanic eruptions. These affect regional income and can cause damage. However, they also increase public awareness, making climate campaigns more effective."
 
 **Political Events:**
 > "International summits, policy changes, elections. These can boost or reduce regional climate dedication."
@@ -344,9 +349,13 @@ Explain event categories:
 **Technology Breakthroughs:**
 > "Random discoveries that provide permanent bonuses - cost reductions, efficiency improvements. These are always beneficial."
 
-**News Briefing:**
-Point to the News Briefing panel on the right:
-> "Recent events appear here as news items. Read them to understand what's happening and how it affects your strategy."
+**Global Briefing:**
+Point to the Global Briefing panel on the right:
+> "Recent events and game updates appear here as news items. Read them to understand what's happening and how it affects your strategy."
+
+**Active Disasters:**
+Point to the Active Disasters section:
+> "When disasters strike, they appear here showing the affected region, impact (like income reduction), and duration remaining."
 
 ### Action
 - If any events have occurred, read through them
@@ -395,18 +404,21 @@ Point to the News Briefing panel on the right:
 - Point to the "Next Month" button:
 > "Click this to advance time. One month passes, income arrives, construction progresses, and climate changes."
 
-- Point to the hamburger menu:
-> "The menu lets you save/load games, view achievements, and access settings."
+- Point to the control buttons in the top bar:
+  - **Restart Game**: Start a new game from the beginning
+  - **Exit**: Return to the main menu
+  - **?**: Access help and game information
 
 **Achievements:**
-> "The game tracks achievements for completing various challenges. These add replayability and goals beyond just winning."
+Point to the Achievements section in the right panel:
+> "The game tracks achievements (shown as X/15) for completing various challenges. These add replayability and goals beyond just winning."
 
 ---
 
 ## Demo Conclusion
 
 **Wrap Up:**
-> "That covers the main features of Carbon Capture. The game combines strategy elements - resource management, diplomacy, technology development - with real climate science. The data comes from sources like the Global Carbon Budget and IEA."
+> "That covers the main features of Carbon Capture: Climate Overseer. The game combines strategy elements - resource management, diplomacy, technology development - with real climate science. The data comes from sources like the Global Carbon Budget and IEA."
 
 **Invite Questions:**
 > "Would you like to see anything in more detail, or do you have questions about how any system works?"
@@ -422,15 +434,18 @@ Point to the News Briefing panel on the right:
 | CO2 | Header | Atmospheric CO2 (ppm) |
 | Temperature | Header | Global temp anomaly |
 | World/Region/Tech | Tabs | Main navigation |
-| Granularity | Below tabs | Map detail level |
+| Granularity | Setup phase | Map detail level (setup only) |
 | Visualization | Below tabs | Map coloring mode |
 | Global Status | Left panel | Climate metrics |
 | Tipping Points | Left panel | Temperature thresholds |
 | Climate History | Left panel | Graph of metrics |
 | Region Details | Right panel | Selected region info |
 | Projects | Region panel | Available construction |
-| News Briefing | Bottom right | Recent events |
-| Next Month | Bottom | Advance time |
+| Global Briefing | Right panel | Recent events |
+| Active Disasters | Right panel | Current disaster effects |
+| Next Month | Top center | Advance time |
+| Restart Game | Top center | Start new game |
+| Exit | Top center | Return to main menu |
 
 ---
 
