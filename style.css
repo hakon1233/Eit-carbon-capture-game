@@ -1637,6 +1637,53 @@ body::before {
   border-left: 3px solid #3498db;
 }
 
+/* Locked CCS Project Cards */
+.project-card.locked-ccs {
+  opacity: 0.55;
+  background: rgba(60, 60, 70, 0.25);
+  border: 1px dashed rgba(150, 150, 150, 0.35);
+  cursor: not-allowed;
+}
+
+.project-card.locked-ccs .project-button {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: rgba(80, 80, 80, 0.4);
+}
+
+.project-locked-status {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(240, 198, 111, 0.85);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.project-description-locked {
+  font-size: 0.72rem;
+  color: var(--muted);
+  opacity: 0.8;
+}
+
+/* CCS Project Cards */
+.project-card.ccs-project {
+  background: rgba(15, 25, 40, 0.85);
+  border-color: rgba(52, 211, 153, 0.25);
+  border-left: 3px solid rgba(52, 211, 153, 0.6);
+}
+
+/* CCS Infrastructure Status Banner */
+.ccs-infrastructure-status {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.15), rgba(34, 197, 94, 0.1));
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 0.78rem;
+  color: rgba(52, 211, 153, 0.95);
+  font-weight: 500;
+}
+
 .project-card p {
   margin: 0;
   color: var(--muted);

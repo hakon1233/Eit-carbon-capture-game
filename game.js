@@ -690,11 +690,33 @@ function calculatePlayerCCSRemoval() {
 
   let totalRemoval = 0;
 
-  Object.values(state.regions).forEach(region => {
+  // All CCS project types that capture/remove CO2
+  const ccsProjectTypes = [
+    'carbonCapture', 'directAirCapture',
+    'postCombustionCapture', 'preCombustionCapture', 'oxyfuelCapture',
+    'beccsPlant', 'ccsHubSmall', 'ccsHubMajor'
+  ];
+
+  Object.entries(state.regions).forEach(([regionId, region]) => {
+    // Calculate infrastructure bonus for this region
+    let infraBonus = 1.0;
+    const hasTransport = region.projects?.some(p =>
+      ['co2Pipeline', 'co2OffshorePipeline', 'co2ShipTerminal'].includes(p.type)
+    );
+    const hasStorage = region.projects?.some(p =>
+      ['depletedReservoirStorage', 'salineAquiferStorage'].includes(p.type)
+    );
+    if (hasTransport) infraBonus += 0.25;
+    if (hasStorage) infraBonus += 0.25;
+    if (hasTransport && hasStorage) infraBonus += 0.15;
+
     region.projects?.forEach(project => {
-      if (project.type === 'carbonCapture' || project.type === 'directAirCapture') {
-        // Convert project CO2 reduction to Gt/year
-        totalRemoval += (project.co2Reduction || 0) / 1000;
+      if (ccsProjectTypes.includes(project.type)) {
+        // Get base CO2 reduction from project
+        const baseCo2Reduction = project.co2Reduction || 0;
+        // Apply infrastructure bonus
+        const adjustedReduction = baseCo2Reduction * infraBonus;
+        totalRemoval += adjustedReduction;
       }
     });
   });
@@ -12530,6 +12552,177 @@ function renderRegionFact(climateData) {
 // Track selected project category (default to climate)
 let selectedProjectCategory = "climate";
 
+// CCS Projects list for dedicated section
+const CCS_PROJECTS = [
+  'postCombustionCapture', 'preCombustionCapture', 'oxyfuelCapture',
+  'directAirCapture', 'beccsPlant', 'co2Pipeline', 'co2OffshorePipeline',
+  'co2ShipTerminal', 'depletedReservoirStorage', 'salineAquiferStorage',
+  'ccsHubSmall', 'ccsHubMajor'
+];
+
+// CCS Capture projects that benefit from infrastructure
+const CCS_CAPTURE_PROJECTS = [
+  'postCombustionCapture', 'preCombustionCapture', 'oxyfuelCapture',
+  'directAirCapture', 'beccsPlant', 'ccsHubSmall', 'ccsHubMajor'
+];
+
+// CCS Infrastructure types
+const CCS_TRANSPORT_PROJECTS = ['co2Pipeline', 'co2OffshorePipeline', 'co2ShipTerminal'];
+const CCS_STORAGE_PROJECTS = ['depletedReservoirStorage', 'salineAquiferStorage'];
+
+/**
+ * Calculate infrastructure bonus for CCS capture projects
+ * @param {string} regionId - Region to check for infrastructure
+ * @returns {Object} { bonus: number, hasTransport: boolean, hasStorage: boolean }
+ */
+function getCCSInfrastructureBonus(regionId) {
+  const region = state.regions[regionId];
+  if (!region?.projects) return { bonus: 1.0, hasTransport: false, hasStorage: false };
+
+  let bonus = 1.0;
+
+  // Check for transport infrastructure
+  const hasTransport = region.projects.some(p =>
+    CCS_TRANSPORT_PROJECTS.includes(p.type)
+  );
+  if (hasTransport) bonus += 0.25; // +25% effectiveness
+
+  // Check for storage infrastructure
+  const hasStorage = region.projects.some(p =>
+    CCS_STORAGE_PROJECTS.includes(p.type)
+  );
+  if (hasStorage) bonus += 0.25; // +25% effectiveness
+
+  // Full chain bonus (transport + storage)
+  if (hasTransport && hasStorage) bonus += 0.15; // Extra +15% synergy
+
+  return { bonus, hasTransport, hasStorage };
+}
+
+/**
+ * Render a locked CCS project card showing requirements
+ * @param {string} projectType - The project type ID
+ * @param {Object} project - The project definition
+ * @returns {HTMLElement} The locked project card element
+ */
+function renderLockedCCSProject(projectType, project) {
+  const card = document.createElement("div");
+  card.className = "project-card locked-ccs";
+
+  // Find the required tech
+  const requiredTechId = project.unlockedBy;
+  const requiredTech = TECHNOLOGIES.find(t => t.id === requiredTechId);
+
+  const button = document.createElement("button");
+  button.className = "project-button";
+  button.disabled = true;
+  button.textContent = `${project.label} (Locked)`;
+
+  const details = document.createElement("p");
+
+  const lockStatus = document.createElement("span");
+  lockStatus.className = "project-locked-status";
+  lockStatus.textContent = `🔒 Requires: ${requiredTech?.name || 'Unknown Technology'}`;
+
+  const descSpan = document.createElement("span");
+  descSpan.className = "project-description-locked";
+  descSpan.textContent = project.description;
+
+  details.appendChild(lockStatus);
+  details.appendChild(document.createElement("br"));
+  details.appendChild(descSpan);
+
+  card.append(button, details);
+  return card;
+}
+
+/**
+ * Render the CCS projects section showing both locked and unlocked projects
+ * @param {string} regionId - The region to render for
+ * @param {Object} climateData - Climate data for effectiveness calculations
+ * @param {Object} difficulty - Difficulty settings
+ */
+function renderCCSProjectsSection(regionId, climateData, difficulty) {
+  const infraBonus = getCCSInfrastructureBonus(regionId);
+
+  // Add infrastructure status indicator if any bonuses active
+  if (infraBonus.hasTransport || infraBonus.hasStorage) {
+    const statusEl = document.createElement("div");
+    statusEl.className = "ccs-infrastructure-status";
+    let statusText = "🏗️ Infrastructure Bonus: ";
+    const bonusParts = [];
+    if (infraBonus.hasTransport) bonusParts.push("📦 Transport (+25%)");
+    if (infraBonus.hasStorage) bonusParts.push("💾 Storage (+25%)");
+    if (infraBonus.hasTransport && infraBonus.hasStorage) bonusParts.push("🔗 Full Chain (+15%)");
+    statusText += bonusParts.join(" | ");
+    statusText += ` = +${Math.round((infraBonus.bonus - 1) * 100)}% total`;
+    statusEl.textContent = statusText;
+    projectButtonsEl.appendChild(statusEl);
+  }
+
+  // Render each CCS project
+  CCS_PROJECTS.forEach(projectType => {
+    const project = PROJECT_TYPES[projectType];
+    if (!project) return;
+
+    const isUnlocked = isProjectUnlocked(projectType);
+
+    if (isUnlocked) {
+      // Render unlocked project with normal card
+      const card = document.createElement("div");
+      card.className = "project-card ccs-project";
+
+      const effectiveness = getProjectEffectiveness(projectType, regionId, climateData);
+      const adjustedCost = Math.round(effectiveness.cost * difficulty.costMultiplier * 10) / 10;
+
+      // Calculate CO2 reduction with infrastructure bonus
+      let adjustedReduction = effectiveness.co2Reduction;
+      if (CCS_CAPTURE_PROJECTS.includes(projectType) && infraBonus.bonus > 1) {
+        adjustedReduction = adjustedReduction * infraBonus.bonus;
+      }
+
+      const button = document.createElement("button");
+      button.className = "project-button";
+
+      const constructionTime = project.constructionMonths || 1;
+      const timeStr = formatConstructionTime(constructionTime);
+      button.textContent = `${project.label} (${formatCurrency(adjustedCost)}, ${timeStr})`;
+
+      // Add infrastructure bonus badge for capture projects
+      if (CCS_CAPTURE_PROJECTS.includes(projectType) && infraBonus.bonus > 1) {
+        const bonusBadge = document.createElement("span");
+        bonusBadge.className = "project-effectiveness bonus has-tooltip";
+        bonusBadge.textContent = `+${Math.round((infraBonus.bonus - 1) * 100)}% infra bonus`;
+        bonusBadge.setAttribute("data-tooltip", "Infrastructure bonus from transport and storage projects in this region");
+        button.appendChild(bonusBadge);
+      }
+
+      button.disabled = state.gameOver || state.funds < adjustedCost;
+      button.addEventListener("click", () => buildProjectWithEffectiveness(regionId, projectType, effectiveness));
+
+      const effectParts = [];
+      if (adjustedReduction > 0) {
+        effectParts.push(`-${adjustedReduction.toFixed(2)} Gt CO2/yr`);
+      }
+      if (project.income > 0) {
+        effectParts.push(`+${formatCurrency(project.income)} / month`);
+      }
+
+      const effectText = effectParts.length ? effectParts.join(", ") : "Infrastructure only";
+
+      const details = document.createElement("p");
+      details.textContent = `${project.description} ${effectText}.`;
+
+      card.append(button, details);
+      projectButtonsEl.appendChild(card);
+    } else {
+      // Render locked project
+      const lockedCard = renderLockedCCSProject(projectType, project);
+      projectButtonsEl.appendChild(lockedCard);
+    }
+  });
+}
+
 function renderProjectButtons() {
   projectButtonsEl.innerHTML = "";
 
@@ -12557,27 +12750,43 @@ function renderProjectButtons() {
   // Category tabs
   const tabsContainer = document.createElement("div");
   tabsContainer.className = "project-category-tabs";
-  tabsContainer.innerHTML = `
-    <button class="category-tab ${selectedProjectCategory === 'climate' ? 'active' : ''}" onclick="setProjectCategory('climate')">
-      Climate
-    </button>
-    <button class="category-tab ${selectedProjectCategory === 'power' ? 'active' : ''}" onclick="setProjectCategory('power')">
-      Power
-    </button>
-    <button class="category-tab ${selectedProjectCategory === 'economic' ? 'active' : ''}" onclick="setProjectCategory('economic')">
-      Economic
-    </button>
-  `;
+
+  const categories = [
+    { id: 'climate', label: 'Climate' },
+    { id: 'power', label: 'Power' },
+    { id: 'ccs', label: '🏭 CCS' },
+    { id: 'economic', label: 'Economic' }
+  ];
+
+  categories.forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = `category-tab ${selectedProjectCategory === cat.id ? 'active' : ''}`;
+    btn.textContent = cat.label;
+    btn.addEventListener("click", () => setProjectCategory(cat.id));
+    tabsContainer.appendChild(btn);
+  });
+
   projectButtonsEl.appendChild(tabsContainer);
 
   // Get climate data for effectiveness calculations
   const climateData = getClimateDataForRegion(selectedRegionId);
   const difficulty = getDifficulty();
 
+  // If CCS category selected, render CCS section and return
+  if (selectedProjectCategory === 'ccs') {
+    renderCCSProjectsSection(selectedRegionId, climateData, difficulty);
+    return;
+  }
+
   // Filter projects by category and unlock status
   const projectEntries = Object.entries(PROJECT_TYPES).filter(([type, project]) => {
     // First check if project is unlocked (via technology research)
     if (!isProjectUnlocked(type)) {
+      return false;
+    }
+
+    // Exclude CCS projects from other tabs (they have their own tab)
+    if (CCS_PROJECTS.includes(type)) {
       return false;
     }
 
