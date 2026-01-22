@@ -13,8 +13,8 @@
           <div class="header-compact">
             <!-- Budget + Income -->
             <div class="header-finance">
-              <span class="finance-budget" id="credits">$100 B</span>
-              <span class="finance-income" id="income-display">+$26.0 B/mo</span>
+              <span class="finance-budget clickable" id="credits" onclick="showIncomeBreakdownPopup()" title="Click for income breakdown">$100 B</span>
+              <span class="finance-income clickable" id="income-display" onclick="showIncomeBreakdownPopup()" title="Click for income breakdown">+$26.0 B/mo</span>
             </div>
 
             <!-- Temperature Gauge -->
@@ -55,9 +55,9 @@
               <span class="stat-label">Allies</span>
               <span class="stat-value" id="alliance-progress">1/6</span>
             </div>
-            <div class="header-stat clickable" title="Research Points - Earned from research centers, used to unlock technologies (click for details)" onclick="openStatDetail('research')">
-              <span class="stat-label">RP</span>
-              <span class="stat-value" id="rp-display">56</span>
+            <div class="header-stat clickable" title="Research Points per month - Assigned/Total (click for details)" onclick="openStatDetail('research')">
+              <span class="stat-label">RP/mo</span>
+              <span class="stat-value" id="rp-display">0/0</span>
             </div>
             <div class="header-stat clickable" title="Built Projects - Total completed projects across all regions (click for details)" onclick="openStatDetail('projects')">
               <span class="stat-label">Built</span>
@@ -107,7 +107,7 @@
             <div><strong>Net CO2</strong> - Monthly CO2 change (green = reducing!)</div>
             <div><strong>Feedback</strong> - Extra CO2 from climate feedback loops</div>
             <div><strong>Projects</strong> - Total projects built worldwide</div>
-            <div><strong>RP</strong> - Research Points for unlocking technologies</div>
+            <div><strong>RP/mo</strong> - Research Points per month (Assigned/Total from research centers)</div>
             <div><strong>Campaigns</strong> - Active climate policy campaigns</div>
             <div><strong>Disasters</strong> - Active natural disasters</div>
             <div><strong>Tipping</strong> - Tipping points triggered (0-4)</div>
@@ -393,6 +393,8 @@
             <div id="region-projects" class="region-projects"></div>
 
             <div id="region-fact" class="region-fact"></div>
+
+            <div id="construction-panel" class="construction-panel"></div>
           </section>
           </div><!-- End Region Tab Content -->
         </aside>
@@ -463,6 +465,59 @@
       </div>
     </div>
 
+    <!-- Income Breakdown Popup -->
+    <div id="income-breakdown-popup" class="popup-container hidden">
+      <div class="popup-overlay" onclick="closeIncomeBreakdownPopup()"></div>
+      <div class="income-breakdown-dialog">
+        <div class="popup-header">
+          <span class="popup-icon">💰</span>
+          <h3 class="popup-title">Monthly Income Breakdown</h3>
+          <button class="popup-close" onclick="closeIncomeBreakdownPopup()">&times;</button>
+        </div>
+        <div class="popup-body">
+          <!-- Climate Budget Section -->
+          <div class="income-section">
+            <h4>Climate Budget Income</h4>
+            <div id="income-climate-list" class="income-list"></div>
+            <div class="income-subtotal" id="income-climate-total"></div>
+          </div>
+
+          <!-- Carbon Tax Section -->
+          <div class="income-section">
+            <h4>Carbon Tax Revenue</h4>
+            <div id="income-tax-list" class="income-list"></div>
+            <div class="income-subtotal" id="income-tax-total"></div>
+          </div>
+
+          <!-- Project Income Section -->
+          <div class="income-section">
+            <h4>Project Income</h4>
+            <div id="income-project-list" class="income-list"></div>
+            <div class="income-subtotal" id="income-project-total"></div>
+          </div>
+
+          <!-- Totals Section -->
+          <div class="income-section income-totals">
+            <div class="income-row">
+              <span class="income-label">Gross Income</span>
+              <span class="income-value" id="income-gross-total"></span>
+            </div>
+            <div class="income-row income-cost">
+              <span class="income-label">Research Center Costs</span>
+              <span class="income-value" id="income-costs"></span>
+            </div>
+            <div class="income-row income-net">
+              <span class="income-label">Net Income</span>
+              <span class="income-value" id="income-net-total"></span>
+            </div>
+          </div>
+
+          <div class="income-note" id="income-multiplier-note"></div>
+        </div>
+        <button class="popup-dismiss" onclick="closeIncomeBreakdownPopup()">Close</button>
+      </div>
+    </div>
+
     <!-- Stat Detail Popup (Generic) -->
     <div id="stat-detail-popup" class="popup-container hidden">
       <div class="popup-overlay" onclick="closeStatDetailPopup()"></div>
@@ -479,8 +534,7 @@
       </div>
     </div>
 
-    <script src="climate-data.js"></script>
-    <script src="game.js"></script>
+    <script type="module" src="game.js"></script>
     <script>
       // ===== SECTION INFO BUTTONS =====
       (function() {
