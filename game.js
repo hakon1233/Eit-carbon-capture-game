@@ -1244,7 +1244,7 @@ const NEGOTIABLE_TERMS = {
     label: "Maximum Climate Dedication",
     description: "Maximum % of GDP dedicated to climate action",
     min: 5,
-    max: 20,
+    max: 10,
     step: 1,
     default: 10,
     unit: "%",
@@ -1922,6 +1922,196 @@ const TECHNOLOGIES = [
     },
     icon: "💧",
   },
+  // ═══════════════════════════════════════════════════════════════
+  // ADDITIONAL ENERGY & NATURE TECHNOLOGIES
+  // ═══════════════════════════════════════════════════════════════
+  {
+    id: "building_efficiency",
+    name: "Building Efficiency Standards",
+    description: "Advanced HVAC systems, insulation, and energy codes reduce building energy consumption by 15%",
+    cost: 150,
+    tier: 1,
+    field: "efficiency",
+    effects: {
+      projectBonus: {
+        solar: { costReduction: 0.9 },
+        wind: { costReduction: 0.9 },
+      },
+    },
+    icon: "🏢",
+  },
+  {
+    id: "energy_storage",
+    name: "Grid-Scale Energy Storage",
+    description: "Battery and pumped hydro storage solutions enable 24/7 renewable power supply",
+    cost: 300,
+    tier: 2,
+    field: "renewable",
+    requires: ["improved_solar"],
+    effects: {
+      projectBonus: {
+        solar: { income: 1.2 },
+        wind: { income: 1.2 },
+        offshoreWind: { income: 1.2 },
+      },
+    },
+    icon: "🔋",
+  },
+  {
+    id: "geothermal_power",
+    name: "Geothermal Power",
+    description: "Harness Earth's internal heat for reliable baseload renewable energy",
+    cost: 200,
+    tier: 2,
+    field: "renewable",
+    effects: {
+      projectBonus: { geothermal: { co2Reduction: 1.25, income: 1.15 } },
+    },
+    icon: "🌋",
+  },
+  {
+    id: "smart_grid",
+    name: "Smart Grid Technology",
+    description: "AI-powered demand response and distribution optimization reduces energy waste by 10%",
+    cost: 250,
+    tier: 2,
+    field: "efficiency",
+    effects: {
+      projectBonus: {
+        solar: { costReduction: 0.95 },
+        wind: { costReduction: 0.95 },
+        offshoreWind: { costReduction: 0.95 },
+        nuclear: { costReduction: 0.95 },
+      },
+    },
+    icon: "🔌",
+  },
+  {
+    id: "wetland_restoration",
+    name: "Wetland Restoration",
+    description: "Restore marshes, bogs, and swamps for high-density carbon sequestration",
+    cost: 180,
+    tier: 2,
+    field: "adaptation",
+    effects: {
+      projectBonus: { forest: { co2Reduction: 1.2 } },
+    },
+    icon: "🦆",
+  },
+  {
+    id: "regenerative_agriculture",
+    name: "Regenerative Agriculture",
+    description: "Soil carbon sequestration through cover crops, no-till farming, and rotational grazing",
+    cost: 220,
+    tier: 2,
+    field: "adaptation",
+    requires: ["enhanced_forests"],
+    effects: {
+      projectBonus: { forest: { co2Reduction: 1.25, income: 1.1 } },
+    },
+    icon: "🌾",
+  },
+  {
+    id: "ocean_carbon",
+    name: "Ocean Carbon Solutions",
+    description: "Blue carbon ecosystems: seagrass meadows, kelp forests, and mangrove restoration",
+    cost: 400,
+    tier: 3,
+    field: "adaptation",
+    requires: ["wetland_restoration"],
+    effects: {
+      projectBonus: { forest: { co2Reduction: 1.35 } },
+    },
+    icon: "🌊",
+  },
+  {
+    id: "clean_energy_integration",
+    name: "Clean Energy Integration",
+    description: "Unified renewable energy systems with storage, smart grids, and demand optimization",
+    cost: 600,
+    tier: 4,
+    field: "renewable",
+    requires: ["energy_storage", "smart_grid"],
+    effects: {
+      projectBonus: {
+        solar: { co2Reduction: 1.2, income: 1.15 },
+        wind: { co2Reduction: 1.2, income: 1.15 },
+        offshoreWind: { co2Reduction: 1.2, income: 1.15 },
+      },
+    },
+    icon: "⚡",
+  },
+  {
+    id: "tidal_wave_energy",
+    name: "Tidal & Wave Energy",
+    description: "Harness ocean currents and waves for predictable, high-density renewable power",
+    cost: 280,
+    tier: 2,
+    field: "renewable",
+    effects: {
+      projectBonus: { offshoreWind: { co2Reduction: 1.15, income: 1.1 } },
+    },
+    icon: "🌊",
+  },
+  {
+    id: "heat_pump_technology",
+    name: "Heat Pump Technology",
+    description: "Electrify heating and cooling with 300-400% efficiency, dramatically reducing building emissions",
+    cost: 200,
+    tier: 2,
+    field: "efficiency",
+    requires: ["building_efficiency"],
+    effects: {
+      projectBonus: {
+        solar: { income: 1.1 },
+        wind: { income: 1.1 },
+      },
+    },
+    icon: "🌡️",
+  },
+  {
+    id: "ev_infrastructure",
+    name: "Electric Vehicle Infrastructure",
+    description: "Charging networks and grid integration enable mass EV adoption, reducing transport emissions",
+    cost: 250,
+    tier: 2,
+    field: "efficiency",
+    requires: ["smart_grid"],
+    effects: {
+      projectBonus: {
+        solar: { income: 1.15 },
+        wind: { income: 1.15 },
+      },
+    },
+    icon: "🚗",
+  },
+  {
+    id: "urban_green_infrastructure",
+    name: "Urban Green Infrastructure",
+    description: "Green roofs, urban forests, and permeable surfaces reduce heat islands and sequester carbon",
+    cost: 160,
+    tier: 2,
+    field: "adaptation",
+    effects: {
+      projectBonus: { forest: { co2Reduction: 1.15, costReduction: 0.9 } },
+    },
+    icon: "🏙️",
+  },
+  {
+    id: "fusion_research",
+    name: "Advanced Fusion Research",
+    description: "Breakthrough fusion technology promises virtually unlimited clean energy with zero emissions",
+    cost: 1000,
+    tier: 4,
+    field: "efficiency",
+    requires: ["modular_nuclear"],
+    effects: {
+      projectBonus: {
+        nuclear: { co2Reduction: 1.5, income: 1.3, costReduction: 0.7 },
+      },
+    },
+    icon: "🔮",
+  },
 
   // ═══════════════════════════════════════════════════════════════
   // CCS TECHNOLOGIES - Carbon Capture and Storage Tech Tree
@@ -2024,6 +2214,22 @@ const TECHNOLOGIES = [
       projectBonus: { co2OffshorePipeline: { costReduction: 0.85 } },
     },
     icon: "🌊",
+  },
+  {
+    id: "co2_truck_transport",
+    name: "CO2 Truck Transport",
+    description: "Road-based CO2 transport for smaller volumes and shorter distances. Most flexible option, ideal for remote capture sites without pipeline access.",
+    cost: 150,
+    tier: 2,
+    field: "carbon",
+    requires: ["ccs_fundamentals"],
+    effects: {
+      projectBonus: {
+        co2TruckTransport: { costReduction: 0.85 },
+        carbonCapture: { costReduction: 0.97 },
+      },
+    },
+    icon: "🚛",
   },
 
   // TIER 3 - STORAGE & ADVANCED TRANSPORT
@@ -4690,6 +4896,1007 @@ const DIFFICULTY_MODES = {
   },
 };
 
+// ═══════════════════════════════════════════════════════════════
+// TUTORIAL SYSTEM
+// Interactive tutorial with popups and UI highlights
+// ═══════════════════════════════════════════════════════════════
+
+const TUTORIAL_STEPS = [
+  // 1. Welcome
+  {
+    id: "welcome",
+    type: "popup",
+    title: "Welcome to Climate Overseer",
+    icon: "🌍",
+    content: "You are the leader of a global climate alliance. Your mission is to unite the world and prevent catastrophic climate change.",
+    bullets: [
+      "Reduce atmospheric CO₂ to 416 ppm (pre-industrial +1.0°C)",
+      "Recruit all {REGION_COUNT} regions into your alliance",
+      "Avoid reaching 511 ppm (+2.0°C catastrophic warming)"
+    ],
+  },
+  // 2-4. Header elements
+  {
+    id: "header-budget",
+    type: "highlight",
+    target: "#credits",
+    title: "Your Budget",
+    icon: "💰",
+    content: "This shows your current funds and monthly income. You earn money from allied regions through climate dedication and carbon taxes.",
+    position: "below",
+  },
+  {
+    id: "header-climate",
+    type: "highlight",
+    target: ".temp-gauge-mini",
+    title: "Climate Status",
+    icon: "🌡️",
+    content: "The temperature gauge shows current warming. The CO₂ bar shows atmospheric carbon dioxide. Click either for detailed breakdowns.",
+    position: "below",
+  },
+  {
+    id: "header-stats",
+    type: "highlight",
+    target: ".header-stats-row",
+    title: "Key Statistics",
+    icon: "📊",
+    content: "These badges show your progress: allied regions, research points, built projects, ongoing construction, CCS capacity, unlocked tech, and climate risk.",
+    position: "below",
+  },
+  // 5. Map intro - NOW HIGHLIGHTS MAP
+  {
+    id: "map-intro",
+    type: "highlight",
+    target: "#map-container",
+    title: "World Map",
+    icon: "🗺️",
+    content: "Allied regions are green. Click any region to select it and view details in the sidebar.",
+    position: "left",
+    popupSize: "small",
+  },
+  // 6. Sidebar tabs
+  {
+    id: "sidebar-tabs",
+    type: "highlight",
+    target: "#sidebar-tabs",
+    title: "Information Panels",
+    icon: "📋",
+    content: "Switch between World (global overview), Region (selected region details), and Tech (research and technology) tabs.",
+    position: "below",
+  },
+  // 7-10. World Tab Deep Dive
+  {
+    id: "world-global-overview",
+    type: "highlight",
+    target: "#global-stats-card",
+    title: "Global Overview",
+    icon: "🌐",
+    content: "This card shows key global stats: temperature anomaly, CO₂ levels, net emissions, your budget and income, active projects, and time remaining.",
+    position: "left",
+    requiredTab: "world",
+  },
+  {
+    id: "world-alliance",
+    type: "highlight",
+    target: "#alliance-overview",
+    title: "Alliance Status",
+    icon: "🤝",
+    content: "See your allied regions at a glance. The happiness bars show how satisfied each ally is. Keep them happy or they may break the alliance!",
+    position: "left",
+    requiredTab: "world",
+  },
+  {
+    id: "world-tipping-points",
+    type: "highlight",
+    target: "#tipping-points-panel",
+    title: "Climate Tipping Points",
+    icon: "⚠️",
+    content: "These are irreversible climate thresholds. Each has a trigger temperature. Once crossed, they create feedback loops that accelerate warming.",
+    bullets: [
+      "Arctic Ice: Melting reflects less sunlight",
+      "Permafrost: Releases trapped methane",
+      "Amazon: Rainforest dieback releases carbon",
+      "Ocean Circulation: Disrupts global heat distribution"
+    ],
+    position: "left",
+    requiredTab: "world",
+  },
+  {
+    id: "world-disasters",
+    type: "highlight",
+    target: "#active-disasters-panel",
+    title: "Active Disasters",
+    icon: "🌪️",
+    content: "Climate disasters strike regions as warming increases. They reduce regional income and happiness. Higher temperatures mean more frequent and severe disasters.",
+    position: "left",
+    requiredTab: "world",
+  },
+  // 11. Region tab
+  {
+    id: "region-tab",
+    type: "highlight",
+    target: "[data-tab='region']",
+    title: "Region Tab",
+    icon: "🏗️",
+    content: "Select a region on the map, then use this tab to build projects: Solar Farms, Wind Turbines, Nuclear Plants, and Carbon Capture facilities.",
+    position: "below",
+  },
+  // 12-17. Region Tab Deep Dive
+  {
+    id: "region-selection",
+    type: "highlight",
+    target: "#selected-region",
+    title: "Selected Region",
+    icon: "📍",
+    content: "Shows the currently selected region and its alliance status. Click 'Negotiate' to begin diplomatic talks with neutral or hostile regions.",
+    position: "left",
+    requiredTab: "region",
+  },
+  {
+    id: "region-income",
+    type: "highlight",
+    target: "#region-income",
+    title: "Regional Income",
+    icon: "💰",
+    content: "Each allied region contributes monthly income based on their GDP and climate dedication percentage. Higher dedication = more funding for your projects.",
+    position: "left",
+    requiredTab: "region",
+  },
+  {
+    id: "region-power",
+    type: "highlight",
+    target: "#power-panel",
+    title: "Power Grid",
+    icon: "⚡",
+    content: "Monitor the region's electricity grid. Demand vs Supply affects stability. Build renewables to shift the energy mix away from fossil fuels.",
+    position: "left",
+    requiredTab: "region",
+  },
+  {
+    id: "region-emissions",
+    type: "highlight",
+    target: "#emissions-breakdown",
+    title: "Emissions Breakdown",
+    icon: "💨",
+    content: "See where the region's CO₂ emissions come from by sector. Your projects target specific sectors to reduce these emissions.",
+    position: "left",
+    requiredTab: "region",
+  },
+  {
+    id: "region-effectiveness",
+    type: "highlight",
+    target: "#effectiveness-panel",
+    title: "Project Effectiveness",
+    icon: "⭐",
+    content: "Star ratings show how effective each project type is in this region. Build where projects work best for maximum impact!",
+    bullets: [
+      "⭐⭐⭐⭐⭐ = Ideal conditions",
+      "⭐⭐⭐ = Average effectiveness",
+      "⭐ = Poor conditions, build elsewhere"
+    ],
+    position: "left",
+    requiredTab: "region",
+  },
+  {
+    id: "region-projects-btn",
+    type: "highlight",
+    target: "#project-buttons",
+    title: "Build Projects",
+    icon: "🏗️",
+    content: "Click these buttons to build new projects. Each has different costs, build times, and CO₂ reduction effects.",
+    position: "left",
+    requiredTab: "region",
+  },
+  // 18. Next Month - MOVED EARLIER
+  {
+    id: "next-month",
+    type: "highlight",
+    target: "#next-month",
+    title: "Advance Time",
+    icon: "⏭️",
+    content: "Click this button to advance one month. Projects progress, income is collected, and climate evolves.",
+    position: "above",
+  },
+  // 19. Construction panel (skipIfEmpty)
+  {
+    id: "region-construction",
+    type: "highlight",
+    target: "#construction-panel",
+    title: "Under Construction",
+    icon: "🚧",
+    content: "Projects being built appear here with progress bars. Each month, construction advances until completion.",
+    position: "left",
+    requiredTab: "region",
+    skipIfEmpty: true,
+  },
+  // 20. Tech tab
+  {
+    id: "tech-tab",
+    type: "highlight",
+    target: "[data-tab='tech']",
+    title: "Technology Tab",
+    icon: "🔬",
+    content: "Research technologies to improve your projects and unlock new capabilities.",
+    position: "below",
+  },
+  // 21. General tech tree
+  {
+    id: "tech-tree-general",
+    type: "highlight",
+    target: ".tech-tree-graph[data-section='energy-&-nature']",
+    title: "Energy Technologies",
+    icon: "⚡",
+    content: "Research energy technologies to improve solar, wind, and nuclear projects. Start with fundamentals, then unlock advanced options.",
+    position: "left",
+    requiredTab: "tech",
+  },
+  // 22. CCS tech tree
+  {
+    id: "tech-tree-ccs",
+    type: "highlight",
+    target: ".tech-tree-graph[data-section='ccs-technologies']",
+    title: "CCS Technologies",
+    icon: "🏭",
+    content: "Carbon Capture and Storage technologies let you remove CO₂ from the atmosphere. Essential for achieving negative emissions.",
+    position: "left",
+    requiredTab: "tech",
+  },
+  // 23. Victory conditions
+  {
+    id: "victory",
+    type: "popup",
+    title: "How to Win",
+    icon: "🏆",
+    content: "Victory requires reducing CO₂ to 416 ppm while maintaining alliances with all regions. Defeat occurs if warming reaches +2.0°C or you run out of time by 2100.",
+    bullets: [
+      "Build renewable energy and CCS aggressively",
+      "Keep allies happy by meeting their goals",
+      "Research better technologies",
+      "Balance your budget carefully"
+    ],
+  },
+  // 30. Complete
+  {
+    id: "complete",
+    type: "popup",
+    title: "Tutorial Complete!",
+    icon: "✅",
+    content: "You now know the basics of Climate Overseer. Good luck saving the planet!",
+    bullets: [
+      "Start by building Solar Farms in your home region",
+      "Negotiate alliances with neighboring regions",
+      "Research better technologies",
+      "Monitor the climate closely"
+    ],
+    isFinal: true,
+  },
+];
+
+// Tutorial state (initialized when tutorial starts)
+let tutorialState = {
+  active: false,
+  currentStep: 0,
+  completed: false,
+};
+
+// Start the tutorial
+function startTutorial() {
+  // Prevent starting if already active
+  if (tutorialState.active) return;
+
+  tutorialState = {
+    active: true,
+    currentStep: 0,
+    completed: false,
+  };
+  // Add keyboard listener for navigation
+  document.addEventListener("keydown", handleTutorialKeydown);
+  showTutorialStep(0);
+}
+
+// Show a specific tutorial step
+function showTutorialStep(stepIndex) {
+  if (stepIndex < 0 || stepIndex >= TUTORIAL_STEPS.length) {
+    return;
+  }
+
+  tutorialState.currentStep = stepIndex;
+  const step = TUTORIAL_STEPS[stepIndex];
+
+  // Clear any existing tutorial UI
+  clearTutorialUI();
+
+  // Prepare the view based on step requirements
+  let delay = 0;
+
+  // Auto-switch tab if step requires it
+  if (step.requiredTab) {
+    // For region tab, ensure a region is selected first (use home region)
+    // Unless skipHomeRegionSelect is set (for alliance negotiation flow)
+    if (step.requiredTab === "region" && state?.homeRegion && !step.skipHomeRegionSelect) {
+      // Always select home region for tutorial to ensure content is visible
+      selectRegion(state.homeRegion);
+      delay = 250;
+    } else {
+      switchToTab(step.requiredTab);
+      delay = 150;
+    }
+  }
+
+  // Show the step after any necessary delays
+  if (delay > 0) {
+    setTimeout(() => {
+      showTutorialStepContent(step, stepIndex);
+    }, delay);
+  } else {
+    showTutorialStepContent(step, stepIndex);
+  }
+}
+
+// Helper to show the actual tutorial step content
+function showTutorialStepContent(step, stepIndex) {
+  if (step.type === "popup") {
+    showTutorialPopup(step, stepIndex);
+  } else if (step.type === "highlight") {
+    showTutorialHighlight(step, stepIndex);
+  }
+}
+
+// Show a tutorial popup (no highlight)
+function showTutorialPopup(step, stepIndex) {
+  const overlay = document.createElement("div");
+  overlay.className = "tutorial-overlay";
+  overlay.id = "tutorial-overlay";
+
+  const popup = document.createElement("div");
+  popup.className = "tutorial-popup centered";
+
+  // Build popup header
+  const header = document.createElement("div");
+  header.className = "tutorial-popup-header";
+
+  const headerTitle = document.createElement("div");
+  headerTitle.className = "tutorial-popup-header-title";
+
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "tutorial-popup-header-icon";
+  iconSpan.textContent = step.icon;
+
+  const labelSpan = document.createElement("span");
+  labelSpan.className = "tutorial-popup-header-label";
+  labelSpan.textContent = "TUTORIAL";
+
+  headerTitle.appendChild(iconSpan);
+  headerTitle.appendChild(labelSpan);
+
+  const skipBtn = document.createElement("button");
+  skipBtn.className = "tutorial-popup-close";
+  skipBtn.textContent = "✕";
+  skipBtn.onclick = skipTutorial;
+
+  header.appendChild(headerTitle);
+  header.appendChild(skipBtn);
+
+  // Build popup content
+  const content = document.createElement("div");
+  content.className = "tutorial-popup-content";
+
+  // Large icon for centered popup
+  const iconLarge = document.createElement("div");
+  iconLarge.className = "tutorial-popup-icon-large";
+  iconLarge.textContent = step.icon;
+  content.appendChild(iconLarge);
+
+  const title = document.createElement("h3");
+  title.className = "tutorial-popup-title";
+  title.textContent = step.title;
+
+  const text = document.createElement("p");
+  text.className = "tutorial-popup-text";
+  text.textContent = step.content;
+
+  content.appendChild(title);
+  content.appendChild(text);
+
+  if (step.bullets) {
+    const ul = document.createElement("ul");
+    ul.className = "tutorial-popup-bullets";
+    step.bullets.forEach(b => {
+      const li = document.createElement("li");
+      // Replace placeholders with dynamic values
+      li.textContent = b.replace("{REGION_COUNT}", availableRegionIds.length);
+      ul.appendChild(li);
+    });
+    content.appendChild(ul);
+  }
+
+  // Build popup footer
+  const footer = document.createElement("div");
+  footer.className = "tutorial-popup-footer";
+
+  const nav = document.createElement("div");
+  nav.className = "tutorial-popup-nav";
+
+  if (stepIndex > 0) {
+    const backBtn = document.createElement("button");
+    backBtn.className = "tutorial-btn tutorial-btn-back";
+    backBtn.textContent = "← Back";
+    backBtn.onclick = prevTutorialStep;
+    nav.appendChild(backBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "tutorial-btn tutorial-btn-next";
+  nextBtn.textContent = step.isFinal ? "Start Playing →" : "Continue →";
+  nextBtn.onclick = step.isFinal ? completeTutorial : nextTutorialStep;
+  nav.appendChild(nextBtn);
+
+  footer.appendChild(nav);
+
+  // Build progress indicator
+  const progress = document.createElement("div");
+  progress.className = "tutorial-popup-progress";
+  progress.textContent = `${stepIndex + 1} / ${TUTORIAL_STEPS.length}`;
+  footer.appendChild(progress);
+
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(footer);
+
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+}
+
+// Show a tutorial highlight with spotlight
+function showTutorialHighlight(step, stepIndex) {
+  const targetEl = document.querySelector(step.target);
+
+  // Handle waitForElement - set up observer to wait for element to appear
+  if (!targetEl && step.waitForElement) {
+    // Element not found, set up observer to wait for it
+    const observer = new MutationObserver((mutations, obs) => {
+      const el = document.querySelector(step.target);
+      if (el) {
+        obs.disconnect();
+        window._tutorialMutationObserver = null;
+        // Remove waiting overlay
+        const waitingOverlay = document.getElementById("tutorial-waiting-overlay");
+        if (waitingOverlay) {
+          waitingOverlay.remove();
+        }
+        // Small delay to let element render fully
+        setTimeout(() => showTutorialHighlight(step, stepIndex), 100);
+      }
+    });
+
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Store reference for cleanup
+    window._tutorialMutationObserver = observer;
+
+    // Show waiting message overlay
+    showTutorialWaitingOverlay(step);
+    return;
+  }
+
+  if (!targetEl) {
+    console.warn("Tutorial target not found:", step.target);
+    nextTutorialStep();
+    return;
+  }
+
+  // Handle skipIfEmpty for construction panel
+  if (step.skipIfEmpty) {
+    const panel = targetEl;
+    const hasContent = panel && panel.style.display !== "none" &&
+                       panel.children.length > 0 &&
+                       panel.querySelector(".construction-item, .project-progress");
+    if (!hasContent) {
+      // Skip this step if panel is empty
+      nextTutorialStep();
+      return;
+    }
+  }
+
+  // Smart scroll that accounts for popup position
+  // Popup is ~250px tall, so we need to leave room for it
+  const popupHeight = 280;
+  const popupWidth = 380;
+  const margin = 30;
+  const position = step.position || "below";
+
+  // First, scroll any parent scrollable containers
+  scrollParentContainers(targetEl, position);
+
+  // Then scroll the main viewport with offset based on popup position
+  const rect = targetEl.getBoundingClientRect();
+  const viewportHeight = window.innerHeight;
+  const viewportWidth = window.innerWidth;
+
+  let scrollOptions = { behavior: "smooth" };
+
+  if (position === "below") {
+    // Element should be in upper portion of screen to leave room for popup below
+    // Scroll so element is about 15% down from top
+    const targetY = rect.top + window.scrollY - (viewportHeight * 0.15);
+    window.scrollTo({ top: Math.max(0, targetY), ...scrollOptions });
+  } else if (position === "above") {
+    // Element should be in lower portion of screen to leave room for popup above
+    // Scroll so element is about 70% down from top
+    const targetY = rect.top + window.scrollY - (viewportHeight * 0.7);
+    window.scrollTo({ top: Math.max(0, targetY), ...scrollOptions });
+  } else if (position === "right") {
+    // For right position, scroll element to left side and center vertically
+    const targetY = rect.top + window.scrollY - (viewportHeight * 0.4);
+    window.scrollTo({ top: Math.max(0, targetY), ...scrollOptions });
+  } else if (position === "left") {
+    // For left position, center vertically
+    const targetY = rect.top + window.scrollY - (viewportHeight * 0.4);
+    window.scrollTo({ top: Math.max(0, targetY), ...scrollOptions });
+  } else {
+    // Default: center vertically
+    targetEl.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "nearest"
+    });
+  }
+
+  // Wait for scroll to complete before positioning spotlight
+  setTimeout(() => {
+    showTutorialHighlightAfterScroll(step, stepIndex, targetEl);
+  }, 500);
+}
+
+// Scroll parent scrollable containers to make element visible
+function scrollParentContainers(element, position = "below") {
+  let parent = element.parentElement;
+  while (parent) {
+    const style = window.getComputedStyle(parent);
+    const isScrollable = (
+      style.overflow === 'auto' ||
+      style.overflow === 'scroll' ||
+      style.overflowY === 'auto' ||
+      style.overflowY === 'scroll'
+    );
+
+    if (isScrollable && parent.scrollHeight > parent.clientHeight) {
+      // This parent is scrollable, scroll the element into view within it
+      const parentRect = parent.getBoundingClientRect();
+      const elementRect = element.getBoundingClientRect();
+
+      // Calculate where element is relative to parent's visible area
+      const elementTopInParent = elementRect.top - parentRect.top + parent.scrollTop;
+
+      // Position element with room for popup
+      let targetScroll;
+      if (position === "below") {
+        // Put element near top (20% down) to leave room for popup below
+        targetScroll = elementTopInParent - (parent.clientHeight * 0.2);
+      } else if (position === "above") {
+        // Put element near bottom (70% down) to leave room for popup above
+        targetScroll = elementTopInParent - (parent.clientHeight * 0.7);
+      } else {
+        // Center the element
+        targetScroll = elementTopInParent - (parent.clientHeight / 2) + (elementRect.height / 2);
+      }
+
+      parent.scrollTo({
+        top: Math.max(0, targetScroll),
+        behavior: "smooth"
+      });
+    }
+    parent = parent.parentElement;
+  }
+}
+
+// Show waiting overlay while waiting for element to appear
+function showTutorialWaitingOverlay(step) {
+  // Remove any existing waiting overlay
+  const existingOverlay = document.getElementById("tutorial-waiting-overlay");
+  if (existingOverlay) {
+    existingOverlay.remove();
+  }
+
+  const overlay = document.createElement("div");
+  overlay.id = "tutorial-waiting-overlay";
+  overlay.className = "tutorial-overlay";
+
+  const message = document.createElement("div");
+  message.className = "tutorial-waiting-message";
+
+  const icon = document.createElement("span");
+  icon.className = "tutorial-waiting-icon";
+  icon.textContent = step.icon || "👆";
+
+  const text = document.createElement("span");
+  text.className = "tutorial-waiting-text";
+  text.textContent = step.waitingMessage || "Complete the action to continue...";
+
+  const skipBtn = document.createElement("button");
+  skipBtn.className = "tutorial-btn tutorial-btn-skip";
+  skipBtn.textContent = "Skip Tutorial";
+  skipBtn.onclick = skipTutorial;
+
+  message.appendChild(icon);
+  message.appendChild(text);
+  message.appendChild(skipBtn);
+  overlay.appendChild(message);
+  document.body.appendChild(overlay);
+}
+
+// Continue showing highlight after scroll completes
+function showTutorialHighlightAfterScroll(step, stepIndex, targetEl) {
+  // Create overlay with cutout
+  const overlay = document.createElement("div");
+  overlay.className = "tutorial-overlay tutorial-highlight-mode";
+  overlay.id = "tutorial-overlay";
+
+  // Create spotlight element
+  const spotlight = document.createElement("div");
+  spotlight.className = "tutorial-spotlight";
+  spotlight.id = "tutorial-spotlight";
+
+  // Position spotlight over target
+  const rect = targetEl.getBoundingClientRect();
+  const padding = 8;
+  spotlight.style.left = (rect.left - padding) + "px";
+  spotlight.style.top = (rect.top - padding) + "px";
+  spotlight.style.width = (rect.width + padding * 2) + "px";
+  spotlight.style.height = (rect.height + padding * 2) + "px";
+
+  // Add highlight class to target
+  targetEl.classList.add("tutorial-target");
+
+  // Store reference for scroll tracking
+  window._tutorialTargetEl = targetEl;
+  window._tutorialStep = step;
+
+  // Create popup positioned near target
+  const popup = document.createElement("div");
+  popup.className = "tutorial-popup";
+  popup.id = "tutorial-popup";
+
+  // Build popup header
+  const header = document.createElement("div");
+  header.className = "tutorial-popup-header";
+
+  const headerTitle = document.createElement("div");
+  headerTitle.className = "tutorial-popup-header-title";
+
+  const iconSpan = document.createElement("span");
+  iconSpan.className = "tutorial-popup-header-icon";
+  iconSpan.textContent = step.icon;
+
+  const labelSpan = document.createElement("span");
+  labelSpan.className = "tutorial-popup-header-label";
+  labelSpan.textContent = "TUTORIAL";
+
+  headerTitle.appendChild(iconSpan);
+  headerTitle.appendChild(labelSpan);
+
+  const skipBtn = document.createElement("button");
+  skipBtn.className = "tutorial-popup-close";
+  skipBtn.textContent = "✕";
+  skipBtn.onclick = skipTutorial;
+
+  header.appendChild(headerTitle);
+  header.appendChild(skipBtn);
+
+  // Build popup content
+  const content = document.createElement("div");
+  content.className = "tutorial-popup-content";
+
+  const title = document.createElement("h3");
+  title.className = "tutorial-popup-title";
+  title.textContent = step.title;
+
+  const text = document.createElement("p");
+  text.className = "tutorial-popup-text";
+  text.textContent = step.content;
+
+  content.appendChild(title);
+  content.appendChild(text);
+
+  // Add bullets if present (for highlight steps with bullets)
+  if (step.bullets) {
+    const ul = document.createElement("ul");
+    ul.className = "tutorial-popup-bullets";
+    step.bullets.forEach(b => {
+      const li = document.createElement("li");
+      li.textContent = b;
+      ul.appendChild(li);
+    });
+    content.appendChild(ul);
+  }
+
+  // Build popup footer
+  const footer = document.createElement("div");
+  footer.className = "tutorial-popup-footer";
+
+  const nav = document.createElement("div");
+  nav.className = "tutorial-popup-nav";
+
+  if (stepIndex > 0) {
+    const backBtn = document.createElement("button");
+    backBtn.className = "tutorial-btn tutorial-btn-back";
+    backBtn.textContent = "← Back";
+    backBtn.onclick = prevTutorialStep;
+    nav.appendChild(backBtn);
+  }
+
+  const nextBtn = document.createElement("button");
+  nextBtn.className = "tutorial-btn tutorial-btn-next";
+  nextBtn.textContent = step.isFinal ? "Start Playing →" : "Continue →";
+  nextBtn.onclick = step.isFinal ? completeTutorial : nextTutorialStep;
+  nav.appendChild(nextBtn);
+
+  footer.appendChild(nav);
+
+  // Build progress indicator
+  const progress = document.createElement("div");
+  progress.className = "tutorial-popup-progress";
+  progress.textContent = `${stepIndex + 1} / ${TUTORIAL_STEPS.length}`;
+  footer.appendChild(progress);
+
+  popup.appendChild(header);
+  popup.appendChild(content);
+  popup.appendChild(footer);
+
+  // Position popup based on step.position
+  positionTutorialPopup(popup, targetEl, step.position || "below");
+
+  // Add small class if specified
+  if (step.popupSize === "small") {
+    popup.classList.add("small");
+  }
+
+  overlay.appendChild(spotlight);
+  overlay.appendChild(popup);
+  document.body.appendChild(overlay);
+
+  // Set up scroll tracking to update spotlight position
+  const updateSpotlightPosition = () => {
+    const rect = targetEl.getBoundingClientRect();
+    const padding = 8;
+    spotlight.style.left = (rect.left - padding) + "px";
+    spotlight.style.top = (rect.top - padding) + "px";
+    spotlight.style.width = (rect.width + padding * 2) + "px";
+    spotlight.style.height = (rect.height + padding * 2) + "px";
+
+    // Also update popup position
+    if (!popup.classList.contains("centered")) {
+      positionTutorialPopup(popup, targetEl, step.position || "below");
+    }
+  };
+
+  // Store listener reference for cleanup
+  window._tutorialScrollHandler = updateSpotlightPosition;
+  window.addEventListener("scroll", updateSpotlightPosition, true);
+
+  // Also listen on sidebar scroll
+  const sidebar = document.getElementById("sidebar");
+  if (sidebar) {
+    sidebar.addEventListener("scroll", updateSpotlightPosition);
+  }
+}
+
+// Position tutorial popup relative to target element
+function positionTutorialPopup(popup, targetEl, position) {
+  const rect = targetEl.getBoundingClientRect();
+  const margin = 25;
+  const spotlightPadding = 12; // Account for spotlight padding around target
+
+  // Temporarily add popup to measure actual dimensions
+  popup.style.visibility = "hidden";
+  popup.style.position = "fixed";
+  popup.style.left = "0px";
+  popup.style.top = "0px";
+  document.body.appendChild(popup);
+  const popupRect = popup.getBoundingClientRect();
+  const popupWidth = popupRect.width;
+  const popupHeight = popupRect.height;
+  popup.remove();
+  popup.style.visibility = "visible";
+
+  let left, top;
+  let finalPosition = position;
+
+  // Calculate spotlight boundaries (element + padding)
+  const spotlightLeft = rect.left - spotlightPadding;
+  const spotlightRight = rect.right + spotlightPadding;
+  const spotlightTop = rect.top - spotlightPadding;
+  const spotlightBottom = rect.bottom + spotlightPadding;
+
+  // Check available space in each direction
+  const spaceBelow = window.innerHeight - spotlightBottom - margin;
+  const spaceAbove = spotlightTop - margin;
+  const spaceLeft = spotlightLeft - margin;
+  const spaceRight = window.innerWidth - spotlightRight - margin;
+
+  // Try the requested position first, fall back if not enough space
+  function tryPosition(pos) {
+    switch (pos) {
+      case "below":
+        if (spaceBelow >= popupHeight) {
+          left = rect.left + rect.width / 2 - popupWidth / 2;
+          top = spotlightBottom + margin;
+          return true;
+        }
+        return false;
+      case "above":
+        if (spaceAbove >= popupHeight) {
+          left = rect.left + rect.width / 2 - popupWidth / 2;
+          top = spotlightTop - popupHeight - margin;
+          return true;
+        }
+        return false;
+      case "left":
+        if (spaceLeft >= popupWidth) {
+          left = spotlightLeft - popupWidth - margin;
+          top = rect.top + rect.height / 2 - popupHeight / 2;
+          return true;
+        }
+        return false;
+      case "right":
+        if (spaceRight >= popupWidth) {
+          left = spotlightRight + margin;
+          top = rect.top + rect.height / 2 - popupHeight / 2;
+          return true;
+        }
+        return false;
+    }
+    return false;
+  }
+
+  // Try positions in order of preference based on requested position
+  const positionOrder = {
+    "below": ["below", "above", "right", "left"],
+    "above": ["above", "below", "right", "left"],
+    "left": ["left", "right", "below", "above"],
+    "right": ["right", "left", "below", "above"]
+  };
+
+  const order = positionOrder[position] || positionOrder["below"];
+  let positioned = false;
+  for (const pos of order) {
+    if (tryPosition(pos)) {
+      finalPosition = pos;
+      positioned = true;
+      break;
+    }
+  }
+
+  // Fallback: if no position works, use below and let it scroll
+  if (!positioned) {
+    left = rect.left + rect.width / 2 - popupWidth / 2;
+    top = spotlightBottom + margin;
+  }
+
+  // Keep popup within viewport horizontally
+  left = Math.max(margin, Math.min(left, window.innerWidth - popupWidth - margin));
+
+  // Keep popup within viewport vertically, but avoid covering the spotlight
+  if (top < margin) {
+    top = margin;
+  }
+  if (top + popupHeight > window.innerHeight - margin) {
+    // If we'd go off bottom, and we're positioned below, try to fit above instead
+    if (finalPosition === "below" && spaceAbove > popupHeight * 0.5) {
+      top = spotlightTop - popupHeight - margin;
+    } else {
+      top = window.innerHeight - popupHeight - margin;
+    }
+  }
+
+  popup.style.position = "fixed";
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
+}
+
+// Clear tutorial UI
+function clearTutorialUI() {
+  // Remove scroll listener
+  if (window._tutorialScrollHandler) {
+    window.removeEventListener("scroll", window._tutorialScrollHandler, true);
+    const sidebar = document.getElementById("sidebar");
+    if (sidebar) {
+      sidebar.removeEventListener("scroll", window._tutorialScrollHandler);
+    }
+    window._tutorialScrollHandler = null;
+  }
+
+  // Clear stored references
+  window._tutorialTargetEl = null;
+  window._tutorialStep = null;
+
+  // Remove any mutation observer
+  if (window._tutorialMutationObserver) {
+    window._tutorialMutationObserver.disconnect();
+    window._tutorialMutationObserver = null;
+  }
+
+  // Remove waiting overlay
+  const waitingOverlay = document.getElementById("tutorial-waiting-overlay");
+  if (waitingOverlay) {
+    waitingOverlay.remove();
+  }
+
+  const overlay = document.getElementById("tutorial-overlay");
+  if (overlay) {
+    overlay.remove();
+  }
+
+  // Remove highlight from any targets
+  document.querySelectorAll(".tutorial-target").forEach(el => {
+    el.classList.remove("tutorial-target");
+  });
+}
+
+// Navigate tutorial
+function nextTutorialStep() {
+  if (tutorialState.currentStep < TUTORIAL_STEPS.length - 1) {
+    showTutorialStep(tutorialState.currentStep + 1);
+  } else {
+    completeTutorial();
+  }
+}
+
+function prevTutorialStep() {
+  if (tutorialState.currentStep > 0) {
+    showTutorialStep(tutorialState.currentStep - 1);
+  }
+}
+
+function skipTutorial() {
+  clearTutorialUI();
+  tutorialState.active = false;
+  tutorialState.completed = false;
+  document.removeEventListener("keydown", handleTutorialKeydown);
+  pushMessage("Tutorial skipped. You can replay it from the main menu by selecting Tutorial difficulty.");
+}
+
+function completeTutorial() {
+  clearTutorialUI();
+  tutorialState.active = false;
+  tutorialState.completed = true;
+  document.removeEventListener("keydown", handleTutorialKeydown);
+  pushMessage("Tutorial complete! Good luck saving the climate.");
+}
+
+// Handle keyboard navigation for tutorial
+function handleTutorialKeydown(e) {
+  if (!tutorialState.active) return;
+
+  if (e.key === "Enter" || e.key === " " || e.key === "ArrowRight") {
+    e.preventDefault();
+    const step = TUTORIAL_STEPS[tutorialState.currentStep];
+    if (step.isFinal) {
+      completeTutorial();
+    } else {
+      nextTutorialStep();
+    }
+  } else if (e.key === "ArrowLeft") {
+    e.preventDefault();
+    prevTutorialStep();
+  } else if (e.key === "Escape") {
+    e.preventDefault();
+    skipTutorial();
+  }
+}
+
+// Expose tutorial functions globally
+window.startTutorial = startTutorial;
+window.nextTutorialStep = nextTutorialStep;
+window.prevTutorialStep = prevTutorialStep;
+window.skipTutorial = skipTutorial;
+window.completeTutorial = completeTutorial;
+
+// ═══════════════════════════════════════════════════════════════
+
 const DEFAULT_REGION_NAMES = {
   north_america: "North America",
   south_america: "South America",
@@ -7005,6 +8212,14 @@ function confirmSetupAndStartGame() {
   updateMapLegend();
   updateAllianceMapVisuals();
   saveGame();
+
+  // Start tutorial if tutorial difficulty is selected
+  if (currentDifficulty === "tutorial") {
+    // Small delay to let UI fully render before tutorial starts
+    setTimeout(() => {
+      startTutorial();
+    }, 500);
+  }
 }
 
 // Check if a region is allied
@@ -7717,6 +8932,86 @@ function showHappinessFactorsPopup(regionId) {
   `;
 
   showGenericFactorsPopup("😊", `${regionName} Happiness Factors`, content);
+}
+
+/**
+ * Show popup with carbon tax breakdown and controls
+ */
+function showCarbonTaxPopup(regionId) {
+  const alliance = state.alliance?.[regionId];
+  if (!alliance || alliance.status !== ALLIANCE_STATUS.ALLIED) return;
+
+  const regionName = getRegionName(regionId);
+  const carbonTax = alliance.carbonTax || { ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default, yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default };
+  const currentRate = carbonTax.ratePerTon || NEGOTIABLE_TERMS.carbonTaxRate.default;
+  const currentGrowth = carbonTax.yearlyGrowthRate || NEGOTIABLE_TERMS.carbonTaxGrowth.default;
+
+  // Calculate monthly revenue from this region
+  const climateData = getClimateDataForRegion(regionId);
+  let monthlyRevenue = 0;
+  let yearlyEmissions = 0;
+  if (climateData && climateData.emissions) {
+    yearlyEmissions = typeof climateData.emissions === 'number' ? climateData.emissions : climateData.emissions.total || 0;
+    monthlyRevenue = (yearlyEmissions / 12) * currentRate;
+  }
+
+  // Check if there's a carbon tax limit demand
+  const taxLimitDemand = alliance.demands?.find(d => d.type === 'carbonTaxLimit');
+  const taxLimitWarning = taxLimitDemand && currentRate > taxLimitDemand.value;
+
+  const content = `
+    <div class="carbon-tax-popup-content">
+      <div class="carbon-tax-stats">
+        <div class="carbon-tax-stat">
+          <span class="stat-label">Monthly Revenue</span>
+          <span class="stat-value positive">+${formatCurrency(monthlyRevenue)}/mo</span>
+        </div>
+        <div class="carbon-tax-stat">
+          <span class="stat-label">Yearly Emissions</span>
+          <span class="stat-value">${yearlyEmissions.toFixed(2)} Gt CO2/yr</span>
+        </div>
+      </div>
+
+      <div class="carbon-tax-control-group">
+        <div class="control-header">
+          <span>Tax Rate</span>
+          <span id="carbon-tax-rate-display-${regionId}" class="${taxLimitWarning ? 'warning' : ''}">$${currentRate}/ton</span>
+        </div>
+        <input type="range"
+          id="carbon-tax-rate-${regionId}"
+          min="${NEGOTIABLE_TERMS.carbonTaxRate.min}"
+          max="${NEGOTIABLE_TERMS.carbonTaxRate.max}"
+          step="${NEGOTIABLE_TERMS.carbonTaxRate.step}"
+          value="${currentRate}"
+          class="carbon-tax-slider"
+          oninput="updateCarbonTaxRate('${regionId}', this.value)"
+        >
+        ${taxLimitWarning ? `<div class="tax-warning">⚠️ Demand: Keep below $${taxLimitDemand.value}/ton</div>` : ''}
+      </div>
+
+      <div class="carbon-tax-control-group">
+        <div class="control-header">
+          <span>Yearly Growth</span>
+          <span id="carbon-tax-growth-display-${regionId}">+${currentGrowth}%/yr</span>
+        </div>
+        <input type="range"
+          id="carbon-tax-growth-${regionId}"
+          min="${NEGOTIABLE_TERMS.carbonTaxGrowth.min}"
+          max="${NEGOTIABLE_TERMS.carbonTaxGrowth.max}"
+          step="${NEGOTIABLE_TERMS.carbonTaxGrowth.step}"
+          value="${currentGrowth}"
+          class="carbon-tax-slider"
+          oninput="updateCarbonTaxGrowth('${regionId}', this.value)"
+        >
+      </div>
+
+      <div class="carbon-tax-note">
+        Carbon tax generates revenue based on regional emissions. Higher rates may affect happiness.
+      </div>
+    </div>
+  `;
+
+  showGenericFactorsPopup("💰", `${regionName} Carbon Tax`, content);
 }
 
 /**
@@ -8760,20 +10055,8 @@ function getAllianceStatusHTML(regionId) {
   const alliance = state.alliance?.[regionId];
   if (!alliance) return "";
 
-  const statusLabels = {
-    [ALLIANCE_STATUS.ALLIED]: "Allied",
-    [ALLIANCE_STATUS.NEUTRAL]: "Not Allied",
-    [ALLIANCE_STATUS.NEGOTIATING]: "Negotiating",
-    [ALLIANCE_STATUS.HOSTILE]: "Hostile",
-  };
-
-  let html = `
-    <div class="alliance-status-section" style="margin-bottom: 12px; position: relative;">
-      <span class="alliance-status-badge ${alliance.status}">
-        ${statusLabels[alliance.status] || alliance.status}
-      </span>
-    </div>
-  `;
+  // Badge is now rendered in header row, so just start with empty HTML
+  let html = "";
 
   // Show happiness meter for allied regions
   if (alliance.status === ALLIANCE_STATUS.ALLIED) {
@@ -8824,24 +10107,26 @@ Tip: Check Project Effectiveness ratings to see which projects work best in each
       }
     }
 
-    const happinessClass = getHappinessClass(alliance.happiness);
+    // Happiness bar - clickable like world page
+    const happiness = Math.round(alliance.happiness || 50);
+    // Calculate color: red (0%) -> yellow (50%) -> green (100%)
+    const red = Math.round(255 * Math.max(0, Math.min(1, 2 - happiness / 50)));
+    const green = Math.round(255 * Math.max(0, Math.min(1, happiness / 50)));
+    const barColor = `rgb(${red}, ${green}, 50)`;
+
     html += `
-      <div class="happiness-meter">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span style="color: var(--text-secondary); font-size: 0.85rem;">Happiness:</span>
-          <button class="factor-help-btn" onclick="showHappinessFactorsPopup('${regionId}')" title="View happiness factors">?</button>
+      <div class="region-happiness-row" onclick="showHappinessFactorsPopup('${regionId}')" title="Click for happiness breakdown">
+        <span class="region-happiness-label">Happiness</span>
+        <div class="region-happiness-bar-container">
+          <div class="region-happiness-bar" style="width: ${happiness}%; background: ${barColor};"></div>
         </div>
-        <div class="happiness-bar">
-          <div class="happiness-fill ${happinessClass}" style="width: ${alliance.happiness}%"></div>
-        </div>
-        <span class="happiness-value">${Math.round(alliance.happiness)}%</span>
+        <span class="region-happiness-value">${happiness}%</span>
       </div>
     `;
 
-    // Carbon Tax Control Section
+    // Carbon Tax - Clickable row that opens popup
     const carbonTax = alliance.carbonTax || { ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default, yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default };
     const currentRate = carbonTax.ratePerTon || NEGOTIABLE_TERMS.carbonTaxRate.default;
-    const currentGrowth = carbonTax.yearlyGrowthRate || NEGOTIABLE_TERMS.carbonTaxGrowth.default;
 
     // Calculate monthly revenue from this region
     const climateData = getClimateDataForRegion(regionId);
@@ -8851,49 +10136,15 @@ Tip: Check Project Effectiveness ratings to see which projects work best in each
       monthlyRevenue = (emissionValue / 12) * currentRate;
     }
 
-    // Check if there's a carbon tax limit demand
+    // Check if there's a carbon tax limit demand for warning indicator
     const taxLimitDemand = alliance.demands?.find(d => d.type === 'carbonTaxLimit');
     const taxLimitWarning = taxLimitDemand && currentRate > taxLimitDemand.value;
 
     html += `
-      <div class="carbon-tax-control" style="margin-top: 12px; padding: 10px; background: var(--bg-tertiary); border-radius: 8px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <strong style="color: var(--text-primary); font-size: 0.85rem;">💰 Carbon Tax</strong>
-          <span style="color: var(--accent-green); font-size: 0.8rem;">+${formatCurrency(monthlyRevenue)}/mo</span>
-        </div>
-
-        <div style="margin-bottom: 10px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="color: var(--text-secondary); font-size: 0.8rem;">Rate:</span>
-            <span id="carbon-tax-rate-display-${regionId}" style="color: ${taxLimitWarning ? 'var(--warning-color)' : 'var(--text-primary)'}; font-size: 0.85rem; font-weight: 500;">$${currentRate}/ton</span>
-          </div>
-          <input type="range"
-            id="carbon-tax-rate-${regionId}"
-            min="${NEGOTIABLE_TERMS.carbonTaxRate.min}"
-            max="${NEGOTIABLE_TERMS.carbonTaxRate.max}"
-            step="${NEGOTIABLE_TERMS.carbonTaxRate.step}"
-            value="${currentRate}"
-            style="width: 100%; cursor: pointer;"
-            oninput="updateCarbonTaxRate('${regionId}', this.value)"
-          >
-          ${taxLimitWarning ? `<div style="color: var(--warning-color); font-size: 0.75rem; margin-top: 2px;">⚠️ Demand: Keep below $${taxLimitDemand.value}/ton</div>` : ''}
-        </div>
-
-        <div>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="color: var(--text-secondary); font-size: 0.8rem;">Yearly Growth:</span>
-            <span id="carbon-tax-growth-display-${regionId}" style="color: var(--text-primary); font-size: 0.85rem; font-weight: 500;">+${currentGrowth}%/yr</span>
-          </div>
-          <input type="range"
-            id="carbon-tax-growth-${regionId}"
-            min="${NEGOTIABLE_TERMS.carbonTaxGrowth.min}"
-            max="${NEGOTIABLE_TERMS.carbonTaxGrowth.max}"
-            step="${NEGOTIABLE_TERMS.carbonTaxGrowth.step}"
-            value="${currentGrowth}"
-            style="width: 100%; cursor: pointer;"
-            oninput="updateCarbonTaxGrowth('${regionId}', this.value)"
-          >
-        </div>
+      <div class="region-carbon-tax-row" onclick="showCarbonTaxPopup('${regionId}')" title="Click to adjust carbon tax">
+        <span class="region-carbon-tax-label">💰 Carbon Tax</span>
+        <span class="region-carbon-tax-rate ${taxLimitWarning ? 'warning' : ''}">$${currentRate}/ton</span>
+        <span class="region-carbon-tax-revenue">+${formatCurrency(monthlyRevenue)}/mo</span>
       </div>
     `;
 
@@ -9713,9 +10964,17 @@ function startClimateCampaign(regionId) {
   const duration = Math.ceil(
     GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier * aggregateMultiplier
   );
-  const increaseAmount =
-    GAME_CONFIG.lobbyMinIncrease +
-    (GAME_CONFIG.lobbyMaxIncrease - GAME_CONFIG.lobbyMinIncrease) * (1 - finance.difficulty);
+
+  // Smart increase based on remaining room to max
+  // More room = larger increase, close to max = smaller increase (diminishing returns)
+  const remainingRoom = Math.max(0, finance.maxPercent - finance.currentPercent);
+  const difficultyMultiplier = 1 - finance.difficulty * 0.5; // 0.5 to 1.0 (easier = higher)
+  // Take 20-30% of remaining room based on difficulty
+  const increasePercent = 0.2 + (0.1 * difficultyMultiplier);
+  const increaseAmount = Math.max(
+    GAME_CONFIG.lobbyMinIncrease * 0.5, // Minimum useful increase
+    Math.min(remainingRoom * increasePercent, remainingRoom) // Cap at remaining room
+  );
 
   // Check if player can afford it
   if (state.funds < cost) {
@@ -10941,8 +12200,8 @@ function renderTechTreePanel() {
   const hasResearchCenters = (state.researchCenters && state.researchCenters.length > 0) || countResearchCenters() > 0;
 
   // Separate CCS and Other technologies
-  const ccsTechs = TECHNOLOGIES.filter((t) => t.category === "carbon");
-  const otherTechs = TECHNOLOGIES.filter((t) => t.category !== "carbon");
+  const ccsTechs = TECHNOLOGIES.filter((t) => t.field === "carbon");
+  const otherTechs = TECHNOLOGIES.filter((t) => t.field !== "carbon");
 
   // Organize by depth for tree visualization
   const ccsDepths = organizeTechsByDepth(ccsTechs);
@@ -10958,8 +12217,9 @@ function renderTechTreePanel() {
     </div>`;
   }
 
-  // Render Technologies section (all techs in one tree)
+  // Render Technologies sections
   html += renderTreeSection("Energy & Nature", otherDepths, "⚡");
+  html += renderTreeSection("CCS Technologies", ccsDepths, "🏭");
 
   // Note: Using innerHTML here - all content from internal game data, not user input
   listEl.innerHTML = html;
@@ -11730,17 +12990,33 @@ function updateSelectedRegionPanel() {
     allianceSection.innerHTML += negotiateButtonHTML;
   }
 
+  // Create header with title and ALLIED badge
+  const headerRow = document.createElement("div");
+  headerRow.className = "region-header-row";
+
   const title = document.createElement("div");
   title.className = "region-title";
   title.textContent = getRegionName(selectedRegionId);
 
-  const temp = document.createElement("div");
-  temp.className = "region-temp";
-  temp.textContent = `Local temperature: ${region.temp.toFixed(2)}°C`;
+  headerRow.appendChild(title);
+
+  // Add alliance badge to header row (top right)
+  if (alliance) {
+    const statusLabels = {
+      [ALLIANCE_STATUS.ALLIED]: "Allied",
+      [ALLIANCE_STATUS.NEUTRAL]: "Not Allied",
+      [ALLIANCE_STATUS.NEGOTIATING]: "Negotiating",
+      [ALLIANCE_STATUS.HOSTILE]: "Hostile",
+    };
+    const badge = document.createElement("span");
+    badge.className = `alliance-status-badge header-badge ${alliance.status}`;
+    badge.textContent = statusLabels[alliance.status] || alliance.status;
+    headerRow.appendChild(badge);
+  }
 
   if (!isAllied) {
-    // NON-ALLIED: Alliance section at top, then title, then basic stats only
-    selectedRegionEl.append(allianceSection, title, temp);
+    // NON-ALLIED: Header, then alliance section (negotiate button etc)
+    selectedRegionEl.append(headerRow, allianceSection);
 
     // Show basic climate data (GDP, population, potential income) but skip detailed panels
     const climateData = getClimateDataForRegion(selectedRegionId);
@@ -11757,8 +13033,8 @@ function updateSelectedRegionPanel() {
     if (constructionEl) constructionEl.style.display = "none";
 
   } else {
-    // ALLIED: Current order (title, temp, alliance, then all panels)
-    selectedRegionEl.append(title, temp, allianceSection);
+    // ALLIED: Header row with title and badge, then alliance details
+    selectedRegionEl.append(headerRow, allianceSection);
 
     // Get climate data and render additional panels
     const climateData = getClimateDataForRegion(selectedRegionId);
@@ -11768,7 +13044,6 @@ function updateSelectedRegionPanel() {
       renderEmissionsBreakdown(climateData, selectedRegionId);
       renderEffectivenessPanel(climateData);
       renderRegionFact(climateData);
-      appendPerCapitaInfo(selectedRegionEl, climateData);
       // Construction panel at the bottom
       renderConstructionPanel(selectedRegionId);
     } else {
@@ -11979,7 +13254,14 @@ function renderRegionIncome(region, climateData) {
       const awarenessModifier = getDisasterAwarenessModifier(selectedRegionId);
       const cost = gdpTrillions * GAME_CONFIG.lobbyCostFactor * finance.difficulty * awarenessModifier * 1000;
       const duration = Math.ceil(GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier);
-      const increaseAmount = GAME_CONFIG.lobbyMinIncrease + (GAME_CONFIG.lobbyMaxIncrease - GAME_CONFIG.lobbyMinIncrease) * (1 - finance.difficulty);
+      // Smart increase based on remaining room to max
+      const remainingRoom = Math.max(0, finance.maxPercent - finance.currentPercent);
+      const difficultyMultiplier = 1 - finance.difficulty * 0.5;
+      const increasePercent = 0.2 + (0.1 * difficultyMultiplier);
+      const increaseAmount = Math.max(
+        GAME_CONFIG.lobbyMinIncrease * 0.5,
+        Math.min(remainingRoom * increasePercent, remainingRoom)
+      );
       const awarenessBonus = state.disasterHistory?.[selectedRegionId]?.climateAwarenessBoost || 0;
 
       const campaignBtn = document.createElement("button");
@@ -12754,7 +14036,7 @@ function renderProjectButtons() {
   const categories = [
     { id: 'climate', label: 'Climate' },
     { id: 'power', label: 'Power' },
-    { id: 'ccs', label: '🏭 CCS' },
+    { id: 'ccs', label: 'CCS' },
     { id: 'economic', label: 'Economic' }
   ];
 
@@ -14344,6 +15626,7 @@ if (typeof window !== "undefined") {
   window.rejectSpontaneousRequest = rejectSpontaneousRequest;
   window.closeFactorsPopup = closeFactorsPopup;
   window.showHappinessFactorsPopup = showHappinessFactorsPopup;
+  window.showCarbonTaxPopup = showCarbonTaxPopup;
   window.showInterestFactorsPopup = showInterestFactorsPopup;
   window.cancelBuildModeDialog = cancelBuildModeDialog;
   window.confirmBuildModeDialog = confirmBuildModeDialog;

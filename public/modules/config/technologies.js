@@ -171,6 +171,22 @@ export const TECHNOLOGIES = [
     },
     icon: "🌊",
   },
+  {
+    id: "co2_truck_transport",
+    name: "CO2 Truck Transport",
+    description: "Road-based CO2 transport for smaller volumes and shorter distances. Most flexible option, ideal for remote capture sites without pipeline access.",
+    cost: 150,
+    tier: 2,
+    field: "carbon",
+    requires: ["ccs_fundamentals"],
+    effects: {
+      projectBonus: {
+        co2TruckTransport: { costReduction: 0.85 },
+        carbonCapture: { costReduction: 0.97 },
+      },
+    },
+    icon: "🚛",
+  },
 
   // TIER 3 - STORAGE & ADVANCED TRANSPORT
   {

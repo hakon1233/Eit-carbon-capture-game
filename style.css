@@ -1559,6 +1559,180 @@ body::before {
   font-size: 1rem;
 }
 
+/* Region Header Row - title + badge */
+.region-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.alliance-status-badge.header-badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+/* Clickable happiness row */
+.region-happiness-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-top: 10px;
+  background: rgba(10, 20, 30, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.region-happiness-row:hover {
+  background: rgba(20, 40, 60, 0.5);
+}
+
+.region-happiness-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-width: 70px;
+}
+
+.region-happiness-bar-container {
+  flex: 1;
+  height: 8px;
+  background: rgba(50, 50, 50, 0.5);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.region-happiness-bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.region-happiness-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* Clickable carbon tax row */
+.region-carbon-tax-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  margin-top: 8px;
+  background: rgba(10, 20, 30, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.region-carbon-tax-row:hover {
+  background: rgba(20, 40, 60, 0.5);
+}
+
+.region-carbon-tax-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+.region-carbon-tax-rate {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.region-carbon-tax-rate.warning {
+  color: var(--warning-color);
+}
+
+.region-carbon-tax-revenue {
+  font-size: 0.8rem;
+  color: var(--accent-green);
+  font-weight: 500;
+}
+
+/* Carbon Tax Popup Styles */
+.carbon-tax-popup-content {
+  padding: 5px 0;
+}
+
+.carbon-tax-stats {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(126, 184, 218, 0.15);
+}
+
+.carbon-tax-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.carbon-tax-stat .stat-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.carbon-tax-stat .stat-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.carbon-tax-stat .stat-value.positive {
+  color: var(--accent-green);
+}
+
+.carbon-tax-control-group {
+  margin-bottom: 15px;
+}
+
+.carbon-tax-control-group .control-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.carbon-tax-control-group .control-header span:last-child {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.carbon-tax-control-group .control-header span.warning {
+  color: var(--warning-color);
+}
+
+.carbon-tax-slider {
+  width: 100%;
+  cursor: pointer;
+}
+
+.tax-warning {
+  font-size: 0.75rem;
+  color: var(--warning-color);
+  margin-top: 4px;
+}
+
+.carbon-tax-note {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(126, 184, 218, 0.1);
+}
+
 .region-temp {
   margin-top: 4px;
   font-size: 0.85rem;
@@ -8320,4 +8494,427 @@ details summary .section-info-btn {
   color: var(--text-secondary);
   min-width: 32px;
   text-align: right;
+}
+
+/* ===== TUTORIAL SYSTEM ===== */
+
+/* Dark overlay covering entire screen */
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 9998;
+  pointer-events: auto;
+  animation: tutorialFadeIn 0.3s ease-out;
+}
+
+/* In highlight mode, overlay is transparent - spotlight provides the darkness */
+.tutorial-overlay.tutorial-highlight-mode {
+  background: transparent;
+  pointer-events: none;
+}
+
+@keyframes tutorialFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Spotlight cutout for highlighted elements */
+.tutorial-spotlight {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  background: transparent; /* The "hole" in the darkness */
+  box-shadow:
+    0 0 0 9999px rgba(0, 0, 0, 0.75),
+    0 0 30px rgba(240, 198, 111, 0.4);
+  border: 2px solid rgba(240, 198, 111, 0.6);
+  border-radius: 8px;
+  animation: spotlightPulse 2s ease-in-out infinite;
+}
+
+@keyframes spotlightPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.75),
+      0 0 30px rgba(240, 198, 111, 0.4);
+    border-color: rgba(240, 198, 111, 0.6);
+  }
+  50% {
+    box-shadow:
+      0 0 0 9999px rgba(0, 0, 0, 0.75),
+      0 0 50px rgba(240, 198, 111, 0.8);
+    border-color: rgba(240, 198, 111, 1);
+  }
+}
+
+/* Visual highlight on target element */
+.tutorial-target {
+  position: relative !important;
+  z-index: 10000 !important;
+  pointer-events: auto;
+  /* Note: display property intentionally not set - it would break flex containers */
+}
+
+.tutorial-target::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  right: -4px;
+  bottom: -4px;
+  border: 2px solid var(--accent);
+  border-radius: 8px;
+  animation: tutorialTargetPulse 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes tutorialTargetPulse {
+  0%, 100% {
+    border-color: var(--accent);
+    box-shadow: 0 0 10px rgba(240, 198, 111, 0.3);
+  }
+  50% {
+    border-color: var(--accent-strong);
+    box-shadow: 0 0 20px rgba(240, 198, 111, 0.6);
+  }
+}
+
+/* Tutorial popup container */
+.tutorial-popup {
+  position: fixed;
+  z-index: 10001;
+  background: linear-gradient(180deg, rgba(20, 35, 55, 0.98) 0%, rgba(15, 25, 40, 0.98) 100%);
+  border: 1px solid rgba(126, 184, 218, 0.3);
+  border-radius: 12px;
+  padding: 0;
+  min-width: 340px;
+  max-width: 420px;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.5),
+    0 0 60px rgba(126, 184, 218, 0.1);
+  animation: tutorialPopupSlideIn 0.3s ease-out;
+  pointer-events: auto; /* Ensure popup is clickable even when overlay has pointer-events: none */
+}
+
+.tutorial-popup.centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: tutorialPopupCenteredSlideIn 0.3s ease-out;
+}
+
+/* Small popup variant for map highlights */
+.tutorial-popup.small {
+  min-width: 260px;
+  max-width: 300px;
+}
+
+.tutorial-popup.small .tutorial-popup-content {
+  padding: 12px 16px;
+}
+
+.tutorial-popup.small .tutorial-popup-text {
+  font-size: 13px;
+}
+
+/* Tutorial waiting overlay */
+.tutorial-waiting-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 32px;
+  background: linear-gradient(180deg, rgba(20, 35, 55, 0.98) 0%, rgba(15, 25, 40, 0.98) 100%);
+  border: 1px solid rgba(126, 184, 218, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  animation: tutorialPopupSlideIn 0.3s ease-out;
+  z-index: 10001;
+}
+
+.tutorial-waiting-icon {
+  font-size: 2.5rem;
+  animation: tutorialWaitingPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes tutorialWaitingPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+.tutorial-waiting-text {
+  font-size: 1rem;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.tutorial-btn-skip {
+  margin-top: 8px;
+  padding: 8px 16px;
+  background: transparent;
+  border: 1px solid rgba(126, 184, 218, 0.3);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.tutorial-btn-skip:hover {
+  background: rgba(126, 184, 218, 0.1);
+  border-color: rgba(126, 184, 218, 0.5);
+  color: var(--text-primary);
+}
+
+@keyframes tutorialPopupCenteredSlideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+@keyframes tutorialPopupSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Tutorial header */
+.tutorial-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-bottom: 1px solid rgba(126, 184, 218, 0.15);
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px 12px 0 0;
+}
+
+.tutorial-popup-header-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tutorial-popup-header-icon {
+  font-size: 1.2rem;
+}
+
+.tutorial-popup-header-label {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--accent);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.tutorial-popup-close {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.tutorial-popup-close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+}
+
+/* Tutorial content */
+.tutorial-popup-content {
+  padding: 20px;
+}
+
+.tutorial-popup-icon-large {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.tutorial-popup-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--text);
+  margin: 0 0 12px;
+  text-align: center;
+}
+
+/* Non-centered popups (highlight mode) have left-aligned text */
+.tutorial-popup:not(.centered) .tutorial-popup-title {
+  text-align: left;
+}
+
+.tutorial-popup:not(.centered) .tutorial-popup-icon-large {
+  display: none;
+}
+
+.tutorial-popup-text {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+/* Tutorial bullets */
+.tutorial-popup-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.tutorial-popup-bullets li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.tutorial-popup-bullets li::before {
+  content: '•';
+  color: var(--accent);
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Tutorial footer with navigation */
+.tutorial-popup-footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(126, 184, 218, 0.15);
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 0 0 12px 12px;
+}
+
+.tutorial-popup-nav {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.tutorial-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid rgba(126, 184, 218, 0.3);
+  border-radius: 6px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tutorial-btn-back {
+  background: rgba(0, 0, 0, 0.3);
+  color: var(--text-secondary);
+}
+
+.tutorial-btn-back:hover {
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--text);
+}
+
+.tutorial-btn-next {
+  background: linear-gradient(180deg, rgba(240, 198, 111, 0.2) 0%, rgba(240, 198, 111, 0.1) 100%);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tutorial-btn-next:hover {
+  background: linear-gradient(180deg, rgba(240, 198, 111, 0.3) 0%, rgba(240, 198, 111, 0.2) 100%);
+  box-shadow: 0 0 15px rgba(240, 198, 111, 0.2);
+}
+
+.tutorial-btn-skip {
+  background: transparent;
+  border-color: rgba(255, 100, 100, 0.3);
+  color: rgba(255, 100, 100, 0.7);
+}
+
+.tutorial-btn-skip:hover {
+  background: rgba(255, 100, 100, 0.1);
+  border-color: rgba(255, 100, 100, 0.5);
+  color: rgba(255, 100, 100, 0.9);
+}
+
+/* Progress indicator */
+.tutorial-popup-progress {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-family: var(--font-mono);
+}
+
+/* Arrow pointing to highlighted element */
+.tutorial-arrow {
+  position: fixed;
+  z-index: 10001;
+  width: 0;
+  height: 0;
+  border-style: solid;
+}
+
+.tutorial-arrow.arrow-up {
+  border-width: 0 12px 16px 12px;
+  border-color: transparent transparent rgba(20, 35, 55, 0.98) transparent;
+}
+
+.tutorial-arrow.arrow-down {
+  border-width: 16px 12px 0 12px;
+  border-color: rgba(20, 35, 55, 0.98) transparent transparent transparent;
+}
+
+.tutorial-arrow.arrow-left {
+  border-width: 12px 16px 12px 0;
+  border-color: transparent rgba(20, 35, 55, 0.98) transparent transparent;
+}
+
+.tutorial-arrow.arrow-right {
+  border-width: 12px 0 12px 16px;
+  border-color: transparent transparent transparent rgba(20, 35, 55, 0.98);
+}
+
+/* Action hint styling */
+.tutorial-action-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(240, 198, 111, 0.1);
+  border: 1px dashed rgba(240, 198, 111, 0.4);
+  border-radius: 6px;
+  margin-top: 12px;
+}
+
+.tutorial-action-hint-icon {
+  font-size: 1rem;
+}
+
+.tutorial-action-hint-text {
+  font-size: 0.85rem;
+  color: var(--accent);
+  font-style: italic;
 }
