@@ -90,7 +90,7 @@ export const NEGOTIABLE_TERMS = {
     label: "Maximum Climate Dedication",
     description: "Maximum % of GDP dedicated to climate action",
     min: 5,
-    max: 20,
+    max: 10,
     step: 1,
     default: 10,
     unit: "%",
