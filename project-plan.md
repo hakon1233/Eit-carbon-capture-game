@@ -6,6 +6,8 @@ A Plague Inc-inspired web game where players act as a global climate overseer, m
 **Genre:** Turn-based/real-time strategy
 **Platform:** Web browser
 
+> For Norway-specific funding, buyer, and go-to-market strategy, see [`docs/strategy/norway-commercialization.md`](docs/strategy/norway-commercialization.md).
+
 ---
 
 ## Core Concept: "Climate Overseer"
