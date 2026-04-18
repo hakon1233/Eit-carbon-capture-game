@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+# Validate commit messages against conventional commits (feat/fix/chore/docs/…).
+# Installed by scripts/activate-husky.sh.
+npx --no -- commitlint --edit "$1"
