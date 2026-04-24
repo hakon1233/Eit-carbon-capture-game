@@ -1,3 +1,10 @@
+---
+name: todo
+description: Track Phase 2-3 features queued for implementation — random events, project upgrades, and core improvements to the game loop.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Features To Implement
 
 This document tracks features that need to be implemented (Phase 2-3 from project plan).

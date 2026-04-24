@@ -1,3 +1,10 @@
+---
+name: nice-to-have
+description: Track lower-priority game features deferred to Phase 4-5 — polish, engagement, achievements, and stretch goals beyond the core loop.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Nice-to-Have Features
 
 Lower priority features to implement if time allows (Phase 4-5 from project plan).

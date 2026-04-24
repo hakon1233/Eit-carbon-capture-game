@@ -1,3 +1,10 @@
+---
+name: system-overview
+description: Top-level entry point for the Carbon Capture Game — what it does, architecture, key workflows. Links out to detailed subfolder docs.
+type: explanation
+last_reviewed: 2026-04-24
+---
+
 # System Overview
 
 <!-- 

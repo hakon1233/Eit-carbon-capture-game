@@ -1,3 +1,10 @@
+---
+name: implemented
+description: Inventory of completed Carbon Capture Game features — core loop, difficulty modes, projects, events, UI — reference snapshot of current behavior.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Implemented Features
 
 This document tracks all features that have been completed in the Carbon Capture Game.
