@@ -1,3 +1,10 @@
+---
+name: norway-commercialization
+description: Strategy note on monetizing the climate game for Norwegian schools — buyers, funders, grant paths, and realistic public-education revenue expectations.
+type: explanation
+last_reviewed: 2026-04-24
+---
+
 # Norway Commercialization & Funding Strategy
 
 Internal strategy note on adapting this climate game for Norwegian school use — who would pay for it, who would fund it, and which doors to knock on first. Blunt and practical, not a pitch deck.

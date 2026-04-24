@@ -1,3 +1,10 @@
+---
+name: how-the-system-works
+description: Explains how workflows, bug tracking, fix loop, session logs, and Obsidian vault sync fit together. Source-of-truth for the repo's agent system.
+type: explanation
+last_reviewed: 2026-04-24
+---
+
 # How the Testing & Workflow System Works
 
 This document explains how workflows, bug tracking, testing, session logging, and the Obsidian vault sync all fit together. It's the source of truth for the entire system.
