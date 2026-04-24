@@ -1,3 +1,10 @@
+---
+name: handoffs-index
+description: Index for context-passing handoff notes between sessions or agents — what was done, what is next, watch-outs, verification steps.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Handoffs
 
 Context-passing documents for complex multi-session work. When a task spans multiple sessions or agents, write a handoff so the next session can pick up where you left off.

@@ -1,3 +1,10 @@
+---
+name: product-index
+description: Index for product and market intelligence — competitors, users, feature proposals, ideas. Distinct from technical research (docs/research/) and ADRs (docs/decisions/).
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Product
 
 Product and market intelligence for this project. Separate from `docs/research/` (which is scoped to technical research: library comparisons, API spikes, performance benchmarks).

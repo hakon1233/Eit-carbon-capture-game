@@ -1,3 +1,10 @@
+---
+name: competitors-index
+description: Index for per-competitor analysis — pricing, target audience, strengths, weaknesses, screenshots, lessons worth stealing.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Competitors
 
 One file per competitor. Short enough to read in under a minute, detailed enough to act on.

@@ -1,3 +1,10 @@
+---
+name: research-index
+description: Index for technical research — spikes, options analysis, library/API comparisons, performance notes. Distinct from docs/product/ market research.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Research
 
 Investigation notes, spike docs, options analysis, and technical exploration.

@@ -1,3 +1,10 @@
+---
+name: features-index
+description: Index for feature proposals — problem, proposed solution, alternatives, risks, open questions. Lives here until promoted to workflow/ticket/spec.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Feature Proposals
 
 Proposals ready enough to discuss but not yet ready to build. Lives here until promoted to a workflow / ticket / spec.

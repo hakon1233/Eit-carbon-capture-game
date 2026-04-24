@@ -1,3 +1,10 @@
+---
+name: architecture-index
+description: Index for architecture explanations — system diagrams, component maps, data flow, integrations, module boundaries, directory layout.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Architecture
 
 System structure, component relationships, data flow, and integration patterns.

@@ -1,3 +1,10 @@
+---
+name: users-index
+description: Index for user research — interview notes, feedback patterns, personas, support-ticket analysis. Raw material informing product decisions.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Users
 
 What users actually say, think, and do. The raw material that informs product decisions.

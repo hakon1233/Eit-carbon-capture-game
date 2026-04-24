@@ -1,3 +1,10 @@
+---
+name: ideas-index
+description: Index for half-baked product ideas — "what if we…" sketches and unvalidated observations. Low-friction capture before ideas evaporate.
+type: reference
+last_reviewed: 2026-04-24
+---
+
 # Ideas
 
 Half-baked thoughts worth capturing before they evaporate. Lighter than a feature proposal.
