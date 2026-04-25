@@ -1,8 +1,8 @@
 ---
 name: runbooks-index
-description: Index for operational runbooks — deployment, rollback, troubleshooting, incident response, environment setup. Each file uses numbered steps with commands and expected output.
+description: Index for operational runbooks — deploy, rollback, troubleshoot, incident response, env setup. Numbered steps with commands and expected output.
 type: reference
-last_reviewed: 2026-04-24
+last_reviewed: 2026-04-25
 ---
 
 # Runbooks
