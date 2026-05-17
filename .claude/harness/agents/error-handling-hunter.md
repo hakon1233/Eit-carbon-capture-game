@@ -58,14 +58,32 @@ process or test setup can delete or replace the file. Shapes to flag:
   file before applying a transformation — sentinel races between
   injection and read.
 
+**Priority ranking within (f) (r26).** When you have multiple TOCTOU
+candidates competing for the cap-4 findings slot, rank by **paired-call
+signature strength**:
+
+- **HIGH (always prefer):** explicit `fs.existsSync(p)` (or `existsSync(p)`
+  imported) followed within ~10 lines by unconditional `fs.readFileSync(p)`
+  / `fs.readFile(p, ...)` / `fs.unlinkSync(p)` / `fs.statSync(p)` on the
+  IDENTICAL path variable, with no `try/catch` between them. This is the
+  canonical filesystem TOCTOU shape — flag it FIRST among (f) candidates.
+
+- **MEDIUM:** `fs.access`-then-use, or async `await fs.access(p)` followed
+  by `await fs.readFile(p)`. Same race shape but harder to confuse with
+  legitimate guard patterns.
+
+- **LOW:** TOCTOU keyword present in comments / logs / test-injection
+  sentinel code without the paired-call signature. Often these are
+  intentional sentinels; deprioritize.
+
+**Selection rule (within-(f) only):** if a HIGH-signature pair exists,
+emit (f) on THAT file even if another file has a more-vocabulary TOCTOU
+mention. The paired-call mechanical signature beats keyword density.
+
 Why this is a separate anti-pattern from (e): TOCTOU is not "the
 catch was wrong"; it's "the structure of check-then-use is wrong."
 The fix is usually to remove the existence check and just `try` the
-read, OR to hold a lock across the window. r23 added this pattern
-to target BH-010 (`src/lib/openclaw/test-injection.ts`) which the
-existing `try/catch` grep already routes into this hunter's
-candidate pool but whose lens vocabulary did not previously include
-TOCTOU as a flaggable shape.
+read, OR to hold a lock across the window.
 
 ### 3 — Context-aware filtering
 
@@ -211,3 +229,12 @@ and the disagreement-as-bug class never gets caught.
 If any of your findings claims "the original error message was X" or
 names a specific bug, strike that finding. Your evidence must come from
 the code you read this session, period.
+
+## History
+
+- **r20 (0.21.2):** Added `intent_signal` neutral-metadata field to finding schema.
+- **r20 (0.21.2):** Added `finding_id` field (later renderer-overridden in r22).
+- **r22 (0.21.4):** finding_id hash computation moved hunter → renderer; hunter-emitted values silently overridden.
+- **r23 (0.21.5):** Added anti-pattern (f) TOCTOU/check-then-use as 6th flag. r25 validation campaign c-5d57f838 caught BH-010 at 3/10 (Fisher p=0.018 vs prior 0/15).
+- **r24 (0.21.6):** Retired r21 mechanism (Step 1.5 + selection_rationale + unranked_matches).
+- **r26 (0.21.7):** Added within-(f) priority ranking by paired-call signature strength to target BH-010 routing variance.
