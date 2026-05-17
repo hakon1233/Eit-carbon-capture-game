@@ -130,7 +130,6 @@ that.
   "coverage_notes": "<one sentence: which routes you curl'd, which port>",
   "findings": [
     {
-      "finding_id": "surface-<8-char-hash>",
       "file": "<the source file most likely to own the broken element, OR 'live:<url>' if you can't pin source>",
       "line_start": 0,
       "line_end": 0,
