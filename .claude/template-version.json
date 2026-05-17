@@ -1,8 +1,8 @@
 {
-  "template_commit": "6dd630c",
-  "template_commit_date": "2026-05-18T00:33:44+02:00",
+  "template_commit": "e6ee3e7",
+  "template_commit_date": "2026-05-18T00:42:34+02:00",
   "bootstrap_version": "2026.04.24b",
-  "applied_at": "2026-05-17T22:41:13Z",
+  "applied_at": "2026-05-17T23:00:36Z",
   "source": "~/projects/work/meta-harness-mvp",
   "layout": "layered-v2"
 }
