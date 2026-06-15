@@ -92,6 +92,17 @@ const GAME_CONFIG = {
   // Legacy (for backward compatibility)
   startingCredits: 100,
   baseIncome: 5,
+
+  // Economy balance — both levers applied lightly (CAR-17)
+  climateBudgetIncomeMultiplier: 0.6,
+};
+
+const PROJECT_UPKEEP_RATES = {
+  default: 1.0,
+  power: 1.5,
+  economic: 1.2,
+  electrification: 0.8,
+  ccs: 1.2,
 };
 
 // Regional Project Caps - Max number of each project type per region
@@ -1289,7 +1300,7 @@ const NEGOTIABLE_TERMS = {
     min: 10,
     max: 100,
     step: 5,
-    default: 25,
+    default: 15,
     unit: "$/ton",
     impactPerStep: -2, // Higher tax = harder to negotiate
   },
@@ -4311,7 +4322,8 @@ function showIncomeBreakdownPopup() {
 
   const costs = document.getElementById("income-costs");
   if (costs) {
-    costs.textContent = `-${formatCurrency(breakdown.costs.researchCenters)}`;
+    const operatingCosts = breakdown.costs.researchCenters + breakdown.costs.projectUpkeep;
+    costs.textContent = `-${formatCurrency(operatingCosts)}`;
   }
 
   const netTotal = document.getElementById("income-net-total");
@@ -6444,6 +6456,19 @@ const PROJECT_TYPES = {
     },
   },
 };
+
+function getProjectMonthlyUpkeep(projectType) {
+  const project = PROJECT_TYPES[projectType];
+  if (!project) {
+    return 0;
+  }
+
+  if (project.subcategory?.startsWith("ccs_")) {
+    return PROJECT_UPKEEP_RATES.ccs;
+  }
+
+  return PROJECT_UPKEEP_RATES[project.category] ?? PROJECT_UPKEEP_RATES.default;
+}
 
 const MONTHS = [
   "Jan",
@@ -10399,7 +10424,7 @@ function calculateIncomeBreakdown() {
     climateBudget: { total: 0, byRegion: {} },
     carbonTax: { total: 0, byRegion: {} },
     projects: { total: 0, byType: {} },
-    costs: { researchCenters: 0 },
+    costs: { researchCenters: 0, projectUpkeep: 0, projectUpkeepByType: {} },
     eventMultiplier: getEventIncomeMultiplier(),
     grossTotal: 0,
     netTotal: 0,
@@ -10428,6 +10453,7 @@ function calculateIncomeBreakdown() {
       gdpTrillions = climateData.gdp || 1;
       climatePercent = climateData.climateFinance.currentPercent;
       regionClimateBudget = (gdpTrillions * climatePercent / 100) / 12 * 1000;
+      regionClimateBudget *= GAME_CONFIG.climateBudgetIncomeMultiplier;
       regionClimateBudget *= disasterMult * gdpContributionMod * powerGdpMod;
     }
 
@@ -10475,6 +10501,7 @@ function calculateIncomeBreakdown() {
 
       const incomeBonus = getTechIncomeBonus(projectType) * getEventBonusForProject(projectType, "income");
       const projectIncome = project.income * effectMult * incomeBonus * disasterMult;
+      const projectUpkeep = getProjectMonthlyUpkeep(projectType);
 
       if (projectIncome > 0) {
         if (!breakdown.projects.byType[projectType]) {
@@ -10487,6 +10514,19 @@ function calculateIncomeBreakdown() {
         breakdown.projects.byType[projectType].count++;
         breakdown.projects.byType[projectType].amount += projectIncome;
         breakdown.projects.total += projectIncome;
+      }
+
+      if (projectUpkeep > 0) {
+        if (!breakdown.costs.projectUpkeepByType[projectType]) {
+          breakdown.costs.projectUpkeepByType[projectType] = {
+            name: project.name,
+            count: 0,
+            amount: 0,
+          };
+        }
+        breakdown.costs.projectUpkeepByType[projectType].count++;
+        breakdown.costs.projectUpkeepByType[projectType].amount += projectUpkeep;
+        breakdown.costs.projectUpkeep += projectUpkeep;
       }
     });
   });
@@ -10506,7 +10546,7 @@ function calculateIncomeBreakdown() {
   grossIncome *= breakdown.eventMultiplier;
 
   breakdown.grossTotal = grossIncome;
-  breakdown.netTotal = grossIncome - breakdown.costs.researchCenters;
+  breakdown.netTotal = grossIncome - breakdown.costs.researchCenters - breakdown.costs.projectUpkeep;
 
   return breakdown;
 }
@@ -10597,6 +10637,7 @@ function nextMonth() {
         const gdpTrillions = climateData.gdp || 1;
         const climatePercent = climateData.climateFinance.currentPercent;
         let monthlyClimateIncome = (gdpTrillions * climatePercent / 100) / 12 * 1000; // Convert to billions
+        monthlyClimateIncome *= GAME_CONFIG.climateBudgetIncomeMultiplier;
         // Apply all modifiers
         monthlyClimateIncome *= disasterMult * gdpContributionMod * powerGdpMod;
         // Track contribution for happiness calculations
@@ -10642,10 +10683,12 @@ function nextMonth() {
       reduction *= disasterMult;
 
       const incomeBonus = getTechIncomeBonus(projectType) * getEventBonusForProject(projectType, "income");
+      const projectUpkeep = getProjectMonthlyUpkeep(projectType);
 
       totalReduction += reduction;
       // Apply disaster reduction to project income (disrupted operations)
       totalIncome += project.income * effectMult * incomeBonus * disasterMult;
+      totalIncome -= projectUpkeep;
     });
 
     // Track alliance turns for loyalty bonus

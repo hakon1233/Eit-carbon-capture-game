@@ -3,7 +3,7 @@
  * Contains functions for calculating GDP, growth rates, and income
  */
 
-import { GAME_CONFIG, GROWTH_CONFIG } from "../config/game-config.js";
+import { GAME_CONFIG, GROWTH_CONFIG, PROJECT_UPKEEP_RATES } from "../config/game-config.js";
 
 /**
  * Infer development level from region ID (fallback when no climate data)
@@ -188,6 +188,7 @@ export function calculateClimateBudgetIncome({
   disasterMult = 1.0,
 }) {
   let income = ((gdpTrillions * climatePercent) / 100 / 12) * 1000;
+  income *= GAME_CONFIG.climateBudgetIncomeMultiplier;
   income *= disasterMult * gdpContributionMod * powerGdpMod;
   return income;
 }
@@ -200,6 +201,18 @@ export function calculateClimateBudgetIncome({
  */
 export function calculateCarbonTaxRevenue(monthlyEmissions, taxRate) {
   return monthlyEmissions * taxRate;
+}
+
+export function calculateProjectUpkeep(project) {
+  if (!project) {
+    return 0;
+  }
+
+  if (project.subcategory?.startsWith("ccs_")) {
+    return PROJECT_UPKEEP_RATES.ccs;
+  }
+
+  return PROJECT_UPKEEP_RATES[project.category] ?? PROJECT_UPKEEP_RATES.default;
 }
 
 /**

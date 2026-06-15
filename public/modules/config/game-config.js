@@ -36,6 +36,17 @@ export const GAME_CONFIG = {
   // Legacy (for backward compatibility)
   startingCredits: 100,
   baseIncome: 5,
+
+  // Economy balance — both levers applied lightly (CAR-17)
+  climateBudgetIncomeMultiplier: 0.6,
+};
+
+export const PROJECT_UPKEEP_RATES = {
+  default: 1.0,
+  power: 1.5,
+  economic: 1.2,
+  electrification: 0.8,
+  ccs: 1.2,
 };
 
 // Regional Project Caps - Max number of each project type per region

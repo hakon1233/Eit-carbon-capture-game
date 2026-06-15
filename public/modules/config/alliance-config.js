@@ -135,7 +135,7 @@ export const NEGOTIABLE_TERMS = {
     min: 10,
     max: 100,
     step: 5,
-    default: 25,
+    default: 15,
     unit: "$/ton",
     impactPerStep: -2, // Higher tax = harder to negotiate
   },

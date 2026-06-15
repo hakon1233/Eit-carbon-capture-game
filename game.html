@@ -4,12 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Carbon Capture: Climate Overseer</title>
+    <!-- Brand: favicon + app icon (CAR-24 "Carbon Lockup") -->
+    <link rel="icon" href="favicon.ico" sizes="any" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="icon-16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+    <link rel="manifest" href="site.webmanifest" />
+    <meta name="theme-color" content="#14171C" />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body class="in-game">
     <div class="game-shell">
       <div class="topbar-wrapper">
         <header class="topbar">
+          <a
+            class="topbar-brand"
+            href="index.html"
+            title="Carbon Capture: Climate Overseer — back to menu"
+            style="display: flex; align-items: center; gap: 8px; margin-right: auto; text-decoration: none;"
+          >
+            <img
+              src="brand/logo/mark.svg"
+              alt="Carbon Capture: Climate Overseer"
+              style="height: 30px; width: 30px; display: block;"
+            />
+          </a>
           <div class="header-compact">
             <!-- Budget + Income -->
             <div class="header-finance">
@@ -503,7 +523,7 @@
               <span class="income-value" id="income-gross-total"></span>
             </div>
             <div class="income-row income-cost">
-              <span class="income-label">Research Center Costs</span>
+              <span class="income-label">Operating Costs</span>
               <span class="income-value" id="income-costs"></span>
             </div>
             <div class="income-row income-net">
