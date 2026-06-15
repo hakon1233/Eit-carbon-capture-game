@@ -8838,8 +8838,22 @@ function updateCarbonTaxRate(regionId, newRate) {
     rateDisplay.style.color = taxLimitWarning ? 'var(--warning-color)' : 'var(--text-primary)';
   }
 
-  // Re-render the region panel to update revenue display
-  renderRegionPanel();
+  // Update the popup's Monthly Revenue stat live to reflect the new rate
+  const revenueDisplay = document.getElementById(`carbon-tax-revenue-display-${regionId}`);
+  if (revenueDisplay) {
+    const climateData = getClimateDataForRegion(regionId);
+    let monthlyRevenue = 0;
+    if (climateData && climateData.emissions) {
+      const yearlyEmissions = typeof climateData.emissions === 'number'
+        ? climateData.emissions
+        : climateData.emissions.total || 0;
+      monthlyRevenue = (yearlyEmissions / 12) * newRate;
+    }
+    revenueDisplay.textContent = `+${formatCurrency(monthlyRevenue)}/mo`;
+  }
+
+  // Re-render the region panel to update the carbon-tax row revenue display
+  updateSelectedRegionPanel();
 }
 
 /**
@@ -8863,6 +8877,9 @@ function updateCarbonTaxGrowth(regionId, newGrowth) {
   if (growthDisplay) {
     growthDisplay.textContent = `+${newGrowth}%/yr`;
   }
+
+  // Re-render the region panel so the carbon-tax row reflects the new growth projection
+  updateSelectedRegionPanel();
 }
 
 /**
@@ -8964,7 +8981,7 @@ function showCarbonTaxPopup(regionId) {
       <div class="carbon-tax-stats">
         <div class="carbon-tax-stat">
           <span class="stat-label">Monthly Revenue</span>
-          <span class="stat-value positive">+${formatCurrency(monthlyRevenue)}/mo</span>
+          <span id="carbon-tax-revenue-display-${regionId}" class="stat-value positive">+${formatCurrency(monthlyRevenue)}/mo</span>
         </div>
         <div class="carbon-tax-stat">
           <span class="stat-label">Yearly Emissions</span>
