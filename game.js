@@ -15553,11 +15553,12 @@ function renderAllianceOverview() {
       // Calculate emissions reduction from projects in this region
       const regionProjects = state.regions[regionId]?.projects || [];
       regionProjects.forEach(p => {
-        if (p.complete) {
-          const projectDef = PROJECT_TYPES.find(pt => pt.type === p.type);
-          if (projectDef) {
-            totalEmissionsReduction += projectDef.co2Reduction || 0;
-          }
+        const projectType = typeof p === "string" ? p : p.type;
+        const effectMult = typeof p === "object" ? (p.effectMultiplier || 1) : 1;
+        const projectDef = PROJECT_TYPES[projectType];
+
+        if (projectDef) {
+          totalEmissionsReduction += (projectDef.co2Reduction || 0) * effectMult;
         }
       });
     }
