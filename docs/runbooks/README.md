@@ -9,6 +9,10 @@ last_reviewed: 2026-04-25
 
 Step-by-step operational procedures for deployment, troubleshooting, and maintenance.
 
+## Runbooks
+
+- [improvement-loop.md](improvement-loop.md) — the standing gameplay improvement loop (founder-reported bug/balance → fix → in-game QA verify → close/re-open).
+
 ## What goes here
 
 - Deployment procedures (how to deploy, rollback, verify)
