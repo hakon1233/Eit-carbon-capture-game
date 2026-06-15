@@ -12724,6 +12724,14 @@ function renderAchievementsPanel() {
 // History graph rendering
 let currentGraphMetric = "co2";
 
+function formatHistoryGraphChange(change, formatValue) {
+  const formattedChange = formatValue(change);
+  if (formattedChange.startsWith("+") || formattedChange.startsWith("-") || formattedChange.startsWith("$-")) {
+    return formattedChange;
+  }
+  return `${change >= 0 ? "+" : ""}${formattedChange}`;
+}
+
 function renderHistoryGraph() {
   const canvas = document.getElementById("history-graph");
   const statsEl = document.getElementById("graph-stats");
@@ -12849,7 +12857,7 @@ function renderHistoryGraph() {
       <div class="graph-stat-label">Start</div>
     </div>
     <div class="graph-stat">
-      <div class="graph-stat-value" style="color:${trendColor}">${trend} ${change >= 0 ? "+" : ""}${formatValue(change)}</div>
+      <div class="graph-stat-value" style="color:${trendColor}">${trend} ${formatHistoryGraphChange(change, formatValue)}</div>
       <div class="graph-stat-label">Change</div>
     </div>
     <div class="graph-stat">
