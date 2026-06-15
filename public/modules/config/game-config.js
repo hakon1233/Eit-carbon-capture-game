@@ -11,7 +11,7 @@ export const GAME_CONFIG = {
 
   // Climate settings
   startingCo2: 423,             // Current CO2 level (2025)
-  startingTemp: 1.09,           // Starting temperature: 423 * 0.0105 - 3.37 = 1.09°C
+  startingTemp: 1.0715,         // Seed = calculateTemperature(423): 423 * 0.0105 - 3.37 = 1.0715°C (displays +1.07°C). Must match the formula so temp doesn't dip on the first tick (CAR-22).
   startYear: 2025,
   startMonth: 1,
   co2Increase: 0.29,            // ppm per month (3.5 ppm/year from WMO 2023-2024 data, legacy fallback)
