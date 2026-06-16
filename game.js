@@ -6031,12 +6031,12 @@ const PROJECT_TYPES = {
   },
   carbonCapture: {
     label: "Basic Carbon Capture",
-    cost: 35,                   // $35B (based on $332M/unit from Sintef, scaled for ~105 units)
-    co2Reduction: 0.001,        // 105 Mt CO2/year (realistic: $332M captures 1 Mt/year)
+    cost: 30,                   // CAR-29: $30B - modest premium over reforestation, far below researched post-combustion ($65B)
+    co2Reduction: 0.04,         // CAR-29: 2x reforestation's effect (was 0.001, an inconsistent-nerf trap); cost-eff 0.00133/$B matches reforestation, well below post-combustion's 0.08
     income: 0,
     category: "climate",
     subcategory: "ccs_capture",
-    constructionMonths: 42,     // 3.5 years (Northern Lights timeline from Equinor)
+    constructionMonths: 24,     // CAR-29: trimmed from absurd 42mo; slower than reforestation (4mo) but under post-combustion (36mo)
     description: "First-generation industrial carbon capture. Research advanced CCS for better options.",
   },
 
