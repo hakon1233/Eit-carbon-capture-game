@@ -3,6 +3,12 @@
  * Contains all buildable project definitions for climate, power, economic, and electrification categories
  */
 
+export function formatCO2ReductionValue(value, decimals) {
+  const rounded = Number(value.toFixed(decimals));
+  const normalized = Object.is(rounded, -0) ? 0 : rounded;
+  return normalized.toFixed(decimals);
+}
+
 export const PROJECT_TYPES = {
   // ═══════════════════════════════════════════════════════════════
   // CLIMATE/ENVIRONMENT PROJECTS
