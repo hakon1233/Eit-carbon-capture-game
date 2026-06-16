@@ -10,10 +10,10 @@ import vm from "node:vm";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-function extractFormatter(src, rel) {
-  const match = /(?:export\s+)?function\s+formatCO2ReductionValue\s*\(/.exec(src);
+function extractFunction(src, rel, functionName, context = {}) {
+  const match = new RegExp(`(?:export\\s+)?function\\s+${functionName}\\s*\\(`).exec(src);
   if (!match) {
-    throw new Error(`${rel}: missing formatCO2ReductionValue helper`);
+    throw new Error(`${rel}: missing ${functionName} helper`);
   }
 
   const functionStart = match.index + match[0].indexOf("function");
@@ -27,11 +27,11 @@ function extractFormatter(src, rel) {
     if (ch === "}") depth -= 1;
     if (depth === 0) {
       const fnSrc = src.slice(functionStart, i + 1);
-      return vm.runInNewContext(`(${fnSrc})`);
+      return vm.runInNewContext(`(${fnSrc})`, context);
     }
   }
 
-  throw new Error(`${rel}: helper body did not terminate`);
+  throw new Error(`${rel}: ${functionName} body did not terminate`);
 }
 
 const cases = [
@@ -51,8 +51,12 @@ let failed = false;
 for (const rel of targets) {
   const src = readFileSync(join(root, rel), "utf8");
   let format;
+  let formatDisplay;
   try {
-    format = extractFormatter(src, rel);
+    format = extractFunction(src, rel, "formatCO2ReductionValue");
+    formatDisplay = extractFunction(src, rel, "formatCO2ReductionDisplay", {
+      formatCO2ReductionValue: format,
+    });
   } catch (err) {
     failed = true;
     console.error(`FAIL ${err.message}`);
@@ -69,9 +73,32 @@ for (const rel of targets) {
     }
   }
 
+  const displayCases = [
+    [0.04, 1, "CO2 / month", "0.0 CO2 / month"],
+    [0.04, 2, "Gt CO2/yr", "-0.04 Gt CO2/yr"],
+    [0.15, 1, "CO2 / month", "-0.1 CO2 / month"],
+    [-0.04, 1, "CO2 / month", "0.0 CO2 / month"],
+    [-0.15, 1, "CO2 / month", "+0.1 CO2 / month"],
+  ];
+
+  for (const [value, decimals, unit, expected] of displayCases) {
+    const actual = formatDisplay(value, decimals, unit);
+    if (actual !== expected) {
+      failed = true;
+      console.error(
+        `FAIL [${rel}] formatCO2ReductionDisplay(${value}, ${decimals}, ${unit}) -> ${actual}, expected ${expected}`,
+      );
+    }
+  }
+
   if (rel === "game.js" && /adjustedReduction\.toFixed\(/.test(src)) {
     failed = true;
     console.error("FAIL [game.js] project card display still formats adjustedReduction directly");
+  }
+
+  if (/`[-+]\\$\\{formatCO2ReductionValue/.test(src)) {
+    failed = true;
+    console.error(`FAIL [${rel}] display still hardcodes a sign outside formatCO2ReductionValue`);
   }
 
   if (!failed) {

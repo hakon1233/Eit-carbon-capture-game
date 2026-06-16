@@ -9,6 +9,13 @@ export function formatCO2ReductionValue(value, decimals) {
   return normalized.toFixed(decimals);
 }
 
+export function formatCO2ReductionDisplay(value, decimals, unit) {
+  const formattedMagnitude = formatCO2ReductionValue(Math.abs(value), decimals);
+  const roundedMagnitude = Number(formattedMagnitude);
+  const sign = roundedMagnitude === 0 ? "" : value > 0 ? "-" : "+";
+  return `${sign}${formattedMagnitude} ${unit}`;
+}
+
 export const PROJECT_TYPES = {
   // ═══════════════════════════════════════════════════════════════
   // CLIMATE/ENVIRONMENT PROJECTS

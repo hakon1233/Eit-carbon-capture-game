@@ -10872,6 +10872,13 @@ function formatCO2ReductionValue(value, decimals) {
   return normalized.toFixed(decimals);
 }
 
+function formatCO2ReductionDisplay(value, decimals, unit) {
+  const formattedMagnitude = formatCO2ReductionValue(Math.abs(value), decimals);
+  const roundedMagnitude = Number(formattedMagnitude);
+  const sign = roundedMagnitude === 0 ? "" : value > 0 ? "-" : "+";
+  return `${sign}${formattedMagnitude} ${unit}`;
+}
+
 // Process ongoing Climate Policy Campaigns
 function processCampaigns() {
   if (!state.activeCampaigns) {
@@ -14058,7 +14065,7 @@ function renderCCSProjectsSection(regionId, climateData, difficulty) {
 
       const effectParts = [];
       if (adjustedReduction > 0) {
-        effectParts.push(`-${formatCO2ReductionValue(adjustedReduction, 2)} Gt CO2/yr`);
+        effectParts.push(formatCO2ReductionDisplay(adjustedReduction, 2, "Gt CO2/yr"));
       }
       if (project.income > 0) {
         effectParts.push(`+${formatCurrency(project.income)} / month`);
@@ -14216,9 +14223,9 @@ function renderProjectButtons() {
 
     const effectParts = [];
     if (adjustedReduction > 0) {
-      effectParts.push(`-${formatCO2ReductionValue(adjustedReduction, 1)} CO2 / month`);
+      effectParts.push(formatCO2ReductionDisplay(adjustedReduction, 1, "CO2 / month"));
     } else if (adjustedReduction < 0) {
-      effectParts.push(`+${formatCO2ReductionValue(Math.abs(adjustedReduction), 1)} CO2 / month`);
+      effectParts.push(formatCO2ReductionDisplay(adjustedReduction, 1, "CO2 / month"));
     }
     if (project.income > 0) {
       effectParts.push(`+${formatCurrency(project.income)} / month`);
