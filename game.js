@@ -3596,10 +3596,10 @@ const ACHIEVEMENTS = [
   {
     id: "speed_run",
     name: "Speed Run",
-    description: "Win the game before 2050",
+    description: "Win the game in the earliest possible year (2050)",
     icon: "⏱️",
     condition: (state) => {
-      return state.won && state.year < 2050;
+      return state.won && state.year === 2050;
     },
   },
   {
@@ -5159,7 +5159,7 @@ const TUTORIAL_STEPS = [
     type: "popup",
     title: "How to Win",
     icon: "🏆",
-    content: "Victory requires reducing CO₂ to 416 ppm while maintaining alliances with all regions. Defeat occurs if warming reaches +2.0°C or you run out of time by 2100.",
+    content: "Victory requires reducing CO₂ to 416 ppm (keeping warming at or below +1.0°C) by 2050. Defeat occurs if warming reaches +2.0°C or you run out of time by 2100.",
     bullets: [
       "Build renewable energy and CCS aggressively",
       "Keep allies happy by meeting their goals",
@@ -14931,7 +14931,7 @@ function checkWinLose() {
   if (state.temperature <= GAME_CONFIG.winTemp && state.year >= minWinYear) {
     state.gameOver = true;
     state.won = true;
-    pushMessage("Victory! Temperature stabilized below 1.5°C through 2050!", "good");
+    pushMessage(`Victory! Temperature stabilized below ${GAME_CONFIG.winTemp}°C through 2050!`, "good");
   } else if (state.temperature >= GAME_CONFIG.loseTemp || state.year >= GAME_CONFIG.loseYear) {
     state.gameOver = true;
     state.won = false;
