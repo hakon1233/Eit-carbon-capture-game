@@ -8819,12 +8819,12 @@ function calculateHappinessFactors(regionId) {
     });
   }
 
-  // Tip: Reduce global temperature
-  if (state.temperature > 1.5) {
+  // Tip: Reduce global temperature toward the win threshold (winTemp)
+  if (state.temperature > GAME_CONFIG.winTemp) {
     tips.push({
       icon: "🌡️",
-      label: "Reduce global temperature below 1.5°C",
-      value: "+" + Math.round((state.temperature - 1.5) * 5),
+      label: `Reduce global temperature below ${GAME_CONFIG.winTemp}°C`,
+      value: "+" + Math.round((state.temperature - GAME_CONFIG.winTemp) * 5),
       description: "Build carbon capture & renewables"
     });
   }
