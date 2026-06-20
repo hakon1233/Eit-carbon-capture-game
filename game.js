@@ -3589,8 +3589,12 @@ const ACHIEVEMENTS = [
     description: "Reduce global temperature below +1.1°C",
     icon: "🏆",
     condition: (state) => {
-      // Threshold below starting temp (1.2°C) but above win condition (1.0°C)
-      return state.temperature < 1.1;
+      // Must have actually reduced temperature below 1.1°C from the starting value (CAR-37).
+      // Guard: if startingTemp is already ≤ 1.1°C the game starts below threshold, so
+      // also require the player has reduced temperature below the starting point.
+      const belowThreshold = state.temperature < 1.1;
+      const reducedFromStart = state.temperature < GAME_CONFIG.startingTemp;
+      return belowThreshold && reducedFromStart;
     },
   },
   {
