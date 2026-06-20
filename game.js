@@ -6199,13 +6199,13 @@ const PROJECT_TYPES = {
   },
 
   research: {
-    label: "Research Center",
+    label: "Climate Innovation Hub",
     cost: 15,                   // $15B (based on Sintef Horizon ~$28.7M, scaled for ~523 centers)
     co2Reduction: 0,            // No direct CO2 reduction (confirmed by sources)
     income: 3,
     category: "climate",
     constructionMonths: 30,     // 2.5 years (Sintef Horizon construction timeline)
-    description: "Climate technology innovation hub.",
+    description: "Climate technology innovation hub. Generates regional income but does not produce Research Points — use the Tech tab to build a Research Center for RP.",
   },
 
   // ═══════════════════════════════════════════════════════════════
