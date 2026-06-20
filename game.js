@@ -10747,7 +10747,9 @@ function nextMonth() {
   // Process active Climate Policy Campaigns
   processCampaigns();
 
-  state.co2 = Math.max(GAME_CONFIG.baselineCo2, state.co2 - totalReduction);
+  // Note: project CO2 reductions are already included in calculateCarbonBalance() (Path A, line ~10602).
+  // Do NOT subtract totalReduction from state.co2 again here — that was a duplicate application
+  // with wrong units (raw Gt/yr values instead of ppm), causing ~94× over-strong CO2 removal.
   state.funds += totalIncome;
 
   // Deduct global research center operating costs
