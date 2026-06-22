@@ -22,6 +22,24 @@
   box-sizing: border-box;
 }
 
+/* Header chips converted to native <button> for keyboard a11y (CAR-50):
+   strip the UA button chrome so they keep their original chip appearance.
+   Placed early so per-chip class rules (.finance-budget, .header-stat, …)
+   override on any conflict. */
+.chip-button {
+  appearance: none;
+  -webkit-appearance: none;
+  background: transparent;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  line-height: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
