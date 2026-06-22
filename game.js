@@ -14947,13 +14947,14 @@ function checkWinLose() {
     state.gameOver = true;
     state.won = true;
     pushMessage(`Victory! Temperature stabilized below ${GAME_CONFIG.winTemp}°C through 2050!`, "good");
-  } else if (state.temperature >= GAME_CONFIG.loseTemp || state.year >= GAME_CONFIG.loseYear) {
+  } else if (state.temperature >= GAME_CONFIG.loseTemp || state.year > GAME_CONFIG.loseYear) {
     state.gameOver = true;
     state.won = false;
     pushMessage("Climate catastrophe reached. Try a new strategy.", "bad");
   }
 
   if (state.gameOver) {
+    clearSavedGame();
     pushMessage("Restart the game to try again.");
   }
 }
