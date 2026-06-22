@@ -56,6 +56,7 @@
         </div>
 
         <div class="launch-actions">
+          <button class="primary-button" id="continue-btn" hidden>Continue</button>
           <button class="primary-button" id="start-game-btn">New Game</button>
         </div>
 
@@ -88,13 +89,46 @@
     </div>
 
     <script>
-      document.getElementById('start-game-btn').addEventListener('click', function() {
-        const difficulty = document.getElementById('difficulty').value;
-        localStorage.setItem('gameDifficulty', difficulty);
-        // Clear any existing saved game to ensure a fresh start
-        localStorage.removeItem('carbonCaptureGameSave');
-        window.location.href = 'game.html';
-      });
+      (function () {
+        var SAVE_KEY = 'carbonCaptureGameSave';
+
+        function hasActiveSave() {
+          try {
+            var raw = localStorage.getItem(SAVE_KEY);
+            if (!raw) return false;
+            var data = JSON.parse(raw);
+            return !!(data && data.state && !data.state.gameOver);
+          } catch (e) {
+            return false;
+          }
+        }
+
+        var continueBtn = document.getElementById('continue-btn');
+        var newGameBtn = document.getElementById('start-game-btn');
+
+        if (hasActiveSave()) {
+          continueBtn.hidden = false;
+          newGameBtn.classList.remove('primary-button');
+          newGameBtn.classList.add('ghost-button');
+        } else {
+          newGameBtn.classList.remove('ghost-button');
+          newGameBtn.classList.add('primary-button');
+        }
+
+        continueBtn.addEventListener('click', function () {
+          window.location.href = 'game.html';
+        });
+
+        newGameBtn.addEventListener('click', function () {
+          if (hasActiveSave()) {
+            if (!confirm('Starting a new game will erase your current save. Are you sure?')) return;
+          }
+          var difficulty = document.getElementById('difficulty').value;
+          localStorage.setItem('gameDifficulty', difficulty);
+          localStorage.removeItem(SAVE_KEY);
+          window.location.href = 'game.html';
+        });
+      })();
     </script>
   </body>
 </html>
