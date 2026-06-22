@@ -4286,6 +4286,28 @@ body::before {
   text-align: center;
 }
 
+/* Non-color valence cue (WCAG 1.4.1): shape (▲/▼) differentiates regardless of color */
+.event-valence {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+  min-width: 1em;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.event-valence.positive {
+  color: var(--region-good);
+}
+
+.event-valence.negative {
+  color: var(--region-hot);
+}
+
+.event-valence.neutral {
+  color: var(--accent);
+}
+
 .event-info {
   flex: 1;
 }
@@ -4421,6 +4443,17 @@ body::before {
   font-size: 1.3rem;
   min-width: 28px;
   text-align: center;
+}
+
+/* Non-color valence cue (WCAG 1.4.1): all disasters are negative (income loss) */
+.disaster-valence {
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.4;
+  min-width: 1em;
+  text-align: center;
+  flex-shrink: 0;
+  color: var(--region-hot);
 }
 
 .disaster-info {

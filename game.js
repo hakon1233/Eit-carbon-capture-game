@@ -12689,6 +12689,10 @@ function renderActiveEventsPanel() {
 
     const itemClass = isPositive ? "positive" : "negative";
 
+    // Redundant non-color valence cue (WCAG 1.4.1) — don't rely on border color alone
+    const valenceIcon = isPositive ? "▲" : "▼";
+    const valenceLabel = isPositive ? "Positive event" : "Negative event";
+
     // Build effects list
     const effectsHtml = [];
     if (event.effects.incomeMultiplier) {
@@ -12718,6 +12722,7 @@ function renderActiveEventsPanel() {
 
     html += `
       <div class="event-item ${itemClass}">
+        <span class="event-valence ${itemClass}" title="${valenceLabel}" aria-label="${valenceLabel}">${valenceIcon}</span>
         <span class="event-icon">${event.icon}</span>
         <div class="event-info">
           <div class="event-name">${event.name}</div>
@@ -12752,6 +12757,7 @@ function renderActiveDisastersPanel() {
 
     html += `
       <div class="disaster-item ${disaster.type}">
+        <span class="disaster-valence" title="Negative impact" aria-label="Negative impact">▼</span>
         <span class="disaster-icon">${disaster.icon}</span>
         <div class="disaster-info">
           <div class="disaster-name">${disaster.typeName}</div>
