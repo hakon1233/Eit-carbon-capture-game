@@ -57,8 +57,11 @@ if (typeof window !== "undefined") {
 // ═══════════════════════════════════════════════════════════════
 // GAME CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
-// Note: Modular versions available in ./public/modules/config/
-// and ./public/modules/systems/ for future migration
+// SINGLE SOURCE OF TRUTH: GAME_CONFIG and all gameplay config below live HERE.
+// ./public/modules/config/ and ./public/modules/systems/ are NOT imported by the
+// build (only ./public/modules/data/ is wired in) — they are stale, orphaned copies
+// from an unfinished modularization. Do NOT edit them expecting changes to ship;
+// edit this file. See public/modules/README.md and CAR-61 findings.
 const GAME_CONFIG = {
   // Currency settings (real-world billions USD)
   startingFunds: 25,            // $25 billion starting budget (reduced for balance)
