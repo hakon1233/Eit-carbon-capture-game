@@ -15328,7 +15328,13 @@ function wireControls() {
     });
   }
   if (restartButton) {
-    restartButton.addEventListener("click", initGame);
+    restartButton.addEventListener("click", () => {
+      // Only prompt during an active run; game-over restart and setup reset need no guard.
+      if (!isSetupMode && !state.gameOver) {
+        if (!window.confirm("Restart the game? Your current progress will be lost.")) return;
+      }
+      initGame();
+    });
   }
 }
 
