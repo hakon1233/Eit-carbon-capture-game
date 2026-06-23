@@ -684,10 +684,13 @@ function calculatePlayerForestRemoval() {
   Object.values(state.regions).forEach(region => {
     // Sum CO2 reduction from forest projects
     region.projects?.forEach(project => {
-      const projectType = ADVANCED_PROJECT_TYPES?.[project.type] || PROJECT_TYPES?.[project.type];
-      if (project.type === 'reforestation' || projectType?.potentialKey === 'forest') {
-        // Convert project CO2 reduction to Gt/year (projects store in Mt)
-        totalRemoval += (project.co2Reduction || 0) / 1000;
+      // BUG-CAR-89: completed projects persist only type and optional effectMultiplier.
+      const projectType = typeof project === "string" ? project : project.type;
+      const projectDef = PROJECT_TYPES?.[projectType] || ADVANCED_PROJECT_TYPES?.[projectType];
+      const effectMultiplier = typeof project === "object" ? (project.effectMultiplier ?? 1) : 1;
+      if (projectType === "forest" || projectDef?.potentialKey === "forest") {
+        const baseRemoval = projectDef?.co2Reduction ?? (projectDef?.baseCo2Reduction ?? 0) / 1000;
+        totalRemoval += baseRemoval * effectMultiplier;
       }
     });
   });
@@ -715,21 +718,23 @@ function calculatePlayerCCSRemoval() {
     // Calculate infrastructure bonus for this region
     let infraBonus = 1.0;
     const hasTransport = region.projects?.some(p =>
-      ['co2Pipeline', 'co2OffshorePipeline', 'co2ShipTerminal'].includes(p.type)
+      ['co2Pipeline', 'co2OffshorePipeline', 'co2ShipTerminal'].includes(typeof p === "string" ? p : p.type)
     );
     const hasStorage = region.projects?.some(p =>
-      ['depletedReservoirStorage', 'salineAquiferStorage'].includes(p.type)
+      ['depletedReservoirStorage', 'salineAquiferStorage'].includes(typeof p === "string" ? p : p.type)
     );
     if (hasTransport) infraBonus += 0.25;
     if (hasStorage) infraBonus += 0.25;
     if (hasTransport && hasStorage) infraBonus += 0.15;
 
     region.projects?.forEach(project => {
-      if (ccsProjectTypes.includes(project.type)) {
-        // Get base CO2 reduction from project
-        const baseCo2Reduction = project.co2Reduction || 0;
+      const projectType = typeof project === "string" ? project : project.type;
+      const projectDef = PROJECT_TYPES?.[projectType] || ADVANCED_PROJECT_TYPES?.[projectType];
+      const effectMultiplier = typeof project === "object" ? (project.effectMultiplier ?? 1) : 1;
+      if (ccsProjectTypes.includes(projectType) || projectDef?.potentialKey === "carbonCapture") {
+        const baseCo2Reduction = projectDef?.co2Reduction ?? (projectDef?.baseCo2Reduction ?? 0) / 1000;
         // Apply infrastructure bonus
-        const adjustedReduction = baseCo2Reduction * infraBonus;
+        const adjustedReduction = baseCo2Reduction * effectMultiplier * infraBonus;
         totalRemoval += adjustedReduction;
       }
     });
