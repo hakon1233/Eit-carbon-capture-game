@@ -55,6 +55,20 @@ if (typeof window !== "undefined") {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// DEBUG LOGGING
+// ═══════════════════════════════════════════════════════════════
+// Verbose "[Map]" tracing (game load, setup, region/SVG clicks) is useful when
+// debugging map wiring but is pure noise in the production console on every click.
+// It is gated behind a flag (default off). Flip it on at runtime in DevTools via
+// `window.DEBUG_MAP = true` — no rebuild needed. Genuine warnings stay on
+// `console.warn` and are never gated. (CAR-82 follow-up.)
+function mapDebug(...args) {
+  if (typeof window !== "undefined" && window.DEBUG_MAP === true) {
+    console.log(...args);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // GAME CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
 // SINGLE SOURCE OF TRUTH: GAME_CONFIG and all gameplay config below live HERE.
@@ -6552,7 +6566,7 @@ function loadGame() {
     currentMapMode = saveData.currentMapMode || "alliance";
     currentDifficulty = saveData.currentDifficulty || "normal";
     isSetupMode = false;
-    console.log('[Map] Game loaded, isSetupMode:', isSetupMode);
+    mapDebug('[Map] Game loaded, isSetupMode:', isSetupMode);
 
     // Migration: Add underConstruction array if missing
     if (!state.underConstruction) {
@@ -8054,7 +8068,7 @@ function getInterestClass(interest) {
 // Enter setup mode for initial game configuration
 function enterSetupMode() {
   isSetupMode = true;
-  console.log('[Map] Entered setup mode, isSetupMode:', isSetupMode);
+  mapDebug('[Map] Entered setup mode, isSetupMode:', isSetupMode);
   selectedRegionId = null;
 
   // Add setup mode class to body for CSS control
@@ -8222,7 +8236,7 @@ function confirmSetupAndStartGame() {
 
   // Exit setup mode
   isSetupMode = false;
-  console.log('[Map] Game started, isSetupMode:', isSetupMode);
+  mapDebug('[Map] Game started, isSetupMode:', isSetupMode);
 
   // Remove setup mode class from body
   document.body.classList.remove("setup-mode");
@@ -11108,7 +11122,7 @@ function updateRegionTemps() {
 }
 
 function selectRegion(regionId) {
-  console.log('[Map] selectRegion:', regionId, 'isSetupMode:', isSetupMode);
+  mapDebug('[Map] selectRegion:', regionId, 'isSetupMode:', isSetupMode);
 
   // In setup mode, allow selection without state.regions check
   if (isSetupMode) {
@@ -15008,13 +15022,13 @@ function clearNews() {
 
 // Delegated click handler for SVG regions
 function handleSvgClick(event) {
-  console.log('[Map] handleSvgClick called, target:', event.target.tagName, event.target.id);
+  mapDebug('[Map] handleSvgClick called, target:', event.target.tagName, event.target.id);
   let target = event.target;
 
   // If clicked on a group element, use its data-region attribute directly
   if (target.tagName === 'g' && target.classList.contains('region-group')) {
     const regionId = target.getAttribute('data-region');
-    console.log('[Map] Clicked on region-group, regionId:', regionId);
+    mapDebug('[Map] Clicked on region-group, regionId:', regionId);
     if (regionId && svgRegions.has(regionId)) {
       selectRegion(regionId);
       return;
@@ -15032,7 +15046,7 @@ function handleSvgClick(event) {
   const config = GRANULARITY_CONFIG[currentGranularity] || GRANULARITY_CONFIG.continents;
   const grouping = config.grouping || currentGranularity;
   const regionId = getRegionIdForGranularity(target, grouping);
-  console.log('[Map] handleSvgClick regionId:', regionId, 'svgRegions.has:', svgRegions.has(regionId));
+  mapDebug('[Map] handleSvgClick regionId:', regionId, 'svgRegions.has:', svgRegions.has(regionId));
 
   if (regionId && svgRegions.has(regionId)) {
     selectRegion(regionId);
@@ -15143,7 +15157,7 @@ function wireMap() {
     svgClickHandler = handleSvgClick;
     svgDoc.documentElement.addEventListener('click', svgClickHandler);
     svgDoc.documentElement.addEventListener('keydown', handleSvgKeydown);
-    console.log('[Map] Delegated event listeners attached to SVG');
+    mapDebug('[Map] Delegated event listeners attached to SVG');
 
     // Verify isSetupMode matches actual game state (Phase 3 guard)
     // Only correct if there's evidence of actual gameplay (history has entries)
@@ -15184,7 +15198,7 @@ function setMapSource(source, force = false) {
   if (svgDoc && svgClickHandler) {
     svgDoc.documentElement.removeEventListener('click', svgClickHandler);
     svgDoc.documentElement.removeEventListener('keydown', handleSvgKeydown);
-    console.log('[Map] Cleaned up SVG event listeners');
+    mapDebug('[Map] Cleaned up SVG event listeners');
   }
   svgDoc = null;
   svgRegions = new Map();
