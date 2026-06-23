@@ -2,6 +2,12 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!-- Security: lock all resource/exfil channels to same-origin (CAR-91). 'unsafe-inline' is required by the app's inline scripts and on*= handlers. -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; object-src 'self'; base-uri 'self'; form-action 'self'"
+    />
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Carbon Capture: Climate Overseer</title>
     <!-- Brand: favicon + app icon (CAR-24 "Carbon Lockup") -->
