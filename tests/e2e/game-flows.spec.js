@@ -131,6 +131,9 @@ test.describe('Core gameplay loop', () => {
   test('restart returns to setup mode', async ({ page }) => {
     await startGame(page)
 
+    // Mid-game restart prompts a confirm() (CAR-74) to guard against accidental
+    // data loss; accept it so the restart proceeds.
+    page.once('dialog', dialog => dialog.accept())
     await page.locator('#restart-button').click()
     await expect(page.locator('#setup-panel')).toBeVisible()
     await expect(page.locator('#confirm-setup-btn')).toBeDisabled()
