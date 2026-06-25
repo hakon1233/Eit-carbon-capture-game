@@ -3298,8 +3298,10 @@ function calculateDisasterProbability(disaster, vulnerability, temperature) {
   const tempAboveBaseline = Math.max(0, temperature - 1.2);
   const tempMultiplier = 1 + (tempAboveBaseline * disaster.tempScaling);
 
-  // Base probability × vulnerability × temperature scaling
-  return disaster.baseProbability * vulnerability * tempMultiplier;
+  // Base probability × vulnerability × temperature scaling.
+  // Clamp to [0,1] so extreme temperatures don't silently produce a >1
+  // "probability" that always fires (consumed as Math.random() < probability).
+  return Math.min(1, disaster.baseProbability * vulnerability * tempMultiplier);
 }
 
 /**
@@ -3513,8 +3515,11 @@ function getNeighboringRegions(regionId) {
  */
 function applyVolcanicCO2Emission(disaster) {
   if (disaster.co2Emission && disaster.co2Emission > 0) {
-    // Convert GT CO2 to ppm (approx 2.12 ppm per GT CO2)
-    const ppmIncrease = disaster.co2Emission * 2.12;
+    // Convert GT CO2 to ppm using the engine's own conversion constant.
+    // NOTE: 2.12 ppm/Gt is the factor for Gt of *carbon*, not Gt CO2; co2Emission
+    // is documented as Gt CO2, so use EMISSIONS_TO_PPM_FACTOR (~0.1277 ppm/Gt CO2)
+    // to stay consistent with the rest of the carbon model.
+    const ppmIncrease = disaster.co2Emission * EMISSIONS_TO_PPM_FACTOR;
     state.co2 += ppmIncrease;
     pushMessage(`${disaster.icon} Volcanic eruption releases ${disaster.co2Emission.toFixed(1)} GT of CO2, adding ${ppmIncrease.toFixed(2)} ppm to atmosphere.`, "bad");
   }
@@ -6684,6 +6689,22 @@ function loadGame() {
     }
     if (typeof state.loseStreakMonths !== "number") {
       state.loseStreakMonths = 0;
+    }
+
+    // Migration: ensure runtime collections the monthly loop accesses unguarded
+    // exist. Saves predating any of these fields would otherwise throw on the
+    // first tick (e.g. state.activeDisasters.some(...), Object.keys(disasterHistory)).
+    if (!Array.isArray(state.activeDisasters)) {
+      state.activeDisasters = [];
+    }
+    if (!state.disasterHistory || typeof state.disasterHistory !== "object") {
+      state.disasterHistory = {};
+    }
+    if (!Array.isArray(state.tippingPointsTriggered)) {
+      state.tippingPointsTriggered = [];
+    }
+    if (!Array.isArray(state.campaignHistory)) {
+      state.campaignHistory = [];
     }
 
     // Migration: Add retiredFossilGW to regions if missing
