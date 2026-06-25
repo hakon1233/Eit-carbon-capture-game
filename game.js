@@ -7198,6 +7198,7 @@ const disastersEl = document.getElementById("disasters");
 const tippingCountEl = document.getElementById("tipping-count");
 const yearsLeftEl = document.getElementById("years-left");
 const nextMonthButton = document.getElementById("next-month");
+const advanceYearButton = document.getElementById("advance-year");
 const restartButton = document.getElementById("restart-button");
 const selectedRegionEl = document.getElementById("selected-region");
 const projectButtonsEl = document.getElementById("project-buttons");
@@ -10884,6 +10885,30 @@ function nextMonth() {
   checkWinLose();
   updateUI();
   saveGame();
+}
+
+function isPlayerPromptOpen() {
+  return (
+    isPopupShowing ||
+    popupQueue.length > 0 ||
+    !!document.querySelector(
+      ".popup-container:not(.hidden), .assignment-modal-overlay, #spontaneous-join-overlay, #negotiation-overlay, #build-mode-overlay"
+    )
+  );
+}
+
+function advanceOneYear() {
+  for (let i = 0; i < 12; i++) {
+    if (state.gameOver || isPlayerPromptOpen()) {
+      break;
+    }
+
+    nextMonth();
+
+    if (state.gameOver || isPlayerPromptOpen()) {
+      break;
+    }
+  }
 }
 
 // Format currency as "$X.X B"
@@ -14982,6 +15007,9 @@ function updateControls() {
   if (nextMonthButton) {
     nextMonthButton.disabled = state.gameOver;
   }
+  if (advanceYearButton) {
+    advanceYearButton.disabled = state.gameOver;
+  }
   if (restartButton) {
     restartButton.textContent = "Restart Game";
   }
@@ -15289,6 +15317,9 @@ function wireStatsInfo() {
 function wireControls() {
   if (nextMonthButton) {
     nextMonthButton.addEventListener("click", nextMonth);
+  }
+  if (advanceYearButton) {
+    advanceYearButton.addEventListener("click", advanceOneYear);
   }
   if (restartButton) {
     restartButton.addEventListener("click", initGame);
