@@ -6573,6 +6573,13 @@ function loadGame() {
       state.underConstruction = [];
     }
 
+    if (typeof state.winStreakMonths !== "number") {
+      state.winStreakMonths = 0;
+    }
+    if (typeof state.loseStreakMonths !== "number") {
+      state.loseStreakMonths = 0;
+    }
+
     // Migration: Add retiredFossilGW to regions if missing
     if (state.regions) {
       Object.values(state.regions).forEach(region => {
@@ -10400,6 +10407,8 @@ function initGame() {
     regions,
     gameOver: false,
     won: false,
+    winStreakMonths: 0,
+    loseStreakMonths: 0,
     activeCampaigns: [], // Active Climate Policy Campaigns
     difficulty: currentDifficulty,
     // New tracking for advanced features
@@ -10883,6 +10892,7 @@ function nextMonth() {
   // Check for newly unlocked achievements
   checkAchievements();
 
+  updateEndgameStreaks();
   checkWinLose();
   updateUI();
   saveGame();
@@ -14984,15 +14994,27 @@ function updateMapLegend() {
   }
 }
 
-function checkWinLose() {
-  // Win condition: temperature stabilized below Paris target AND year is past 2050
-  // This ensures the player has maintained climate stability for a significant period
+function updateEndgameStreaks() {
   const minWinYear = 2050;
   if (state.temperature <= GAME_CONFIG.winTemp && state.year >= minWinYear) {
+    state.winStreakMonths = (state.winStreakMonths || 0) + 1;
+  } else {
+    state.winStreakMonths = 0;
+  }
+
+  if (state.temperature >= GAME_CONFIG.loseTemp) {
+    state.loseStreakMonths = (state.loseStreakMonths || 0) + 1;
+  } else {
+    state.loseStreakMonths = 0;
+  }
+}
+
+function checkWinLose() {
+  if (state.winStreakMonths >= 12) {
     state.gameOver = true;
     state.won = true;
     pushMessage(`Victory! Temperature stabilized below ${GAME_CONFIG.winTemp}°C through 2050!`, "good");
-  } else if (state.temperature >= GAME_CONFIG.loseTemp || state.year > GAME_CONFIG.loseYear) {
+  } else if (state.loseStreakMonths >= 3 || state.year > GAME_CONFIG.loseYear) {
     state.gameOver = true;
     state.won = false;
     pushMessage("Climate catastrophe reached. Try a new strategy.", "bad");
