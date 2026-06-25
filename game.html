@@ -433,10 +433,10 @@
     <!-- Event Popup System -->
     <div id="event-popup-container" class="popup-container hidden">
       <div class="popup-overlay"></div>
-      <div id="event-popup" class="event-popup">
+      <div id="event-popup" class="event-popup" role="dialog" aria-modal="true" aria-labelledby="event-popup-title" tabindex="-1">
         <div class="popup-header">
           <span class="popup-icon"></span>
-          <h3 class="popup-title"></h3>
+          <h3 class="popup-title" id="event-popup-title"></h3>
         </div>
         <div class="popup-body">
           <p class="popup-description"></p>
@@ -449,10 +449,10 @@
     <!-- Carbon Balance Popup -->
     <div id="carbon-balance-popup" class="popup-container hidden">
       <div class="popup-overlay" onclick="closeCarbonBalancePopup()"></div>
-      <div class="carbon-balance-dialog carbon-balance-dialog-wide">
+      <div class="carbon-balance-dialog carbon-balance-dialog-wide" role="dialog" aria-modal="true" aria-labelledby="carbon-balance-title" tabindex="-1">
         <div class="popup-header">
-          <h3 class="popup-title">Global Carbon Balance</h3>
-          <button class="popup-close" onclick="closeCarbonBalancePopup()">&times;</button>
+          <h3 class="popup-title" id="carbon-balance-title">Global Carbon Balance</h3>
+          <button class="popup-close" onclick="closeCarbonBalancePopup()" aria-label="Close global carbon balance">&times;</button>
         </div>
         <div class="popup-body">
           <!-- Tab navigation -->
@@ -497,11 +497,11 @@
     <!-- Income Breakdown Popup -->
     <div id="income-breakdown-popup" class="popup-container hidden">
       <div class="popup-overlay" onclick="closeIncomeBreakdownPopup()"></div>
-      <div class="income-breakdown-dialog">
+      <div class="income-breakdown-dialog" role="dialog" aria-modal="true" aria-labelledby="income-breakdown-title" tabindex="-1">
         <div class="popup-header">
           <span class="popup-icon">💰</span>
-          <h3 class="popup-title">Monthly Income Breakdown</h3>
-          <button class="popup-close" onclick="closeIncomeBreakdownPopup()">&times;</button>
+          <h3 class="popup-title" id="income-breakdown-title">Monthly Income Breakdown</h3>
+          <button class="popup-close" onclick="closeIncomeBreakdownPopup()" aria-label="Close monthly income breakdown">&times;</button>
         </div>
         <div class="popup-body">
           <!-- Climate Budget Section -->
@@ -550,11 +550,11 @@
     <!-- Stat Detail Popup (Generic) -->
     <div id="stat-detail-popup" class="popup-container hidden">
       <div class="popup-overlay" onclick="closeStatDetailPopup()"></div>
-      <div class="stat-detail-dialog">
+      <div class="stat-detail-dialog" role="dialog" aria-modal="true" aria-labelledby="stat-detail-title" tabindex="-1">
         <div class="popup-header">
           <span class="stat-detail-icon" id="stat-detail-icon"></span>
           <h3 class="popup-title" id="stat-detail-title">Stat Details</h3>
-          <button class="popup-close" onclick="closeStatDetailPopup()">&times;</button>
+          <button class="popup-close" onclick="closeStatDetailPopup()" aria-label="Close stat details">&times;</button>
         </div>
         <div class="popup-body" id="stat-detail-body">
           <!-- Content populated dynamically -->

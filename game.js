@@ -3800,6 +3800,90 @@ function showAchievementNotification(achievement) {
 // Queue for pending popups
 const popupQueue = [];
 let isPopupShowing = false;
+let activeDialogState = null;
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])"
+].join(",");
+
+function getFocusableElements(dialog) {
+  return Array.from(dialog.querySelectorAll(FOCUSABLE_SELECTOR))
+    .filter((element) => {
+      if (!(element instanceof HTMLElement)) return false;
+      if (element.hasAttribute("disabled")) return false;
+      return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+    });
+}
+
+function deactivateDialog(container, options = {}) {
+  const { restoreFocus = true } = options;
+  if (!activeDialogState || activeDialogState.container !== container) return;
+
+  document.removeEventListener("keydown", activeDialogState.handleKeydown, true);
+  const previouslyFocused = activeDialogState.previouslyFocused;
+  activeDialogState = null;
+
+  if (restoreFocus && previouslyFocused && document.contains(previouslyFocused)) {
+    previouslyFocused.focus();
+  }
+}
+
+function activateDialog(container, dialog, onClose) {
+  if (!container || !dialog) return;
+  if (activeDialogState) {
+    deactivateDialog(activeDialogState.container, { restoreFocus: false });
+  }
+
+  const previouslyFocused = document.activeElement instanceof HTMLElement
+    ? document.activeElement
+    : null;
+
+  const handleKeydown = (event) => {
+    if (!activeDialogState || activeDialogState.container !== container) return;
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      onClose();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusableElements = getFocusableElements(dialog);
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      dialog.focus();
+      return;
+    }
+
+    const first = focusableElements[0];
+    const last = focusableElements[focusableElements.length - 1];
+    const activeElement = document.activeElement;
+
+    if (event.shiftKey && (activeElement === first || !dialog.contains(activeElement))) {
+      event.preventDefault();
+      last.focus();
+      return;
+    }
+
+    if (!event.shiftKey && activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
+  activeDialogState = { container, handleKeydown, previouslyFocused };
+  document.addEventListener("keydown", handleKeydown, true);
+
+  const focusTarget = getFocusableElements(dialog)[0] || dialog;
+  focusTarget.focus();
+}
 
 /**
  * Show an event popup to the user
@@ -3862,26 +3946,17 @@ function displayNextPopup() {
   // Setup dismiss handler
   const handleDismiss = () => {
     hideEventPopup();
-    dismissBtn.removeEventListener("click", handleDismiss);
   };
-  dismissBtn.addEventListener("click", handleDismiss);
+  dismissBtn.addEventListener("click", handleDismiss, { once: true });
 
   // Also allow clicking overlay to dismiss
   const overlay = container.querySelector(".popup-overlay");
   const handleOverlayClick = () => {
     hideEventPopup();
-    overlay.removeEventListener("click", handleOverlayClick);
   };
-  overlay.addEventListener("click", handleOverlayClick);
+  overlay.addEventListener("click", handleOverlayClick, { once: true });
 
-  // Allow Escape key to dismiss
-  const handleEscape = (e) => {
-    if (e.key === "Escape") {
-      hideEventPopup();
-      document.removeEventListener("keydown", handleEscape);
-    }
-  };
-  document.addEventListener("keydown", handleEscape);
+  activateDialog(container, popup, hideEventPopup);
 }
 
 /**
@@ -3889,6 +3964,7 @@ function displayNextPopup() {
  */
 function hideEventPopup() {
   const container = document.getElementById("event-popup-container");
+  deactivateDialog(container);
   container.classList.add("hidden");
 
   // Small delay before showing next popup
@@ -3942,6 +4018,11 @@ function openCarbonBalancePopup() {
   }
 
   container.classList.remove("hidden");
+  activateDialog(
+    container,
+    container.querySelector(".carbon-balance-dialog"),
+    closeCarbonBalancePopup
+  );
 }
 
 /**
@@ -4206,6 +4287,7 @@ function switchCarbonTab(tabName) {
 function closeCarbonBalancePopup() {
   const container = document.getElementById("carbon-balance-popup");
   if (container) {
+    deactivateDialog(container);
     container.classList.add("hidden");
   }
 }
@@ -4369,6 +4451,11 @@ function showIncomeBreakdownPopup() {
   }
 
   container.classList.remove("hidden");
+  activateDialog(
+    container,
+    container.querySelector(".income-breakdown-dialog"),
+    closeIncomeBreakdownPopup
+  );
 }
 
 /**
@@ -4377,6 +4464,7 @@ function showIncomeBreakdownPopup() {
 function closeIncomeBreakdownPopup() {
   const container = document.getElementById("income-breakdown-popup");
   if (container) {
+    deactivateDialog(container);
     container.classList.add("hidden");
   }
 }
@@ -4442,6 +4530,11 @@ function openStatDetail(statType) {
   bodyEl.innerHTML = config.getContent();
 
   container.classList.remove("hidden");
+  activateDialog(
+    container,
+    container.querySelector(".stat-detail-dialog"),
+    closeStatDetailPopup
+  );
 }
 
 /**
@@ -4450,6 +4543,7 @@ function openStatDetail(statType) {
 function closeStatDetailPopup() {
   const container = document.getElementById("stat-detail-popup");
   if (container) {
+    deactivateDialog(container);
     container.classList.add("hidden");
   }
 }
