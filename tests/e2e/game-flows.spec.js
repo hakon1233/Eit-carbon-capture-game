@@ -135,6 +135,28 @@ test.describe('Core gameplay loop', () => {
     await expect(page.locator('#setup-panel')).toBeVisible()
     await expect(page.locator('#confirm-setup-btn')).toBeDisabled()
   })
+
+  test('How to play replays the interactive tutorial during a normal game', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('gameDifficulty', 'normal')
+    })
+
+    await startGame(page)
+
+    await page.getByRole('button', { name: 'How to play' }).click()
+
+    await expect(page.locator('#tutorial-overlay')).toBeVisible()
+    await expect(page.locator('#tutorial-overlay')).toContainText('1 /')
+
+    await page.locator('.tutorial-popup-close').click()
+    await expect(page.locator('#tutorial-overlay')).toBeHidden()
+
+    await page.getByRole('button', { name: 'How to play' }).click()
+    await expect(page.locator('#tutorial-overlay')).toBeVisible()
+    await expect(page.locator('#tutorial-overlay')).toContainText('1 /')
+  })
 })
 
 test.describe('Console & page health', () => {

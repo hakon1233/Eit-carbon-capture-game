@@ -7199,6 +7199,7 @@ const tippingCountEl = document.getElementById("tipping-count");
 const yearsLeftEl = document.getElementById("years-left");
 const nextMonthButton = document.getElementById("next-month");
 const advanceYearButton = document.getElementById("advance-year");
+const howToPlayButton = document.getElementById("how-to-play-button");
 const restartButton = document.getElementById("restart-button");
 const selectedRegionEl = document.getElementById("selected-region");
 const projectButtonsEl = document.getElementById("project-buttons");
@@ -15320,6 +15321,11 @@ function wireControls() {
   }
   if (advanceYearButton) {
     advanceYearButton.addEventListener("click", advanceOneYear);
+  }
+  if (howToPlayButton) {
+    howToPlayButton.addEventListener("click", () => {
+      window.startTutorial();
+    });
   }
   if (restartButton) {
     restartButton.addEventListener("click", initGame);
