@@ -5382,6 +5382,10 @@ function showTutorialPopup(step, stepIndex) {
 
   const popup = document.createElement("div");
   popup.className = "tutorial-popup centered";
+  popup.setAttribute("role", "dialog");
+  popup.setAttribute("aria-modal", "true");
+  popup.setAttribute("aria-labelledby", "tutorial-popup-title");
+  popup.setAttribute("tabindex", "-1");
 
   // Build popup header
   const header = document.createElement("div");
@@ -5404,6 +5408,7 @@ function showTutorialPopup(step, stepIndex) {
   const skipBtn = document.createElement("button");
   skipBtn.className = "tutorial-popup-close";
   skipBtn.textContent = "✕";
+  skipBtn.setAttribute("aria-label", "Skip tutorial");
   skipBtn.onclick = skipTutorial;
 
   header.appendChild(headerTitle);
@@ -5421,6 +5426,7 @@ function showTutorialPopup(step, stepIndex) {
 
   const title = document.createElement("h3");
   title.className = "tutorial-popup-title";
+  title.id = "tutorial-popup-title";
   title.textContent = step.title;
 
   const text = document.createElement("p");
@@ -5691,6 +5697,10 @@ function showTutorialHighlightAfterScroll(step, stepIndex, targetEl) {
   const popup = document.createElement("div");
   popup.className = "tutorial-popup";
   popup.id = "tutorial-popup";
+  popup.setAttribute("role", "dialog");
+  popup.setAttribute("aria-modal", "true");
+  popup.setAttribute("aria-labelledby", "tutorial-popup-title");
+  popup.setAttribute("tabindex", "-1");
 
   // Build popup header
   const header = document.createElement("div");
@@ -5713,6 +5723,7 @@ function showTutorialHighlightAfterScroll(step, stepIndex, targetEl) {
   const skipBtn = document.createElement("button");
   skipBtn.className = "tutorial-popup-close";
   skipBtn.textContent = "✕";
+  skipBtn.setAttribute("aria-label", "Skip tutorial");
   skipBtn.onclick = skipTutorial;
 
   header.appendChild(headerTitle);
@@ -5724,6 +5735,7 @@ function showTutorialHighlightAfterScroll(step, stepIndex, targetEl) {
 
   const title = document.createElement("h3");
   title.className = "tutorial-popup-title";
+  title.id = "tutorial-popup-title";
   title.textContent = step.title;
 
   const text = document.createElement("p");
@@ -9256,11 +9268,11 @@ function showGenericFactorsPopup(icon, title, content) {
   popup.className = 'popup-container';
   popup.innerHTML = `
     <div class="popup-overlay" onclick="closeFactorsPopup()"></div>
-    <div class="factors-popup-dialog">
+    <div class="factors-popup-dialog" role="dialog" aria-modal="true" aria-labelledby="factors-popup-title" tabindex="-1">
       <div class="popup-header">
         <span class="popup-icon">${icon}</span>
-        <h3 class="popup-title">${title}</h3>
-        <button class="popup-close" onclick="closeFactorsPopup()">&times;</button>
+        <h3 class="popup-title" id="factors-popup-title">${title}</h3>
+        <button class="popup-close" onclick="closeFactorsPopup()" aria-label="Close">&times;</button>
       </div>
       <div class="popup-body">
         ${content}
@@ -9270,11 +9282,15 @@ function showGenericFactorsPopup(icon, title, content) {
   `;
 
   document.body.appendChild(popup);
+  activateDialog(popup, popup.querySelector(".factors-popup-dialog"), closeFactorsPopup);
 }
 
 function closeFactorsPopup() {
   const popup = document.getElementById('factors-popup');
-  if (popup) popup.remove();
+  if (popup) {
+    deactivateDialog(popup);
+    popup.remove();
+  }
 }
 
 // Handle a region leaving the alliance
@@ -9364,11 +9380,11 @@ function showSpontaneousJoinRequest(regionId) {
   overlay.className = "negotiation-overlay";
 
   overlay.innerHTML = `
-    <div class="negotiation-popup">
+    <div class="negotiation-popup" role="dialog" aria-modal="true" aria-labelledby="spontaneous-join-title" tabindex="-1">
       <div class="negotiation-header">
         <div class="negotiation-flag">${diplomatic.flag || "🌍"}</div>
         <div class="negotiation-region-info">
-          <h3>${regionName}</h3>
+          <h3 id="spontaneous-join-title">${regionName}</h3>
           <span class="interest-badge" style="color: var(--success-color);">Interest: ${interest}% (Very High)</span>
         </div>
       </div>
@@ -9695,11 +9711,11 @@ function showNegotiationPopup(regionId, demands) {
   }).join("");
 
   overlay.innerHTML = `
-    <div class="popup negotiation-popup">
+    <div class="popup negotiation-popup" role="dialog" aria-modal="true" aria-labelledby="negotiation-popup-title" tabindex="-1">
       <div class="negotiation-header">
         <div class="negotiation-flag">🌍</div>
         <div class="negotiation-region-info">
-          <h3>${regionName}</h3>
+          <h3 id="negotiation-popup-title">${regionName}</h3>
           <p>${personalityText[diplomatic.personality] || "They are open to discussion."}</p>
           <p class="interest-display">Interest: <strong>${interest}%</strong> (${getInterestLabel(interest)})</p>
         </div>
@@ -11584,9 +11600,9 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
   overlay.className = "popup-overlay";
 
   overlay.innerHTML = `
-    <div class="popup build-mode-popup">
+    <div class="popup build-mode-popup" role="dialog" aria-modal="true" aria-labelledby="build-mode-title" tabindex="-1">
       <div class="build-mode-header">
-        <h3>Build ${project.label}</h3>
+        <h3 id="build-mode-title">Build ${project.label}</h3>
         <p class="build-mode-region">in ${regionName}</p>
       </div>
 
@@ -12736,10 +12752,10 @@ function showAssignmentModal(regionId) {
   modal.className = 'assignment-modal-overlay';
 
   let html = `
-    <div class="assignment-modal">
+    <div class="assignment-modal" role="dialog" aria-modal="true" aria-labelledby="assignment-modal-title" tabindex="-1">
       <div class="assignment-modal-header">
-        <h3>Assign Research - ${regionName}</h3>
-        <button class="assignment-modal-close">&times;</button>
+        <h3 id="assignment-modal-title">Assign Research - ${regionName}</h3>
+        <button class="assignment-modal-close" aria-label="Close">&times;</button>
       </div>
       <div class="assignment-modal-body">
   `;
@@ -12796,13 +12812,18 @@ function showAssignmentModal(regionId) {
   modal.innerHTML = html;
   document.body.appendChild(modal);
 
+  const closeModal = () => {
+    deactivateDialog(modal);
+    modal.remove();
+  };
+
   // Event listeners
   modal.querySelector('.assignment-modal-close').addEventListener('click', () => {
-    modal.remove();
+    closeModal();
   });
 
   modal.addEventListener('click', (e) => {
-    if (e.target === modal) modal.remove();
+    if (e.target === modal) closeModal();
   });
 
   modal.querySelectorAll('.tech-select-btn').forEach(btn => {
@@ -12812,10 +12833,12 @@ function showAssignmentModal(regionId) {
       const tId = e.target.dataset.tech;
       if (rId && fId && tId) {
         assignCenterToProject(rId, fId, tId);
-        modal.remove();
+        closeModal();
       }
     });
   });
+
+  activateDialog(modal, modal.querySelector(".assignment-modal"), closeModal);
 }
 
 // Render active events panel
