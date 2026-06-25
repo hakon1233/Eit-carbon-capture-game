@@ -8980,3 +8980,23 @@ details summary .section-info-btn {
   color: var(--accent);
   font-style: italic;
 }
+
+/* ==========================================================================
+   Accessibility: prefers-reduced-motion (WCAG 2.3.3, CAR-99)
+   --------------------------------------------------------------------------
+   When the user has requested reduced motion at the OS level, neutralize the
+   animated transitions/keyframes (gauges, CO2 bars, popups, etc.) to
+   near-instant. This is additive and reversible: it does NOT alter the
+   default motion-on experience. Final/resting states still render correctly
+   because animations resolve immediately rather than being removed.
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
