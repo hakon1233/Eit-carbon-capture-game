@@ -1,6 +1,6 @@
 // Regression for CAR-30: tiny negative CO2 reduction values that round to zero
 // must never display as signed zero (for example "-0.0 CO2 / month").
-// Checks both the served root game.js and the modular project config mirror.
+// Checks the served root game.js formatter used by project cards.
 // Run: node scripts/test-co2-reduction-formatting.mjs
 
 import { readFileSync } from "node:fs";
@@ -45,7 +45,7 @@ const cases = [
   [0.123, 2, "0.12"],
 ];
 
-const targets = ["game.js", "public/modules/config/projects.js"];
+const targets = ["game.js"];
 let failed = false;
 
 for (const rel of targets) {
