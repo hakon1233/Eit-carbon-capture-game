@@ -19,8 +19,11 @@ export default defineConfig({
   use: {
     baseURL: `${ORIGIN}${BASE_PATH}`,
     headless: true,
-    trace: 'on',
-    screenshot: 'on',
+    // Retain heavy artifacts only for failures. Recording traces/screenshots for
+    // every passing test has caused intermittent shared-output finalization
+    // failures unrelated to the app under test.
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
     video: 'retain-on-failure',
   },
   projects: [
