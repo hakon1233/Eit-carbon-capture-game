@@ -854,7 +854,7 @@ function calculateEmbodiedCarbon() {
 
       // Embodied carbon spread over construction period
       const monthsRemaining = construction.monthsRemaining || 1;
-      const totalMonths = construction.totalMonths || monthsRemaining;
+      const totalMonths = construction.monthsTotal || construction.totalMonths || monthsRemaining;
       const monthlyEmbodied = (EMBODIED_CARBON[projectType] * capacityGW) / totalMonths;
 
       // Convert to annual rate (Gt/year)
@@ -11496,7 +11496,7 @@ function buildProject(regionId, projectType) {
       return pType === projectType;
     }).length;
     const underConstructionCount = (state.underConstruction || []).filter(c =>
-      c.regionId === regionId && c.projectType === projectType
+      c.regionId === regionId && c.type === projectType
     ).length;
     const totalCount = existingCount + underConstructionCount;
 
