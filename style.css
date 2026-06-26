@@ -23,8 +23,7 @@
   --shadow: 0 22px 40px rgba(5, 8, 12, 0.5);
   --radius: 18px;
   --font-display: "Oswald", "Palatino Linotype", "Book Antiqua", Palatino, serif;
-  --font-body: "Space Mono", "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
-    sans-serif;
+  --font-body: "Space Mono", "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
 
 * {
@@ -7250,7 +7249,7 @@ details summary .section-info-btn {
 
 .build-mode-option:hover {
   background: rgba(0, 0, 0, 0.4);
-  border-color: rgba(54, 226, 123, 0.3); /* Capture Green */
+  border-color: rgba(54, 226, 123, 0.3); /* Capture Green hover tint — CAR-49 */
 }
 
 .build-mode-option.selected {
