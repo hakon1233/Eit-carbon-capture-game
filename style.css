@@ -22,6 +22,15 @@
   box-sizing: border-box;
 }
 
+/* The HTML `hidden` attribute relies on the UA rule `[hidden] { display: none }`,
+   but author `display` declarations (e.g. .primary-button { display: inline-flex })
+   outrank UA rules and re-paint the element despite `hidden` (CAR-140). Restore the
+   intended semantics so any `hidden` element stays hidden regardless of its other
+   display rules. Toggling the `hidden` attribute remains the correct show/hide path. */
+[hidden] {
+  display: none !important;
+}
+
 /* Header chips converted to native <button> for keyboard a11y (CAR-50):
    strip the UA button chrome so they keep their original chip appearance.
    Placed early so per-chip class rules (.finance-budget, .header-stat, …)

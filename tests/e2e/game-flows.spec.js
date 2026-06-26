@@ -75,6 +75,35 @@ test.describe('Launch screen (index.html)', () => {
     await expect(page).toHaveURL(/game\.html/)
     await expect(page.locator('#setup-panel')).toBeVisible()
   })
+
+  // CAR-140: the `hidden` Continue button was still painted because author
+  // `.primary-button { display: inline-flex }` outranks the UA `[hidden]` rule.
+  // A first-time visitor (no save) must NOT see a stray Continue button.
+  test('Continue stays hidden for a first-time player with no save', async ({
+    page,
+  }) => {
+    await page.goto('')
+    // No save seeded => Continue is hidden (attribute + actually not painted).
+    await expect(page.locator('#continue-btn')).toBeHidden()
+    await expect(page.locator('#start-game-btn')).toBeVisible()
+  })
+
+  test('Continue shows and resumes when an active save exists', async ({
+    page,
+  }) => {
+    await page.goto('')
+    // Seed a non-game-over save the way the launch script's hasActiveSave() reads it.
+    await page.evaluate(() => {
+      localStorage.setItem(
+        'carbonCaptureGameSave',
+        JSON.stringify({ state: { gameOver: false } }),
+      )
+    })
+    await page.reload()
+    await expect(page.locator('#continue-btn')).toBeVisible()
+    await page.click('#continue-btn')
+    await expect(page).toHaveURL(/game\.html/)
+  })
 })
 
 test.describe('Game setup & start', () => {
