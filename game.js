@@ -7370,7 +7370,7 @@ function calculateNetCO2Rate() {
   Object.values(state.regions).forEach(region => {
     region.projects.forEach(proj => {
       const projectType = typeof proj === "string" ? proj : proj.type;
-      const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
+      const effectMult = typeof proj === "object" ? (proj.effectMultiplier ?? 1) : 1;
       const project = PROJECT_TYPES[projectType];
 
       // Only apply CO2 reduction for non-power projects (forest, carbonCapture)
@@ -10623,7 +10623,7 @@ function calculateIncomeBreakdown() {
     // Project income
     region.projects.forEach((proj) => {
       const projectType = typeof proj === "string" ? proj : proj.type;
-      const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
+      const effectMult = typeof proj === "object" ? (proj.effectMultiplier ?? 1) : 1;
       const project = PROJECT_TYPES[projectType];
       if (!project) return;
 
@@ -10785,7 +10785,7 @@ function nextMonth() {
 
     region.projects.forEach((proj) => {
       const projectType = typeof proj === "string" ? proj : proj.type;
-      const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
+      const effectMult = typeof proj === "object" ? (proj.effectMultiplier ?? 1) : 1;
       const project = PROJECT_TYPES[projectType];
       if (!project) {
         return;
@@ -14712,7 +14712,7 @@ function renderRegionProjects() {
   // Handle both old format (string) and new format ({ type, effectMultiplier })
   const projectStats = region.projects.reduce((acc, proj) => {
     const projectType = typeof proj === "string" ? proj : proj.type;
-    const effectMult = typeof proj === "object" ? proj.effectMultiplier : 1;
+    const effectMult = typeof proj === "object" ? (proj.effectMultiplier ?? 1) : 1;
     if (!acc[projectType]) {
       acc[projectType] = { count: 0, totalEffect: 0 };
     }
