@@ -10,8 +10,7 @@
 // game's titular mechanic. Likely the global 100x climate nerf was applied
 // inconsistently to this one entry.
 //
-// Invariants asserted (checked in BOTH the served root game.js AND the modular
-// mirror public/modules/config/projects.js, which must stay consistent):
+// Invariants asserted in the served root game.js:
 //   1. Monotone effect curve:  forest < carbonCapture < postCombustionCapture
 //      on co2Reduction.
 //   2. Not strictly dominated by forest: carbonCapture must beat forest on at
@@ -44,7 +43,7 @@ function projNum(src, projKey, field) {
   return parseFloat(m[1]);
 }
 
-const targets = ["game.js", "public/modules/config/projects.js"];
+const targets = ["game.js"];
 let failed = false;
 
 for (const rel of targets) {

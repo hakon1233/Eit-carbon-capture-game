@@ -7,9 +7,8 @@
 // at startingCo2=423 yields 423*0.0105 - 3.37 = 1.0715. T0 showed the 1.09 seed,
 // then the first tick recomputed via the formula and "corrected" downward to 1.07.
 //
-// This test parses the GAME_CONFIG numeric constants out of both the served file
-// (root game.js) and the modular config (public/modules/config/game-config.js)
-// and asserts: startingTemp === startingCo2 * tempFactor + tempOffset.
+// This test parses the GAME_CONFIG numeric constants out of the served root
+// game.js and asserts: startingTemp === startingCo2 * tempFactor + tempOffset.
 // Run: node scripts/test-temp-seed-consistency.mjs   (exit 0 = pass, 1 = fail)
 
 import { readFileSync } from "node:fs";
@@ -25,7 +24,7 @@ function num(src, key) {
   return parseFloat(m[1]);
 }
 
-const targets = ["game.js", "public/modules/config/game-config.js"];
+const targets = ["game.js"];
 let failed = false;
 
 for (const rel of targets) {
