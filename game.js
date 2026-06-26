@@ -11534,6 +11534,17 @@ function buildProject(regionId, projectType) {
   startConstruction(regionId, projectType, adjustedCost, 1.0, "add");
 }
 
+/**
+ * Modal shown only for power projects (CAR-217): lets the player choose between
+ * "Add Capacity" (build clean generation on top of the grid) and "Replace Fossil"
+ * (retire an equivalent slice of coal/gas as the project completes, which cuts
+ * power-sector emissions far more aggressively).
+ *
+ * The auto-retire amount is derived from energy equivalence, not nameplate GW:
+ * the new plant's annual clean generation (capacityGW * capacityFactor * 8.76h)
+ * is converted back into the fossil GW that produced the same TWh. Non-power
+ * projects never reach here — they build directly via startConstruction().
+ */
 function showPowerBuildModeDialog(regionId, projectType, cost, effectiveness = null) {
   const project = PROJECT_TYPES[projectType];
   const region = state.regions[regionId];
