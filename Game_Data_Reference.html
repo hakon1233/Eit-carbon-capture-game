@@ -61,6 +61,21 @@
             max-width: 1000px;
             padding: 40px;
         }
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: #2c5282;
+            text-decoration: none;
+            font-size: 0.95em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: color 0.2s;
+        }
+        .back-link:hover {
+            color: #1a365d;
+            text-decoration: underline;
+        }
         h1 {
             color: #1a365d;
             font-size: 2.5em;
@@ -341,6 +356,8 @@
     </nav>
 
     <div class="container">
+        <a href="index.html" class="back-link">&larr; Back to Menu</a>
+
         <h1>Game Data Reference</h1>
         <p class="subtitle">Carbon Capture Game - Complete Data Documentation with Verified Sources</p>
 
