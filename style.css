@@ -1,21 +1,30 @@
+/* Brand Package v1.0 fonts — offline base64 @font-face (Oswald + Space Mono).
+   Relative path so Vite bundles/inlines it under the configured `base`. */
+@import "./brand/fonts.css";
+
 :root {
   color-scheme: dark;
-  --bg-top: #0b1824;
-  --bg-bottom: #132c3f;
-  --panel: rgba(9, 17, 27, 0.86);
-  --panel-border: rgba(240, 214, 140, 0.24);
-  --text: #f4f7fb;
-  --muted: #a9b4c3;
-  --accent: #f0c66f;
-  --accent-strong: #f5dd9a;
+  /* Brand Package v1.0 palette — Carbon canvas, Capture Green primary.
+     See brand/README.md (Palette + Typography). */
+  --bg-top: #14171c; /* Carbon (canvas) */
+  --bg-bottom: #0e1014; /* Ink (deepest) */
+  --panel: rgba(27, 31, 38, 0.86); /* Panel #1B1F26 */
+  --panel-border: rgba(42, 47, 56, 0.9); /* Line #2A2F38 */
+  --text: #f2f5f4; /* White */
+  --muted: #8a93a0; /* Muted */
+  --accent: #36e27b; /* Capture Green (primary) */
+  --accent-rgb: 54, 226, 123; /* Capture Green, for rgba() translucency */
+  --accent-strong: #5cf59b; /* Green Bright (hover/glow) */
+  --accent-strong-rgb: 92, 245, 155; /* Green Bright, for rgba() */
   --region-good: #5ed68a;
   --region-mild: #f4d370;
   --region-warm: #f2a45b;
   --region-hot: #e46370;
-  --shadow: 0 22px 40px rgba(5, 12, 18, 0.45);
+  --shadow: 0 22px 40px rgba(5, 8, 12, 0.5);
   --radius: 18px;
-  --font-display: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-  --font-body: "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+  --font-display: "Oswald", "Palatino Linotype", "Book Antiqua", Palatino, serif;
+  --font-body: "Space Mono", "Trebuchet MS", "Lucida Sans Unicode", "Lucida Grande",
+    sans-serif;
 }
 
 * {
@@ -97,7 +106,7 @@ body::before {
   justify-content: center;
   align-items: center;
   padding: 12px 20px;
-  background: rgba(9, 17, 27, 0.95);
+  background: rgba(27, 31, 38, 0.95); /* Panel #1B1F26 */
   border-bottom: 1px solid var(--panel-border);
   box-shadow: var(--shadow);
   gap: 12px;
@@ -621,7 +630,7 @@ body::before {
   display: flex;
   gap: 8px;
   align-items: center;
-  background: rgba(9, 17, 27, 0.85);
+  background: rgba(27, 31, 38, 0.85); /* Panel #1B1F26 */
   padding: 8px 12px;
   border-radius: 8px;
   backdrop-filter: blur(8px);
@@ -1991,7 +2000,7 @@ body::before {
 .project-locked-status {
   display: block;
   font-size: 0.72rem;
-  color: rgba(240, 198, 111, 0.85);
+  color: rgba(var(--accent-rgb), 0.85);
   font-weight: 500;
   margin-bottom: 4px;
 }
@@ -2149,7 +2158,7 @@ body::before {
 .primary-button {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   color: #231f20;
-  box-shadow: 0 12px 24px rgba(240, 198, 111, 0.3);
+  box-shadow: 0 12px 24px rgba(var(--accent-rgb), 0.3);
 }
 
 .primary-button:hover,
@@ -2457,7 +2466,7 @@ body::before {
 
 /* Region Fact */
 .region-fact {
-  background: rgba(240, 198, 111, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   border-left: 3px solid var(--accent);
   padding: 10px 12px;
   margin-top: 10px;
@@ -3017,7 +3026,7 @@ body::before {
 
 /* Notes */
 .note {
-  background: rgba(240, 198, 111, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   border-left: 3px solid var(--accent);
   padding: 10px 14px;
   font-size: 0.9rem;
@@ -3272,7 +3281,7 @@ body::before {
 .campaign-button {
   width: 100%;
   padding: 12px 16px;
-  background: linear-gradient(135deg, rgba(240, 198, 111, 0.2), rgba(240, 198, 111, 0.1));
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.2), rgba(var(--accent-rgb), 0.1));
   border: 1px solid var(--accent);
   border-radius: 10px;
   color: var(--accent-strong);
@@ -3287,9 +3296,9 @@ body::before {
 }
 
 .campaign-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, rgba(240, 198, 111, 0.35), rgba(240, 198, 111, 0.2));
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.35), rgba(var(--accent-rgb), 0.2));
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(240, 198, 111, 0.2);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.2);
 }
 
 .campaign-button:disabled {
@@ -3591,7 +3600,7 @@ body::before {
 }
 
 .tech-tree-tip.available-tip {
-  background: rgba(240, 198, 111, 0.15);
+  background: rgba(var(--accent-rgb), 0.15);
   border-left: 3px solid var(--accent);
   color: var(--text);
 }
@@ -3635,7 +3644,7 @@ body::before {
 }
 
 .tech-item.available {
-  background: rgba(240, 198, 111, 0.12);
+  background: rgba(var(--accent-rgb), 0.12);
   border-left: 3px solid var(--accent);
 }
 
@@ -3793,8 +3802,8 @@ body::before {
 
 .tech-tree-legend .legend-item.available .dot {
   border-color: var(--accent);
-  background: rgba(240, 198, 111, 0.4);
-  box-shadow: 0 0 8px rgba(240, 198, 111, 0.5);
+  background: rgba(var(--accent-rgb), 0.4);
+  box-shadow: 0 0 8px rgba(var(--accent-rgb), 0.5);
 }
 
 .tech-tree-legend .legend-item.unlocked .dot {
@@ -4053,7 +4062,7 @@ body::before {
 
 .tech-hex.available .hex-inner {
   border-color: var(--accent);
-  box-shadow: 0 0 20px rgba(240, 198, 111, 0.4), inset 0 0 15px rgba(240, 198, 111, 0.1);
+  box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.4), inset 0 0 15px rgba(var(--accent-rgb), 0.1);
   animation: hex-pulse 2s ease-in-out infinite;
 }
 
@@ -4067,11 +4076,11 @@ body::before {
 
 @keyframes hex-pulse {
   0%, 100% {
-    box-shadow: 0 0 12px rgba(240, 198, 111, 0.4), inset 0 0 10px rgba(240, 198, 111, 0.05);
+    box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.4), inset 0 0 10px rgba(var(--accent-rgb), 0.05);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 28px rgba(240, 198, 111, 0.65), inset 0 0 20px rgba(240, 198, 111, 0.15);
+    box-shadow: 0 0 28px rgba(var(--accent-rgb), 0.65), inset 0 0 20px rgba(var(--accent-rgb), 0.15);
     transform: scale(1.04);
   }
 }
@@ -4240,7 +4249,7 @@ body::before {
   font-size: 0.75rem;
   font-weight: 600;
   color: var(--accent);
-  background: rgba(240, 198, 111, 0.15);
+  background: rgba(var(--accent-rgb), 0.15);
   padding: 3px 8px;
   border-radius: 4px;
 }
@@ -4326,7 +4335,7 @@ body::before {
 }
 
 .tooltip-status.available {
-  background: rgba(240, 198, 111, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   color: var(--accent);
 }
 
@@ -4421,7 +4430,7 @@ body::before {
 }
 
 .event-item.neutral {
-  background: rgba(240, 198, 111, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
   border-left: 3px solid var(--accent);
 }
 
@@ -5030,7 +5039,7 @@ body::before {
 }
 
 .section-info-panel .info-tip {
-  background: rgba(240, 198, 111, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 0.75rem;
@@ -5265,7 +5274,7 @@ details summary .section-info-btn {
 
 .popup-dismiss:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(240, 198, 111, 0.4);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.4);
 }
 
 .popup-dismiss:active {
@@ -5313,7 +5322,7 @@ details summary .section-info-btn {
 
 /* Research Theme - Green/Gold */
 .event-popup.research .popup-header {
-  background: linear-gradient(135deg, rgba(94, 214, 138, 0.2) 0%, rgba(240, 198, 111, 0.15) 100%);
+  background: linear-gradient(135deg, rgba(94, 214, 138, 0.2) 0%, rgba(var(--accent-rgb), 0.15) 100%);
   border-bottom-color: rgba(94, 214, 138, 0.4);
 }
 
@@ -5327,8 +5336,8 @@ details summary .section-info-btn {
 
 /* Breakthrough Theme - Gold */
 .event-popup.breakthrough .popup-header {
-  background: linear-gradient(135deg, rgba(240, 198, 111, 0.25) 0%, rgba(245, 221, 154, 0.15) 100%);
-  border-bottom-color: rgba(240, 198, 111, 0.5);
+  background: linear-gradient(135deg, rgba(var(--accent-rgb), 0.25) 0%, rgba(var(--accent-strong-rgb), 0.15) 100%);
+  border-bottom-color: rgba(var(--accent-rgb), 0.5);
 }
 
 .event-popup.breakthrough .popup-title {
@@ -5340,8 +5349,8 @@ details summary .section-info-btn {
 }
 
 @keyframes breakthroughGlow {
-  0%, 100% { filter: drop-shadow(0 0 5px rgba(240, 198, 111, 0.5)); }
-  50% { filter: drop-shadow(0 0 15px rgba(240, 198, 111, 0.8)); }
+  0%, 100% { filter: drop-shadow(0 0 5px rgba(var(--accent-rgb), 0.5)); }
+  50% { filter: drop-shadow(0 0 15px rgba(var(--accent-rgb), 0.8)); }
 }
 
 /* Endgame results popup */
@@ -5375,7 +5384,7 @@ details summary .section-info-btn {
   min-height: 54px;
   border-radius: 999px;
   background: var(--accent);
-  box-shadow: 0 0 24px rgba(240, 198, 111, 0.35);
+  box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.35);
 }
 
 .endgame-results-dialog.victory .endgame-result-mark {
@@ -7214,12 +7223,12 @@ details summary .section-info-btn {
 
 .build-mode-option:hover {
   background: rgba(0, 0, 0, 0.4);
-  border-color: rgba(240, 214, 140, 0.3);
+  border-color: rgba(54, 226, 123, 0.3); /* Capture Green */
 }
 
 .build-mode-option.selected {
   border-color: var(--accent);
-  background: rgba(240, 198, 111, 0.1);
+  background: rgba(var(--accent-rgb), 0.1);
 }
 
 .build-mode-option input[type="radio"] {
@@ -7382,7 +7391,7 @@ details summary .section-info-btn {
 
 .confirm-build-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(240, 198, 111, 0.3);
+  box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.3);
 }
 
 /* Construction Progress in Region Panel */
@@ -7800,7 +7809,7 @@ details summary .section-info-btn {
 
 .tech-category-item.has-centers {
   border-color: var(--accent);
-  background: rgba(240, 198, 111, 0.08);
+  background: rgba(var(--accent-rgb), 0.08);
 }
 
 .tech-category-item .category-rp {
@@ -7874,7 +7883,7 @@ details summary .section-info-btn {
 .rc-level-badge {
   font-size: 0.7rem;
   padding: 3px 8px;
-  background: rgba(240, 198, 111, 0.2);
+  background: rgba(var(--accent-rgb), 0.2);
   color: var(--accent);
   border-radius: 4px;
   font-weight: 600;
@@ -8906,8 +8915,8 @@ details summary .section-info-btn {
   background: transparent; /* The "hole" in the darkness */
   box-shadow:
     0 0 0 9999px rgba(0, 0, 0, 0.75),
-    0 0 30px rgba(240, 198, 111, 0.4);
-  border: 2px solid rgba(240, 198, 111, 0.6);
+    0 0 30px rgba(var(--accent-rgb), 0.4);
+  border: 2px solid rgba(var(--accent-rgb), 0.6);
   border-radius: 8px;
   animation: spotlightPulse 2s ease-in-out infinite;
 }
@@ -8916,14 +8925,14 @@ details summary .section-info-btn {
   0%, 100% {
     box-shadow:
       0 0 0 9999px rgba(0, 0, 0, 0.75),
-      0 0 30px rgba(240, 198, 111, 0.4);
-    border-color: rgba(240, 198, 111, 0.6);
+      0 0 30px rgba(var(--accent-rgb), 0.4);
+    border-color: rgba(var(--accent-rgb), 0.6);
   }
   50% {
     box-shadow:
       0 0 0 9999px rgba(0, 0, 0, 0.75),
-      0 0 50px rgba(240, 198, 111, 0.8);
-    border-color: rgba(240, 198, 111, 1);
+      0 0 50px rgba(var(--accent-rgb), 0.8);
+    border-color: rgba(var(--accent-rgb), 1);
   }
 }
 
@@ -8951,11 +8960,11 @@ details summary .section-info-btn {
 @keyframes tutorialTargetPulse {
   0%, 100% {
     border-color: var(--accent);
-    box-shadow: 0 0 10px rgba(240, 198, 111, 0.3);
+    box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.3);
   }
   50% {
     border-color: var(--accent-strong);
-    box-shadow: 0 0 20px rgba(240, 198, 111, 0.6);
+    box-shadow: 0 0 20px rgba(var(--accent-rgb), 0.6);
   }
 }
 
@@ -9215,14 +9224,14 @@ details summary .section-info-btn {
 }
 
 .tutorial-btn-next {
-  background: linear-gradient(180deg, rgba(240, 198, 111, 0.2) 0%, rgba(240, 198, 111, 0.1) 100%);
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.2) 0%, rgba(var(--accent-rgb), 0.1) 100%);
   color: var(--accent);
   border-color: var(--accent);
 }
 
 .tutorial-btn-next:hover {
-  background: linear-gradient(180deg, rgba(240, 198, 111, 0.3) 0%, rgba(240, 198, 111, 0.2) 100%);
-  box-shadow: 0 0 15px rgba(240, 198, 111, 0.2);
+  background: linear-gradient(180deg, rgba(var(--accent-rgb), 0.3) 0%, rgba(var(--accent-rgb), 0.2) 100%);
+  box-shadow: 0 0 15px rgba(var(--accent-rgb), 0.2);
 }
 
 .tutorial-btn-skip {
@@ -9279,8 +9288,8 @@ details summary .section-info-btn {
   align-items: center;
   gap: 8px;
   padding: 10px 14px;
-  background: rgba(240, 198, 111, 0.1);
-  border: 1px dashed rgba(240, 198, 111, 0.4);
+  background: rgba(var(--accent-rgb), 0.1);
+  border: 1px dashed rgba(var(--accent-rgb), 0.4);
   border-radius: 6px;
   margin-top: 12px;
 }
