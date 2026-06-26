@@ -59,6 +59,12 @@
             <option value="hard">Hard - Political resistance (Realistic)</option>
             <option value="extreme">Extreme - Against all odds</option>
           </select>
+          <!-- CAR-163: surface the selected mode's description + key stat deltas,
+               sourced from the shared DIFFICULTY_MODES config (no re-hardcoded copy). -->
+          <div id="difficulty-details" class="difficulty-details" aria-live="polite">
+            <p id="difficulty-description" class="difficulty-description"></p>
+            <ul id="difficulty-stats" class="difficulty-stats"></ul>
+          </div>
         </div>
 
         <div class="launch-actions">
@@ -135,6 +141,65 @@
           window.location.href = 'game.html';
         });
       })();
+    </script>
+
+    <!-- CAR-163: render the selected difficulty's description + stat deltas,
+         sourced from the single-source-of-truth DIFFICULTY_MODES config. -->
+    <script type="module">
+      import { DIFFICULTY_MODES } from './public/modules/data/difficulty-modes.js';
+
+      var select = document.getElementById('difficulty');
+      var descEl = document.getElementById('difficulty-description');
+      var statsEl = document.getElementById('difficulty-stats');
+
+      // Each stat is derived directly from the config fields — no re-hardcoded copy.
+      function formatStats(mode) {
+        var costDelta = Math.round((mode.costMultiplier - 1) * 100);
+        var costLabel =
+          costDelta === 0 ? 'normal' : (costDelta > 0 ? '+' + costDelta + '%' : costDelta + '%');
+
+        var eventsLabel;
+        if (!mode.eventsEnabled) {
+          eventsLabel = 'Off';
+        } else if (mode.eventSeverity <= 0.5) {
+          eventsLabel = 'Mild (×' + mode.eventSeverity + ')';
+        } else if (mode.eventSeverity >= 2) {
+          eventsLabel = 'Extreme (×' + mode.eventSeverity + ')';
+        } else if (mode.eventSeverity > 1) {
+          eventsLabel = 'Harsh (×' + mode.eventSeverity + ')';
+        } else {
+          eventsLabel = 'Normal (×' + mode.eventSeverity + ')';
+        }
+
+        return [
+          { label: 'Starting budget', value: '$' + mode.startingFunds + 'B' },
+          { label: 'CO₂ rise', value: '×' + mode.co2Multiplier },
+          { label: 'Project costs', value: costLabel },
+          { label: 'Events', value: eventsLabel },
+        ];
+      }
+
+      function render() {
+        var mode = DIFFICULTY_MODES[select.value];
+        if (!mode) return;
+        descEl.textContent = mode.description;
+        statsEl.innerHTML = '';
+        formatStats(mode).forEach(function (stat) {
+          var li = document.createElement('li');
+          var k = document.createElement('span');
+          k.className = 'difficulty-stat-label';
+          k.textContent = stat.label;
+          var v = document.createElement('span');
+          v.className = 'difficulty-stat-value';
+          v.textContent = stat.value;
+          li.appendChild(k);
+          li.appendChild(v);
+          statsEl.appendChild(li);
+        });
+      }
+
+      select.addEventListener('change', render);
+      render();
     </script>
   </body>
 </html>
