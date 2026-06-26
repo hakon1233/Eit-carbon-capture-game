@@ -53,7 +53,7 @@ Primary contract for AI coding agents (Claude Code, Codex, Copilot, Cursor, Aide
 ```bash
 npm install            # Install deps
 npm run dev            # Dev server
-npm test               # Run tests
+npm run test:e2e       # Run Playwright e2e tests
 npm run build          # Production build
 ```
 
@@ -61,7 +61,8 @@ npm run build          # Production build
 
 <!-- Brief map of top-level directories. Don't duplicate what a listing would show — focus on non-obvious boundaries. -->
 
-- `src/` — application code
+- `index.html` / `game.html` — launch + game pages (Vite multi-page inputs)
+- `game.js`, `style.css` — game logic and styles (repo root)
 - `docs/` — non-code docs (synced to Obsidian vault every 5 minutes)
 - `.claude/` — Claude Code config: skills, commands, agents, bug tracker
 
@@ -75,7 +76,7 @@ npm run build          # Production build
 ## Verification before commit
 
 ```bash
-npm test
+npm run test:e2e
 ./scripts/docs/audit-stray-docs.sh
 ./scripts/docs/generate-skills-index.sh   # only if .claude/{skills,commands,agents}/ changed
 ```
