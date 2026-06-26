@@ -59,6 +59,31 @@ async function startGame(page) {
   await expect(page.locator('#header-controls')).toBeVisible()
 }
 
+/**
+ * Dismiss the random event popup if it is currently showing. Month-advance can
+ * surface an event popup (game.js:displayNextPopup) that intercepts #next-month;
+ * the dismiss button closes it. hideEventPopup schedules the next queued popup
+ * after ~200ms, so we re-check a couple of times.
+ */
+async function dismissEventPopupIfPresent(page) {
+  for (let i = 0; i < 4; i += 1) {
+    const showing = await page.evaluate(() => {
+      const c = document.getElementById('event-popup-container')
+      return !!(c && !c.classList.contains('hidden'))
+    })
+    if (!showing) return
+    await page.locator('#event-popup .popup-dismiss').click()
+    await page.waitForTimeout(250)
+  }
+}
+
+/** Advance the in-game clock by one month, clearing any event popup around it. */
+async function advanceMonth(page) {
+  await dismissEventPopupIfPresent(page)
+  await page.locator('#next-month').click()
+  await dismissEventPopupIfPresent(page)
+}
+
 test.describe('Launch screen (index.html)', () => {
   test('renders branding and a New Game CTA', async ({ page }) => {
     await page.goto('')
@@ -176,6 +201,28 @@ test.describe('Core gameplay loop', () => {
     await expect(page.locator('#confirm-setup-btn')).toBeDisabled()
   })
 
+  // CAR-74: the restart guard's whole point is that *cancelling* it leaves the
+  // live game untouched (a stray click must not wipe progress). The accept branch
+  // is covered above; this pins the cancel branch so a regression that drops the
+  // guard — or treats cancel as confirm — fails loudly.
+  test('cancelling the restart confirmation keeps the game running', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    let dialogMessage = ''
+    page.once('dialog', (dialog) => {
+      dialogMessage = dialog.message()
+      return dialog.dismiss()
+    })
+    await page.locator('#restart-button').click()
+
+    // The guard prompted, and dismissing it leaves the active game in place.
+    expect(dialogMessage).toContain('Restart the game?')
+    await expect(page.locator('#setup-panel')).toBeHidden()
+    await expect(page.locator('#header-controls')).toBeVisible()
+  })
+
   // CAR-198: the endgame re-entry banner must never appear during a live run —
   // it is only revealed when the results modal is dismissed after game over.
   // (Game-over itself is unreachable in a fast headless test: a loss needs temp
@@ -218,6 +265,119 @@ test.describe('Core gameplay loop', () => {
     await page.getByRole('button', { name: 'How to play' }).click()
     await expect(page.locator('#tutorial-overlay')).toBeVisible()
     await expect(page.locator('#tutorial-overlay')).toContainText('1 /')
+  })
+})
+
+// Climate build-a-project coverage (originally CAR-171 / CAR-192). Unlike the
+// CAR-217 power tests, this drives the REAL project-button click path end to end:
+// open the Climate tab, click an affordable project, and assert the player-visible
+// signals. A non-power Climate project routes straight through to construction
+// with no build-mode dialog, so this is the deterministic UI path.
+test.describe('Build-a-project mechanic (Climate)', () => {
+  test('building a Climate project spends funds and queues construction', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    // Re-select the auto-allied home region in game mode so its project menu renders.
+    await selectFirstRegion(page)
+    await page.locator('#project-buttons .category-tab', { hasText: 'Climate' })
+      .first()
+      .click()
+
+    // First affordable (enabled) Climate project — non-power, so it builds
+    // directly without the power build-mode dialog.
+    const projectBtn = page
+      .locator('#project-buttons button.project-button:not([disabled])')
+      .first()
+    await expect(projectBtn).toBeVisible()
+
+    const underConstructionBefore = Number(
+      (await page.locator('#under-construction').textContent())?.trim()
+    )
+    const creditsBefore = (await page.locator('#credits').textContent())?.trim()
+
+    await projectBtn.click()
+
+    // Under-construction HUD counter increments by one.
+    await expect
+      .poll(async () =>
+        Number((await page.locator('#under-construction').textContent())?.trim())
+      )
+      .toBe(underConstructionBefore + 1)
+
+    // Funds were spent (credits label changed off its starting value).
+    await expect
+      .poll(async () => (await page.locator('#credits').textContent())?.trim())
+      .not.toBe(creditsBefore)
+
+    // The player gets a confirmation in the news log.
+    await expect(page.locator('#news-log')).toContainText(/Construction started/i)
+  })
+
+  test('a built Climate project completes and increments the projects HUD', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    await selectFirstRegion(page)
+    await page.locator('#project-buttons .category-tab', { hasText: 'Climate' })
+      .first()
+      .click()
+
+    // Reforestation is the cheapest/shortest Climate build (4 months), so
+    // completion is reachable quickly and deterministically.
+    const reforestationBtn = page
+      .locator('#project-buttons button.project-button:not([disabled])', {
+        hasText: /Reforestation/i,
+      })
+      .first()
+    await expect(reforestationBtn).toBeVisible()
+
+    const underConstructionBefore = Number(
+      (await page.locator('#under-construction').textContent())?.trim()
+    )
+    const projectsBuiltBefore = Number(
+      (await page.locator('#projects-display').textContent())?.trim()
+    )
+
+    await reforestationBtn.click()
+
+    await expect
+      .poll(async () =>
+        Number((await page.locator('#under-construction').textContent())?.trim())
+      )
+      .toBe(underConstructionBefore + 1)
+
+    // Advance one month at a time, dismissing any random event popup that would
+    // otherwise intercept #next-month, until the build finishes. The 10-advance
+    // cap fails loudly rather than hanging if the completion path regresses.
+    let completed = false
+    for (let i = 0; i < 10; i += 1) {
+      await advanceMonth(page)
+      const built = Number(
+        (await page.locator('#projects-display').textContent())?.trim()
+      )
+      if (built >= projectsBuiltBefore + 1) {
+        completed = true
+        break
+      }
+    }
+
+    expect(
+      completed,
+      'Reforestation did not complete within 10 month-advances'
+    ).toBe(true)
+
+    // Under-construction returns to its baseline once the build finishes.
+    await expect
+      .poll(async () =>
+        Number((await page.locator('#under-construction').textContent())?.trim())
+      )
+      .toBe(underConstructionBefore)
+
+    // The player gets a completion confirmation in the news log.
+    await expect(page.locator('#news-log')).toContainText(/completed/i)
   })
 })
 
