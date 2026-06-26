@@ -11525,7 +11525,7 @@ function buildProject(regionId, projectType) {
   startConstruction(regionId, projectType, adjustedCost, 1.0, "add");
 }
 
-function showPowerBuildModeDialog(regionId, projectType, cost) {
+function showPowerBuildModeDialog(regionId, projectType, cost, effectiveness = null) {
   const project = PROJECT_TYPES[projectType];
   const region = state.regions[regionId];
   const regionName = getRegionName(regionId);
@@ -11663,6 +11663,11 @@ function showPowerBuildModeDialog(regionId, projectType, cost) {
 
   document.body.appendChild(overlay);
 
+  // Stash the effectiveness payload so confirmBuildModeDialog can commit the
+  // build through the effectiveness-aware path (CAR-217). Null for the legacy
+  // buildProject() path, which falls back to startConstruction.
+  overlay._effectiveness = effectiveness;
+
   // Add event listeners for build mode selection
   const addOption = overlay.querySelector('[data-mode="add"]');
   const replaceOption = overlay.querySelector('[data-mode="replace"]');
@@ -11750,11 +11755,21 @@ function confirmBuildModeDialog(regionId, projectType, cost) {
     }
   }
 
+  // Capture the effectiveness payload before removing the overlay.
+  const effectiveness = overlay._effectiveness;
+
   // Close dialog
   overlay.remove();
 
-  // Start construction
-  startConstruction(regionId, projectType, cost, 1.0, buildMode, replaceCapacityGW, replaceFossilType);
+  // CAR-217: When reached from buildProjectWithEffectiveness (normal play), commit
+  // through the effectiveness-aware path so the regional effectiveness multiplier
+  // and difficulty-adjusted cost still apply. The legacy buildProject() path has no
+  // effectiveness payload and falls back to the flat startConstruction path.
+  if (effectiveness) {
+    executeEffectivenessBuild(regionId, projectType, effectiveness, cost, buildMode, replaceCapacityGW, replaceFossilType);
+  } else {
+    startConstruction(regionId, projectType, cost, 1.0, buildMode, replaceCapacityGW, replaceFossilType);
+  }
 }
 
 function updateUI() {
@@ -14609,6 +14624,28 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
     return;
   }
 
+  // CAR-217: Power projects (capacityGW > 0) let the player choose Add Capacity
+  // vs Replace Fossil. The dialog confirms back into executeEffectivenessBuild
+  // with the chosen build mode, so the effectiveness multiplier and cost still
+  // apply. Non-power projects build directly in the unchanged "add" path.
+  if (project.capacityGW && project.capacityGW > 0) {
+    showPowerBuildModeDialog(regionId, projectType, cost, effectiveness);
+    return;
+  }
+
+  executeEffectivenessBuild(regionId, projectType, effectiveness, cost, "add", 0, null);
+}
+
+/**
+ * Commit an effectiveness-aware project build. Shared by the direct (non-power)
+ * path and the power build-mode dialog. buildMode "replace" carries the fossil
+ * capacity to retire on construction completion (see processConstruction).
+ */
+function executeEffectivenessBuild(regionId, projectType, effectiveness, cost, buildMode, replaceCapacityGW, replaceFossilType) {
+  const region = state.regions[regionId];
+  const project = PROJECT_TYPES[projectType];
+  const allianceData = state.alliance?.[regionId];
+
   state.funds -= cost;
   // Track total spending for achievements
   if (!state.totalSpent) state.totalSpent = 0;
@@ -14642,6 +14679,8 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
     allianceData.happiness = Math.min(100, allianceData.happiness + happinessBonus);
   }
 
+  const isReplace = buildMode === "replace" && replaceCapacityGW > 0 && !!replaceFossilType;
+
   // Check if project has construction time > 1 month
   const constructionMonths = project.constructionMonths || 1;
   if (constructionMonths > 1) {
@@ -14658,7 +14697,9 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
       monthsTotal: constructionMonths,
       monthsRemaining: constructionMonths,
       startDate: { year: state.year, month: state.month },
-      buildMode: "add",
+      buildMode: isReplace ? "replace" : "add",
+      replaceCapacityGW: isReplace ? replaceCapacityGW : 0,
+      replaceFossilType: isReplace ? replaceFossilType : null,
     });
 
     const timeStr = formatConstructionTime(constructionMonths);
@@ -14667,9 +14708,13 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
       : effectiveness.effectMultiplier < 1
         ? ` (${((1 - effectiveness.effectMultiplier) * 100).toFixed(0)}% penalty)`
         : "";
-    pushMessage(`Construction started: ${project.label} in ${getRegionName(regionId)}. ${timeStr} to completion.${bonusText}`, "good");
+    const replaceText = isReplace
+      ? ` Will retire ${replaceCapacityGW.toFixed(1)} GW ${replaceFossilType} on completion.`
+      : "";
+    pushMessage(`Construction started: ${project.label} in ${getRegionName(regionId)}. ${timeStr} to completion.${bonusText}${replaceText}`, "good");
   } else {
-    // Instant build for projects with no/minimal construction time
+    // Instant build for projects with no/minimal construction time.
+    // (Replace mode only applies to power projects, which all have build time.)
     region.projects.push({
       type: projectType,
       effectMultiplier: effectiveness.effectMultiplier,
@@ -16145,4 +16190,16 @@ if (typeof window !== "undefined") {
   window.openStatDetail = openStatDetail;
   window.closeStatDetailPopup = closeStatDetailPopup;
   window.switchCarbonTab = switchCarbonTab;
+
+  // CAR-217: minimal read/drive bridge for e2e tests. The power build-mode
+  // dialog (Add vs Replace Fossil) and its fossil-retirement outcome are not
+  // otherwise observable from the DOM, so the Replace-branch test drives the
+  // real flow through here and asserts against live state. Test-only; safe to
+  // expose in this single-player, local-only game.
+  window.__carbonTestBridge = {
+    getState: () => state,
+    buildProjectWithEffectiveness,
+    getClimateDataForRegion,
+    ALLIANCE_STATUS,
+  };
 }

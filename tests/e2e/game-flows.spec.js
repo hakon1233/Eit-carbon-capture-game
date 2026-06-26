@@ -221,6 +221,133 @@ test.describe('Core gameplay loop', () => {
   })
 })
 
+// CAR-217: the power "build mode" dialog (Add Capacity vs Replace Fossil) used
+// to be unreachable dead code — building a power project always hard-coded
+// buildMode "add", so the Replace-Fossil lever (the only way to retire coal/gas
+// and cut power-sector CO2) could never fire. These tests drive the now-wired
+// flow through the real dialog and assert the Replace branch actually retires
+// fossil capacity on completion.
+//
+// The flow is driven via window.__carbonTestBridge (a thin read/drive hook added
+// for exactly this — fossil retirement is otherwise invisible from the DOM).
+test.describe('Power build-mode dialog (Add vs Replace Fossil)', () => {
+  test('building a power project opens the Add/Replace dialog', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    // Drive the real build entry point for a power project (solar, capacityGW>0)
+    // in the player's allied home region, exactly as a project-button click does.
+    const opened = await page.evaluate(() => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      const regionId = Object.keys(st.alliance || {}).find(
+        (id) => st.alliance[id]?.status === b.ALLIANCE_STATUS.ALLIED,
+      )
+      if (!regionId) return false
+      st.funds = Math.max(st.funds, 1000)
+      b.buildProjectWithEffectiveness(regionId, 'solar', {
+        cost: 1,
+        effectMultiplier: 1,
+      })
+      return true
+    })
+    expect(opened).toBe(true)
+
+    // The previously-unreachable dialog now appears, offering both modes.
+    const overlay = page.locator('#build-mode-overlay')
+    await expect(overlay).toBeVisible()
+    await expect(overlay.locator('[data-mode="add"]')).toBeVisible()
+    await expect(overlay.locator('[data-mode="replace"]')).toBeVisible()
+  })
+
+  test('Replace Fossil retires fossil capacity and is reflected in state', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    // Pick an allied region that actually has fossil (coal/gas) to retire, then
+    // start a power build there. Force-ally a fossil region if the home region
+    // has none, so the Replace branch is genuinely exercised.
+    const setup = await page.evaluate(() => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      let chosen = null
+      let fossilType = null
+      for (const regionId of Object.keys(st.regions)) {
+        if (!st.alliance?.[regionId]) continue
+        const mix = b.getClimateDataForRegion(regionId)?.power?.currentMixTWh || {}
+        if ((mix.coal || 0) > 0) {
+          chosen = regionId
+          fossilType = 'coal'
+          break
+        }
+        if ((mix.gas || 0) > 0 && !chosen) {
+          chosen = regionId
+          fossilType = 'gas'
+        }
+      }
+      if (!chosen) return { ok: false }
+      st.alliance[chosen].status = b.ALLIANCE_STATUS.ALLIED
+      st.funds = Math.max(st.funds, 1000)
+      const before = st.regions[chosen].retiredFossilGW?.[fossilType] || 0
+      b.buildProjectWithEffectiveness(chosen, 'solar', {
+        cost: 1,
+        effectMultiplier: 1,
+      })
+      return { ok: true, chosen, fossilType, before }
+    })
+    expect(setup.ok).toBe(true)
+
+    // Choose "Replace Fossil" and confirm.
+    const overlay = page.locator('#build-mode-overlay')
+    await expect(overlay).toBeVisible()
+    await overlay.locator('[data-mode="replace"]').click()
+    await expect(overlay.locator('#replace-options')).toBeVisible()
+    await overlay.locator('.confirm-build-btn').click()
+    await expect(overlay).toHaveCount(0)
+
+    // The queued construction carries the replace intent (this is what was
+    // impossible before the fix — buildMode was always "add").
+    const queued = await page.evaluate(() => {
+      const st = window.__carbonTestBridge.getState()
+      const c = (st.underConstruction || []).find(
+        (x) => x.type === 'solar' && x.buildMode === 'replace',
+      )
+      if (!c) return null
+      return {
+        id: c.id,
+        buildMode: c.buildMode,
+        gw: c.replaceCapacityGW,
+        fossilType: c.replaceFossilType,
+      }
+    })
+    expect(queued).not.toBeNull()
+    expect(queued.buildMode).toBe('replace')
+    expect(queued.gw).toBeGreaterThan(0)
+    expect(['coal', 'gas']).toContain(queued.fossilType)
+
+    // Fast-forward this build to completion and advance one month; on completion
+    // the chosen fossil capacity must be retired (region.retiredFossilGW grows).
+    await page.evaluate((id) => {
+      const st = window.__carbonTestBridge.getState()
+      const c = st.underConstruction.find((x) => x.id === id)
+      c.monthsRemaining = 1
+    }, queued.id)
+
+    await page.locator('#next-month').click()
+
+    const after = await page.evaluate(
+      ({ chosen, fossilType }) => {
+        const st = window.__carbonTestBridge.getState()
+        return st.regions[chosen].retiredFossilGW?.[fossilType] || 0
+      },
+      { chosen: setup.chosen, fossilType: queued.fossilType },
+    )
+    expect(after).toBeGreaterThan(setup.before)
+  })
+})
+
 test.describe('Console & page health', () => {
   test('no uncaught page errors during a full setup->play cycle', async ({
     page,
