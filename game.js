@@ -3772,6 +3772,9 @@ function showAchievementNotification(achievement) {
   // Create toast element
   const toast = document.createElement("div");
   toast.className = "achievement-toast";
+  toast.setAttribute("role", "status");
+  toast.setAttribute("aria-live", "assertive");
+  toast.setAttribute("aria-atomic", "true");
   toast.innerHTML = `
     <div class="achievement-toast-icon">${achievement.icon}</div>
     <div class="achievement-toast-content">
