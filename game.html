@@ -446,6 +446,30 @@
       </div>
     </div>
 
+    <!-- Endgame Results Popup -->
+    <div id="endgame-results-popup" class="popup-container hidden">
+      <div class="popup-overlay"></div>
+      <div id="endgame-results-dialog" class="endgame-results-dialog" role="dialog" aria-modal="true" aria-labelledby="endgame-results-title" tabindex="-1">
+        <div class="popup-header">
+          <div class="endgame-result-mark" aria-hidden="true"></div>
+          <div>
+            <p class="endgame-kicker">Run complete</p>
+            <h3 class="popup-title" id="endgame-results-title">Results</h3>
+          </div>
+          <button class="popup-close" aria-label="Close results">&times;</button>
+        </div>
+        <div class="popup-body">
+          <p class="endgame-outcome" id="endgame-results-outcome"></p>
+          <p class="endgame-score" id="endgame-results-score"></p>
+          <dl class="endgame-summary" id="endgame-results-summary"></dl>
+        </div>
+        <div class="endgame-actions">
+          <button class="popup-dismiss endgame-play-again">Play Again</button>
+          <button class="ghost-button endgame-back-menu">Back to Menu</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Carbon Balance Popup -->
     <div id="carbon-balance-popup" class="popup-container hidden">
       <div class="popup-overlay" onclick="closeCarbonBalancePopup()"></div>

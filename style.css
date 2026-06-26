@@ -5169,6 +5169,145 @@ details summary .section-info-btn {
   50% { filter: drop-shadow(0 0 15px rgba(240, 198, 111, 0.8)); }
 }
 
+/* Endgame results popup */
+.endgame-results-dialog {
+  position: relative;
+  z-index: 1;
+  width: min(92vw, 560px);
+  background: linear-gradient(135deg, rgba(15, 25, 35, 0.98) 0%, rgba(25, 40, 55, 0.98) 100%);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: popupSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+
+.endgame-results-dialog.victory {
+  border: 1px solid rgba(93, 214, 143, 0.45);
+}
+
+.endgame-results-dialog.defeat {
+  border: 1px solid rgba(231, 92, 77, 0.5);
+}
+
+.endgame-results-dialog .popup-header {
+  align-items: flex-start;
+  background: rgba(0, 0, 0, 0.34);
+}
+
+.endgame-result-mark {
+  width: 12px;
+  align-self: stretch;
+  min-height: 54px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 24px rgba(240, 198, 111, 0.35);
+}
+
+.endgame-results-dialog.victory .endgame-result-mark {
+  background: #5dd68f;
+  box-shadow: 0 0 26px rgba(93, 214, 143, 0.45);
+}
+
+.endgame-results-dialog.defeat .endgame-result-mark {
+  background: #e75c4d;
+  box-shadow: 0 0 26px rgba(231, 92, 77, 0.45);
+}
+
+.endgame-kicker {
+  margin: 0 0 4px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.endgame-results-dialog .popup-title {
+  color: var(--text-primary);
+}
+
+.endgame-results-dialog .popup-close {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.endgame-results-dialog .popup-close:hover {
+  color: var(--text-primary);
+}
+
+.endgame-outcome {
+  margin: 0 0 8px;
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.endgame-score {
+  margin: 0 0 16px;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.endgame-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+}
+
+.endgame-summary div {
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.endgame-summary dt {
+  margin: 0 0 4px;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.endgame-summary dd {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.endgame-actions {
+  display: flex;
+  gap: 12px;
+  padding: 0 20px 20px;
+}
+
+.endgame-actions .popup-dismiss,
+.endgame-actions .ghost-button {
+  width: auto;
+  flex: 1;
+  margin: 0;
+}
+
+@media (max-width: 560px) {
+  .endgame-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .endgame-actions {
+    flex-direction: column;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════
    CARBON BALANCE POPUP
    ═══════════════════════════════════════════════════════════════ */

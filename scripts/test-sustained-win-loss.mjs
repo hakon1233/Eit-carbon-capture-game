@@ -55,6 +55,7 @@ const context = {
     context.messages.push({ message, tone });
   },
   clearSavedGame() {},
+  showEndgameResultsModal() {},
 };
 vm.createContext(context);
 vm.runInContext(

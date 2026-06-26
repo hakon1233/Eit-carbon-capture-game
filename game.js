@@ -15147,7 +15147,93 @@ function updateEndgameStreaks() {
   }
 }
 
+function calculateEndgameScore(summary) {
+  const tempTarget = summary.won ? GAME_CONFIG.winTemp : GAME_CONFIG.loseTemp;
+  const tempDelta = summary.won
+    ? Math.max(0, tempTarget - summary.finalTemperature)
+    : -Math.max(0, summary.finalTemperature - tempTarget);
+  const allianceBonus = summary.totalRegions > 0
+    ? (summary.alliedRegions / summary.totalRegions) * 180
+    : 0;
+  const projectBonus = Math.min(160, summary.projectsBuilt * 4);
+  const treasuryBonus = Math.min(120, Math.max(0, summary.endingTreasury) / 20);
+  const outcomeBase = summary.won ? 700 : 160;
+
+  // Lightweight run rating only: derives from existing state and never feeds back into simulation.
+  return Math.max(0, Math.round(outcomeBase + tempDelta * 220 + allianceBonus + projectBonus + treasuryBonus));
+}
+
+function getEndgameRunSummary() {
+  const totalRegions = getRegionIds().length;
+  const alliedRegions = getAlliedRegionsCount();
+  const summary = {
+    won: state.won,
+    finalTemperature: state.temperature,
+    finalCo2: state.co2,
+    yearReached: state.year,
+    alliedRegions,
+    totalRegions,
+    projectsBuilt: countTotalProjects(),
+    endingTreasury: state.funds,
+  };
+  summary.score = calculateEndgameScore(summary);
+  return summary;
+}
+
+function closeEndgameResultsModal() {
+  const container = document.getElementById("endgame-results-popup");
+  if (!container) return;
+
+  deactivateDialog(container);
+  container.classList.add("hidden");
+}
+
+function showEndgameResultsModal() {
+  const container = document.getElementById("endgame-results-popup");
+  const dialog = document.getElementById("endgame-results-dialog");
+  if (!container || !dialog) return;
+
+  const titleEl = document.getElementById("endgame-results-title");
+  const outcomeEl = document.getElementById("endgame-results-outcome");
+  const summaryEl = document.getElementById("endgame-results-summary");
+  const scoreEl = document.getElementById("endgame-results-score");
+  const closeButton = dialog.querySelector(".popup-close");
+  const playAgainButton = dialog.querySelector(".endgame-play-again");
+  const backMenuButton = dialog.querySelector(".endgame-back-menu");
+  const overlay = container.querySelector(".popup-overlay");
+  const summary = getEndgameRunSummary();
+  const outcomeLabel = summary.won ? "Victory" : "Climate Catastrophe";
+
+  dialog.className = `endgame-results-dialog ${summary.won ? "victory" : "defeat"}`;
+  titleEl.textContent = summary.won ? "Climate Stabilized" : "Run Failed";
+  outcomeEl.textContent = outcomeLabel;
+  scoreEl.textContent = `Score: ${summary.score}`;
+  summaryEl.innerHTML = `
+    <div><dt>Final temp anomaly</dt><dd>${summary.finalTemperature.toFixed(2)}°C</dd></div>
+    <div><dt>Year reached</dt><dd>${summary.yearReached}</dd></div>
+    <div><dt>Final CO2</dt><dd>${summary.finalCo2.toFixed(1)} ppm</dd></div>
+    <div><dt>Allies</dt><dd>${summary.alliedRegions} / ${summary.totalRegions}</dd></div>
+    <div><dt>Projects built</dt><dd>${summary.projectsBuilt}</dd></div>
+    <div><dt>Ending treasury</dt><dd>${formatCurrency(summary.endingTreasury)}</dd></div>
+  `;
+
+  closeButton.onclick = closeEndgameResultsModal;
+  overlay.onclick = closeEndgameResultsModal;
+  playAgainButton.onclick = () => {
+    closeEndgameResultsModal();
+    initGame();
+  };
+  backMenuButton.onclick = () => {
+    window.location.href = "index.html";
+  };
+
+  container.classList.remove("hidden");
+  activateDialog(container, dialog, closeEndgameResultsModal);
+}
+
 function checkWinLose() {
+  if (state.gameOver) return;
+
   if (state.winStreakMonths >= 12) {
     state.gameOver = true;
     state.won = true;
@@ -15161,6 +15247,7 @@ function checkWinLose() {
   if (state.gameOver) {
     clearSavedGame();
     pushMessage("Restart the game to try again.");
+    showEndgameResultsModal();
   }
 }
 
