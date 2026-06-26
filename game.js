@@ -5050,7 +5050,7 @@ const TUTORIAL_STEPS = [
     icon: "🌍",
     content: "You are the leader of a global climate alliance. Your mission is to unite the world and prevent catastrophic climate change.",
     bullets: [
-      "Reduce atmospheric CO₂ to 416 ppm (pre-industrial +1.0°C)",
+      "Hold global warming at or below +1.0°C for 12 months from 2050",
       "Recruit all {REGION_COUNT} regions into your alliance",
       "Avoid reaching 511 ppm (+2.0°C catastrophic warming)"
     ],
@@ -5071,7 +5071,7 @@ const TUTORIAL_STEPS = [
     target: ".temp-gauge-mini",
     title: "Climate Status",
     icon: "🌡️",
-    content: "The temperature gauge shows current warming. The CO₂ bar shows atmospheric carbon dioxide. Click either for detailed breakdowns.",
+    content: "The temperature gauge shows current warming. To win, reach +1.0°C by 2050, then hold it for 12 months in a row.",
     position: "below",
   },
   {
@@ -5080,7 +5080,7 @@ const TUTORIAL_STEPS = [
     target: ".header-stats-row",
     title: "Key Statistics",
     icon: "📊",
-    content: "These badges show your progress: allied regions, research points, built projects, ongoing construction, CCS capacity, unlocked tech, and climate risk.",
+    content: "These badges show your progress: allies, research, projects, CCS, climate risk, and how many months you have held the +1.0°C goal.",
     position: "below",
   },
   // 5. Map intro - NOW HIGHLIGHTS MAP
@@ -11933,6 +11933,8 @@ function updateUI() {
     }
   }
 
+  updateWinProgressHud();
+
   // ========== INCOME DISPLAY (compact header) ==========
 
   // Calculate and display projected income
@@ -12090,6 +12092,54 @@ function updateUI() {
   updateMapColors();
   updateMapSelection();
   updateControls();
+}
+
+function updateWinProgressHud() {
+  const statEl = document.getElementById('win-progress-stat');
+  const valueEl = document.getElementById('win-progress-value');
+  if (!statEl || !valueEl) return;
+
+  const minWinYear = 2050;
+  const winTargetShort = GAME_CONFIG.winTemp.toFixed(1);
+  const winTargetDisplay = GAME_CONFIG.winTemp.toFixed(2);
+  const currentTemp = state.temperature.toFixed(2);
+  const winStreak = Math.min(12, Math.max(0, state.winStreakMonths || 0));
+  const loseStreak = Math.min(3, Math.max(0, state.loseStreakMonths || 0));
+
+  statEl.classList.remove(
+    'win-progress-approach',
+    'win-progress-ready',
+    'win-progress-active',
+    'win-progress-reset',
+    'win-progress-danger',
+  );
+
+  if (state.temperature >= GAME_CONFIG.loseTemp && loseStreak > 0) {
+    valueEl.textContent = `Danger ${loseStreak} / 3`;
+    statEl.classList.add('win-progress-danger');
+    statEl.title = `Danger: ${loseStreak} of 3 hot months at +${GAME_CONFIG.loseTemp.toFixed(1)}°C.`;
+    return;
+  }
+
+  if (state.year < minWinYear && state.temperature <= GAME_CONFIG.winTemp) {
+    valueEl.textContent = `Ready in ${minWinYear}`;
+    statEl.classList.add('win-progress-ready');
+    statEl.title = `Great! Stay at or below +${winTargetShort}°C until ${minWinYear}, then hold it for 12 months.`;
+    return;
+  }
+
+  if (state.year >= minWinYear) {
+    valueEl.textContent = `${winStreak} / 12 held`;
+    statEl.classList.add(state.temperature <= GAME_CONFIG.winTemp ? 'win-progress-active' : 'win-progress-reset');
+    statEl.title = state.temperature <= GAME_CONFIG.winTemp
+      ? `Win progress: ${winStreak} of 12 months held at or below +${winTargetShort}°C.`
+      : `The 12-month streak resets while warming is above +${winTargetShort}°C.`;
+    return;
+  }
+
+  valueEl.textContent = `+${currentTemp} -> +${winTargetDisplay}`;
+  statEl.classList.add('win-progress-approach');
+  statEl.title = `Goal: reach +${winTargetShort}°C by ${minWinYear}, then hold it for 12 months.`;
 }
 
 // Render the tipping points panel

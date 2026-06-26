@@ -65,6 +65,9 @@ test.describe('Launch screen (index.html)', () => {
     await expect(page.locator('#launch-screen')).toBeVisible()
     await expect(page.locator('#start-game-btn')).toBeVisible()
     await expect(page.locator('#difficulty')).toBeVisible()
+    await expect(page.locator('.launch-card').first()).toContainText(
+      'hold it for 12 months in a row',
+    )
     await expect(page).toHaveTitle(/Carbon Capture/i)
   })
 
@@ -137,6 +140,8 @@ test.describe('Game setup & start', () => {
     await expect(page.locator('#temperature')).toContainText(/°C/)
     await expect(page.locator('#co2')).toContainText(/ppm/)
     await expect(page.locator('#date')).toContainText(/\d{4}/)
+    await expect(page.locator('#win-progress-stat')).toBeVisible()
+    await expect(page.locator('#win-progress-value')).toContainText(/\+1\.\d{2} -> \+1\.00/)
 
     await page.screenshot({
       path: 'playwright-report/started-game.png',

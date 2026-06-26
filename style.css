@@ -117,6 +117,7 @@ body::before {
 /* Secondary Stats Row */
 .header-stats-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 16px;
@@ -147,6 +148,47 @@ body::before {
   display: flex;
   align-items: center;
   gap: 3px;
+}
+
+.win-progress-stat {
+  min-width: 112px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.win-progress-stat .stat-value {
+  color: var(--text);
+}
+
+.win-progress-stat.win-progress-ready,
+.win-progress-stat.win-progress-active {
+  border-color: rgba(76, 175, 80, 0.45);
+  background: rgba(76, 175, 80, 0.14);
+}
+
+.win-progress-stat.win-progress-ready .stat-value,
+.win-progress-stat.win-progress-active .stat-value {
+  color: var(--region-good);
+}
+
+.win-progress-stat.win-progress-reset {
+  border-color: rgba(255, 183, 77, 0.5);
+  background: rgba(255, 183, 77, 0.14);
+}
+
+.win-progress-stat.win-progress-reset .stat-value {
+  color: var(--warning);
+}
+
+.win-progress-stat.win-progress-danger {
+  border-color: rgba(239, 83, 80, 0.55);
+  background: rgba(239, 83, 80, 0.16);
+}
+
+.win-progress-stat.win-progress-danger .stat-value {
+  color: var(--danger);
 }
 
 .header-stat .stat-delta {
