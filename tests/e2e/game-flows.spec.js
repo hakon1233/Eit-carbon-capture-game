@@ -691,6 +691,56 @@ test.describe('Power build-mode dialog (Add vs Replace Fossil)', () => {
   })
 })
 
+// CAR-236: prior passes pinned only the "endgame banner stays hidden during a
+// live run" invariant (CAR-198). The actual game-over transition — checkWinLose
+// flipping state.gameOver, showEndgameResultsModal painting the results dialog,
+// time controls disabling, and the re-entry banner being revealed only once the
+// modal is dismissed — was never exercised. This drives the deterministic
+// time-out loss (year > GAME_CONFIG.loseYear=2100), which trips checkWinLose
+// independent of the climate sim, and asserts the whole transition end to end.
+test.describe('Endgame results modal (CAR-236)', () => {
+  test('reaching the lose year ends the run and shows the defeat results modal', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    // Force the time-out lose condition deterministically: checkWinLose loses
+    // when state.year > loseYear, regardless of temperature/streaks, so this is
+    // robust against the monthly climate recompute.
+    await page.evaluate(() => {
+      window.__carbonTestBridge.getState().year = 2101
+    })
+
+    // Advance one month to run updateEndgameStreaks() -> checkWinLose().
+    await dismissEventPopupIfPresent(page)
+    await page.locator('#next-month').click()
+
+    const popup = page.locator('#endgame-results-popup')
+    await expect(popup).toBeVisible()
+    await expect(page.locator('#endgame-results-title')).toHaveText('Run Failed')
+    await expect(page.locator('#endgame-results-outcome')).toHaveText(
+      'Climate Catastrophe',
+    )
+    await expect(page.locator('#endgame-results-dialog')).toHaveClass(/defeat/)
+
+    // Game-over disables the time controls (updateControls).
+    await expect(page.locator('#next-month')).toBeDisabled()
+
+    // The re-entry banner stays hidden while the modal is open...
+    await expect(page.locator('#endgame-banner')).toBeHidden()
+
+    // ...and is revealed once the player dismisses the results modal, so the
+    // player is never stranded on a frozen board with no forward affordance.
+    await page.locator('#endgame-results-dialog .popup-close').click()
+    await expect(popup).toBeHidden()
+    await expect(page.locator('#endgame-banner')).toBeVisible()
+
+    // Play Again from the banner clears game-over and returns to setup mode.
+    await page.locator('#endgame-banner-play-again').click()
+    await expect(page.locator('#setup-panel')).toBeVisible()
+  })
+})
+
 test.describe('Console & page health', () => {
   test('no uncaught page errors during a full setup->play cycle', async ({
     page,
