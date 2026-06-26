@@ -22,6 +22,17 @@
   </head>
   <body class="in-game">
     <div class="game-shell">
+      <!-- Endgame re-entry banner (CAR-198): shown when the results modal is
+           dismissed after game over, so the player is never stranded on a
+           frozen board with no forward affordance. -->
+      <div id="endgame-banner" class="endgame-banner hidden" role="region" aria-label="Run over">
+        <span class="endgame-banner-label">Run over</span>
+        <div class="endgame-banner-actions">
+          <button id="endgame-banner-view" type="button" class="ghost-button small">View Results</button>
+          <button id="endgame-banner-play-again" type="button" class="primary-button small">Play Again</button>
+          <a href="index.html" class="ghost-button small">Back to Menu</a>
+        </div>
+      </div>
       <div class="topbar-wrapper">
         <header class="topbar">
           <a

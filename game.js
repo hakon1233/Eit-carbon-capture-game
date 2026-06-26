@@ -15190,12 +15190,26 @@ function getEndgameRunSummary() {
   return summary;
 }
 
+// CAR-198: keep the persistent re-entry banner in sync with game state. It is
+// shown only when the run is over AND the results modal is currently dismissed,
+// so dismissing the modal never strands the player on a frozen board with no
+// forward affordance.
+function syncEndgameBanner() {
+  const banner = document.getElementById("endgame-banner");
+  if (!banner) return;
+  const popup = document.getElementById("endgame-results-popup");
+  const resultsOpen = !!popup && !popup.classList.contains("hidden");
+  const shouldShow = !!state.gameOver && !resultsOpen;
+  banner.classList.toggle("hidden", !shouldShow);
+}
+
 function closeEndgameResultsModal() {
   const container = document.getElementById("endgame-results-popup");
   if (!container) return;
 
   deactivateDialog(container);
   container.classList.add("hidden");
+  syncEndgameBanner();
 }
 
 function showEndgameResultsModal() {
@@ -15239,6 +15253,7 @@ function showEndgameResultsModal() {
 
   container.classList.remove("hidden");
   activateDialog(container, dialog, closeEndgameResultsModal);
+  syncEndgameBanner();
 }
 
 function checkWinLose() {
@@ -15271,6 +15286,8 @@ function updateControls() {
   if (restartButton) {
     restartButton.textContent = "Restart Game";
   }
+  // CAR-198: starting a new run clears state.gameOver; keep the banner honest.
+  syncEndgameBanner();
 }
 
 function pushMessage(message, tone = "neutral") {
@@ -15590,6 +15607,22 @@ function wireControls() {
       if (!isSetupMode && !state.gameOver) {
         if (!window.confirm("Restart the game? Your current progress will be lost.")) return;
       }
+      initGame();
+    });
+  }
+
+  // CAR-198: re-entry banner controls. "View Results" reopens the dismissed
+  // endgame modal; "Play Again" starts a fresh run. ("Back to Menu" is a plain
+  // <a href> in the markup and needs no JS.)
+  const endgameBannerView = document.getElementById("endgame-banner-view");
+  if (endgameBannerView) {
+    endgameBannerView.addEventListener("click", () => {
+      showEndgameResultsModal();
+    });
+  }
+  const endgameBannerPlayAgain = document.getElementById("endgame-banner-play-again");
+  if (endgameBannerPlayAgain) {
+    endgameBannerPlayAgain.addEventListener("click", () => {
       initGame();
     });
   }

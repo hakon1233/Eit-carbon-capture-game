@@ -176,6 +176,28 @@ test.describe('Core gameplay loop', () => {
     await expect(page.locator('#confirm-setup-btn')).toBeDisabled()
   })
 
+  // CAR-198: the endgame re-entry banner must never appear during a live run —
+  // it is only revealed when the results modal is dismissed after game over.
+  // (Game-over itself is unreachable in a fast headless test: a loss needs temp
+  // >= +2.0°C for 3 straight months or year > 2100, so we assert the banner is
+  // present-but-hidden during normal play, which is the failure mode this fix
+  // could regress.)
+  test('endgame re-entry banner stays hidden during a live run', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    const banner = page.locator('#endgame-banner')
+    await expect(banner).toBeHidden()
+    // Its controls exist in the DOM so dismiss-after-game-over has a target.
+    await expect(page.locator('#endgame-banner-view')).toHaveCount(1)
+    await expect(page.locator('#endgame-banner-play-again')).toHaveCount(1)
+
+    // Advancing time must not reveal it while the run is still going.
+    await page.locator('#next-month').click()
+    await expect(banner).toBeHidden()
+  })
+
   test('How to play replays the interactive tutorial during a normal game', async ({
     page,
   }) => {
