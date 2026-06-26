@@ -97,6 +97,7 @@ const context = {
   clearCount: 0,
   initCount: 0,
   activatedDialog: null,
+  bannerSyncCount: 0,
   pushMessage(message, tone = "neutral") {
     context.messages.push({ message, tone });
   },
@@ -110,6 +111,9 @@ const context = {
     context.activatedDialog = { container, dialog, onClose };
   },
   deactivateDialog() {},
+  syncEndgameBanner() {
+    context.bannerSyncCount += 1;
+  },
   countTotalProjects() {
     return Object.values(context.state.regions).reduce(
       (total, region) => total + region.projects.length,
