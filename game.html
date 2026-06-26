@@ -177,7 +177,19 @@
               type="image/svg+xml"
               data="assets/maps/mapsvg-world-world.svg"
               aria-label="World map"
-            ></object>
+            >
+              <!-- Native fallback shown if the <object> itself cannot render -->
+              <div class="map-error-fallback">
+                <p>Couldn't load the world map.</p>
+                <p>Check your connection and reload the page.</p>
+              </div>
+            </object>
+            <!-- JS-controlled error/fallback state (CAR-100); hidden on the happy path -->
+            <div id="map-error" class="map-error-overlay" role="alert" hidden>
+              <p class="map-error-title">Couldn't load the world map.</p>
+              <p class="map-error-detail">Check your connection and reload the map. The rest of the game still works.</p>
+              <button id="map-error-retry" type="button" class="primary-button small">Reload map</button>
+            </div>
           </div>
           <div id="header-controls" class="header-controls" style="display: none;">
             <button id="next-month" class="primary-button small">Next Month</button>

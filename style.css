@@ -1664,6 +1664,44 @@ body::before {
   display: block;
 }
 
+/*
+ * Map error/fallback state (CAR-100). Centered, readable message shown when the
+ * world map SVG fails to load so the map area isn't a silent blank. The rest of
+ * the game (stats, projects, Next Month) stays usable beneath/around it.
+ */
+.map-error-overlay,
+.map-error-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  text-align: center;
+  background: rgba(6, 12, 18, 0.85);
+  color: var(--text);
+}
+
+.map-error-overlay[hidden] {
+  display: none;
+}
+
+.map-error-title,
+.map-error-fallback p:first-child {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.map-error-detail,
+.map-error-fallback p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  max-width: 360px;
+}
+
 .action-panel {
   display: flex;
   flex-direction: column;

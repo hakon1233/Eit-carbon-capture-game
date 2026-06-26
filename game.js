@@ -15389,16 +15389,55 @@ function handleSvgKeydown(event) {
   }
 }
 
+// How long to wait for the world map SVG to resolve before assuming it failed
+// (covers blocked requests / parse stalls where no `error` event ever fires).
+const MAP_LOAD_TIMEOUT_MS = 8000;
+
 function wireMap() {
   if (!mapObject) {
     return;
   }
+
+  // CAR-100: graceful error/fallback state. If the SVG 404s, is blocked, or
+  // never resolves, reveal a readable message + retry instead of a blank map.
+  const mapError = document.getElementById("map-error");
+  const mapErrorRetry = document.getElementById("map-error-retry");
+  let mapLoadTimer = null;
+
+  const clearMapLoadTimer = () => {
+    if (mapLoadTimer !== null) {
+      clearTimeout(mapLoadTimer);
+      mapLoadTimer = null;
+    }
+  };
+  const showMapError = () => {
+    clearMapLoadTimer();
+    if (mapError) {
+      mapError.hidden = false;
+    }
+  };
+  const hideMapError = () => {
+    if (mapError) {
+      mapError.hidden = true;
+    }
+  };
+  const armMapLoadWatchdog = () => {
+    clearMapLoadTimer();
+    mapLoadTimer = setTimeout(() => {
+      if (!svgDoc) {
+        showMapError();
+      }
+    }, MAP_LOAD_TIMEOUT_MS);
+  };
 
   const initializeMap = () => {
     const nextDoc = mapObject.contentDocument;
     if (!nextDoc || nextDoc === svgDoc) {
       return;
     }
+    // Map resolved successfully — tear down any pending error state.
+    clearMapLoadTimer();
+    hideMapError();
     svgDoc = nextDoc;
     ensureSvgStyles();
     loadSvgGeoData();
@@ -15484,6 +15523,19 @@ function wireMap() {
   };
 
   mapObject.addEventListener("load", initializeMap);
+  // The <object> fires `error` when the SVG resource itself fails to load.
+  mapObject.addEventListener("error", showMapError);
+
+  if (mapErrorRetry) {
+    // A failed/blocked <object> load leaves the element in a dead state that
+    // setting `data` won't revive, so the only reliable recovery is a full page
+    // reload. Safe here: a map that never loaded means no game is in progress.
+    mapErrorRetry.addEventListener("click", () => {
+      window.location.reload();
+    });
+  }
+
+  armMapLoadWatchdog();
   initializeMap();
 }
 
