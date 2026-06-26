@@ -41,7 +41,12 @@ while IFS= read -r file; do
     e2e/*|\
     node_modules/*|\
     .next/*|\
-    .github/*)
+    .github/*|\
+    .claude/harness/*|\
+    .claude/project/*)
+      # .claude/harness/** and .claude/project/** are the two source layers that
+      # scripts/compose-workspace.sh merges into the synced .claude/{skills,commands,agents}
+      # outputs (which ARE in-scope above). The sources are infrastructure, not stray docs.
       continue
       ;;
   esac
