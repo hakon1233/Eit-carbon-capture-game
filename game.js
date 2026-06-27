@@ -12754,7 +12754,7 @@ function renderRegionalCentersUI() {
     html += `
       <div class="rc-no-allies">
         <p>You need to form alliances with regions before building research centers.</p>
-        <p>Go to the Diplomacy tab to recruit allies!</p>
+        <p>Click a region on the map, then use Negotiate Alliance to recruit allies.</p>
       </div>
     `;
   }
