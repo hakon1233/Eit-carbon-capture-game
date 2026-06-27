@@ -104,6 +104,9 @@ const context = {
   clearSavedGame() {
     context.clearCount += 1;
   },
+  // checkWinLose() re-checks achievements once the game ends (CAR-253); this
+  // harness exercises the modal, so a no-op stub is sufficient.
+  checkAchievements() {},
   initGame() {
     context.initCount += 1;
   },

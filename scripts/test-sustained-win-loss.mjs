@@ -56,6 +56,9 @@ const context = {
   },
   clearSavedGame() {},
   showEndgameResultsModal() {},
+  // checkWinLose() re-checks achievements once the game ends (CAR-253); this
+  // harness only exercises the streak logic, so a no-op stub is sufficient.
+  checkAchievements() {},
 };
 vm.createContext(context);
 vm.runInContext(

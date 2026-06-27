@@ -15315,6 +15315,11 @@ function checkWinLose() {
   }
 
   if (state.gameOver) {
+    // Re-check achievements now that state.won is finalized. advanceOneMonth()
+    // calls checkAchievements() BEFORE checkWinLose(), so win-gated achievements
+    // (speed_run, against_all_odds) would otherwise never unlock — the month loop
+    // halts once gameOver is set. checkAchievements() is idempotent. (CAR-253)
+    checkAchievements();
     clearSavedGame();
     pushMessage("Restart the game to try again.");
     showEndgameResultsModal();
