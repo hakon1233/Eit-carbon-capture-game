@@ -6624,10 +6624,25 @@ function saveGame() {
   }
 }
 
+function showSaveLoadFailureNotice() {
+  const notice = document.getElementById("save-load-notice");
+  if (!notice) return;
+
+  notice.hidden = false;
+  const dismissButton = document.getElementById("save-load-notice-dismiss");
+  if (dismissButton) {
+    dismissButton.onclick = () => {
+      notice.hidden = true;
+    };
+  }
+}
+
 function loadGame() {
+  let hadSavedGame = false;
   try {
     const saved = localStorage.getItem(SAVE_KEY);
     if (!saved) return false;
+    hadSavedGame = true;
     const saveData = JSON.parse(saved);
     if (!saveData.state || saveData.state.gameOver) return false;
 
@@ -6710,6 +6725,9 @@ function loadGame() {
 
     return true;
   } catch (e) {
+    if (hadSavedGame) {
+      showSaveLoadFailureNotice();
+    }
     console.warn("Failed to load game:", e);
     return false;
   }
