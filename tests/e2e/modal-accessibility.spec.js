@@ -64,6 +64,32 @@ async function expectEscapeClosesAndRestoresFocus(
 }
 
 test.describe('Modal dialog accessibility', () => {
+  test('carbon tax sliders have screen-reader labels', async ({ page }) => {
+    await startGame(page)
+
+    await page.evaluate(() => {
+      const state = window.__carbonTestBridge.getState()
+      const allianceStatus = window.__carbonTestBridge.ALLIANCE_STATUS
+      const regionId = state.homeRegion
+      state.alliance[regionId] = {
+        ...(state.alliance[regionId] || {}),
+        status: allianceStatus.ALLIED,
+      }
+      window.showCarbonTaxPopup(regionId)
+    })
+
+    const dialog = page.getByRole('dialog', { name: /Carbon Tax/ })
+    await expect(dialog).toBeVisible()
+    await expect(
+      dialog.getByRole('slider', { name: /Carbon tax rate for / })
+    ).toBeVisible()
+    await expect(
+      dialog.getByRole('slider', {
+        name: /Carbon tax yearly growth rate for /,
+      })
+    ).toBeVisible()
+  })
+
   test('carbon balance dialog traps focus, closes with Escape, and restores focus', async ({
     page,
   }) => {

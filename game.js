@@ -9143,6 +9143,7 @@ function showCarbonTaxPopup(regionId) {
         </div>
         <input type="range"
           id="carbon-tax-rate-${regionId}"
+          aria-label="Carbon tax rate for ${regionName}"
           min="${NEGOTIABLE_TERMS.carbonTaxRate.min}"
           max="${NEGOTIABLE_TERMS.carbonTaxRate.max}"
           step="${NEGOTIABLE_TERMS.carbonTaxRate.step}"
@@ -9160,6 +9161,7 @@ function showCarbonTaxPopup(regionId) {
         </div>
         <input type="range"
           id="carbon-tax-growth-${regionId}"
+          aria-label="Carbon tax yearly growth rate for ${regionName}"
           min="${NEGOTIABLE_TERMS.carbonTaxGrowth.min}"
           max="${NEGOTIABLE_TERMS.carbonTaxGrowth.max}"
           step="${NEGOTIABLE_TERMS.carbonTaxGrowth.step}"
