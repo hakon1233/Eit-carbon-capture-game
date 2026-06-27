@@ -145,6 +145,40 @@ test.describe('Modal dialog accessibility', () => {
     )
   })
 
+  test('region meter rows activate dialogs from the keyboard', async ({
+    page,
+  }) => {
+    await startGame(page)
+    await selectFirstRegion(page)
+
+    const happinessTrigger = page.locator(
+      '#selected-region .region-happiness-row'
+    )
+    await expect(happinessTrigger).toHaveAttribute('role', 'button')
+    await expect(happinessTrigger).toHaveAttribute('tabindex', '0')
+    await expect(happinessTrigger).toHaveAccessibleName(
+      /open happiness breakdown/i,
+    )
+    await happinessTrigger.focus()
+    await page.keyboard.press('Enter')
+    await expect(
+      page.getByRole('dialog', { name: /Happiness Factors/i })
+    ).toBeVisible()
+    await page.locator('#factors-popup .popup-dismiss').click()
+
+    const carbonTaxTrigger = page.locator(
+      '#selected-region .region-carbon-tax-row'
+    )
+    await expect(carbonTaxTrigger).toHaveAttribute('role', 'button')
+    await expect(carbonTaxTrigger).toHaveAttribute('tabindex', '0')
+    await expect(carbonTaxTrigger).toHaveAccessibleName(/adjust carbon tax/i)
+    await carbonTaxTrigger.focus()
+    await page.keyboard.press('Space')
+    await expect(
+      page.getByRole('dialog', { name: /Carbon Tax/i })
+    ).toBeVisible()
+  })
+
   test('event popup traps focus, closes with Escape, and restores focus', async ({
     page,
   }) => {

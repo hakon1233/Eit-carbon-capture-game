@@ -1759,8 +1759,14 @@ body::before {
   transition: background 0.15s ease;
 }
 
-.region-happiness-row:hover {
+.region-happiness-row:hover,
+.region-happiness-row:focus-visible {
   background: rgba(20, 40, 60, 0.5);
+}
+
+.region-happiness-row:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 .region-happiness-label {
@@ -1804,8 +1810,14 @@ body::before {
   transition: background 0.15s ease;
 }
 
-.region-carbon-tax-row:hover {
+.region-carbon-tax-row:hover,
+.region-carbon-tax-row:focus-visible {
   background: rgba(20, 40, 60, 0.5);
+}
+
+.region-carbon-tax-row:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 .region-carbon-tax-label {
@@ -8822,8 +8834,14 @@ details summary .section-info-btn {
   transition: background 0.2s;
 }
 
-.alliance-happiness-row:hover {
+.alliance-happiness-row:hover,
+.alliance-happiness-row:focus-visible {
   background: var(--bg-secondary);
+}
+
+.alliance-happiness-row:focus-visible {
+  outline: 2px solid var(--accent-color);
+  outline-offset: 2px;
 }
 
 .alliance-happiness-name {

@@ -10285,7 +10285,7 @@ Tip: Check Project Effectiveness ratings to see which projects work best in each
     const barColor = `rgb(${red}, ${green}, 50)`;
 
     html += `
-      <div class="region-happiness-row" onclick="showHappinessFactorsPopup('${regionId}')" title="Click for happiness breakdown">
+      <div class="region-happiness-row" role="button" tabindex="0" aria-label="Open happiness breakdown" onclick="showHappinessFactorsPopup('${regionId}')" title="Click for happiness breakdown">
         <span class="region-happiness-label">Happiness</span>
         <div class="region-happiness-bar-container">
           <div class="region-happiness-bar" style="width: ${happiness}%; background: ${barColor};"></div>
@@ -10311,7 +10311,7 @@ Tip: Check Project Effectiveness ratings to see which projects work best in each
     const taxLimitWarning = taxLimitDemand && currentRate > taxLimitDemand.value;
 
     html += `
-      <div class="region-carbon-tax-row" onclick="showCarbonTaxPopup('${regionId}')" title="Click to adjust carbon tax">
+      <div class="region-carbon-tax-row" role="button" tabindex="0" aria-label="Adjust carbon tax" onclick="showCarbonTaxPopup('${regionId}')" title="Click to adjust carbon tax">
         <span class="region-carbon-tax-label">💰 Carbon Tax</span>
         <span class="region-carbon-tax-rate ${taxLimitWarning ? 'warning' : ''}">$${currentRate}/ton</span>
         <span class="region-carbon-tax-revenue">+${formatCurrency(monthlyRevenue)}/mo</span>
@@ -16136,7 +16136,7 @@ function renderAllianceOverview() {
             const green = Math.round(255 * Math.max(0, Math.min(1, happiness / 50)));
             const barColor = `rgb(${red}, ${green}, 50)`;
             return `
-              <div class="alliance-happiness-row" onclick="showHappinessFactorsPopup('${regionId}')" title="Click for details">
+              <div class="alliance-happiness-row" role="button" tabindex="0" aria-label="Open happiness breakdown for ${regionName}" onclick="showHappinessFactorsPopup('${regionId}')" title="Click for details">
                 <span class="alliance-happiness-name">${regionName}</span>
                 <div class="alliance-happiness-bar-container">
                   <div class="alliance-happiness-bar" style="width: ${happiness}%; background: ${barColor};"></div>
