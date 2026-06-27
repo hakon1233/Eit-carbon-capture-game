@@ -173,6 +173,66 @@ test.describe('Game setup & start', () => {
       fullPage: true,
     })
   })
+
+  test('cancelling a setup granularity change keeps the selected region', async ({
+    page,
+  }) => {
+    await page.goto('game.html')
+    await waitForMapRegions(page)
+    await selectFirstRegion(page)
+
+    const confirmBtn = page.locator('#confirm-setup-btn')
+    await expect(confirmBtn).toBeEnabled()
+    const selectedRegionText = (
+      await page.locator('#setup-selected-region').textContent()
+    )?.trim()
+
+    let dialogMessage = ''
+    page.once('dialog', (dialog) => {
+      dialogMessage = dialog.message()
+      return dialog.dismiss()
+    })
+    await page.locator('.granularity-btn[data-granularity="major_regions"]').click()
+    expect(dialogMessage).toContain('Change map granularity?')
+
+    await expect(confirmBtn).toBeEnabled()
+    await expect(page.locator('#setup-selected-region')).toContainText(
+      selectedRegionText,
+    )
+    await expect(
+      page.locator('.granularity-btn[data-granularity="continents"]'),
+    ).toHaveClass(/active/)
+    await expect(
+      page.locator('.granularity-btn[data-granularity="major_regions"]'),
+    ).not.toHaveClass(/active/)
+  })
+
+  test('accepting a setup granularity change clears the selected region', async ({
+    page,
+  }) => {
+    await page.goto('game.html')
+    await waitForMapRegions(page)
+    await selectFirstRegion(page)
+
+    const confirmBtn = page.locator('#confirm-setup-btn')
+    await expect(confirmBtn).toBeEnabled()
+
+    let dialogMessage = ''
+    page.once('dialog', (dialog) => {
+      dialogMessage = dialog.message()
+      return dialog.accept()
+    })
+    await page.locator('.granularity-btn[data-granularity="major_regions"]').click()
+    expect(dialogMessage).toContain('Change map granularity?')
+
+    await expect(confirmBtn).toBeDisabled()
+    await expect(page.locator('#setup-selected-region')).toContainText(
+      'No region selected',
+    )
+    await expect(
+      page.locator('.granularity-btn[data-granularity="major_regions"]'),
+    ).toHaveClass(/active/)
+  })
 })
 
 test.describe('Core gameplay loop', () => {

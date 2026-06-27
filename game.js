@@ -15811,6 +15811,14 @@ function wireSetupGranularityButtons() {
     btn.addEventListener("click", () => {
       const granularity = btn.dataset.granularity;
       if (!granularity) return;
+      if (granularity === currentGranularity) return;
+
+      if (isSetupMode && selectedRegionId) {
+        const confirmed = window.confirm(
+          "Change map granularity? Your selected starting region will be cleared."
+        );
+        if (!confirmed) return;
+      }
 
       // Update active button state
       buttons.forEach(b => b.classList.remove("active"));
