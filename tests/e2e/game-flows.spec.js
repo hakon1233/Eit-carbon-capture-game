@@ -84,6 +84,12 @@ async function advanceMonth(page) {
   await dismissEventPopupIfPresent(page)
 }
 
+async function readSavedGame(page) {
+  return page.evaluate(() =>
+    JSON.parse(localStorage.getItem('carbonCaptureGameSave') || 'null'),
+  )
+}
+
 test.describe('Launch screen (index.html)', () => {
   test('renders branding and a New Game CTA', async ({ page }) => {
     await page.goto('')
@@ -438,6 +444,123 @@ test.describe('Build-a-project mechanic (Climate)', () => {
 
     // The player gets a completion confirmation in the news log.
     await expect(page.locator('#news-log')).toContainText(/completed/i)
+  })
+})
+
+test.describe('Mid-month autosave', () => {
+  test('project builds persist immediately without waiting for month advance', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    const beforeSave = await readSavedGame(page)
+    const beforeQueued = beforeSave.state.underConstruction?.length || 0
+
+    const built = await page.evaluate(() => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      const regionId = Object.keys(st.alliance || {}).find(
+        (id) => st.alliance[id]?.status === b.ALLIANCE_STATUS.ALLIED,
+      )
+      if (!regionId) return { ok: false }
+      st.funds = Math.max(st.funds, 1000)
+      const fundsBefore = st.funds
+      b.buildProjectWithEffectiveness(regionId, 'forest', {
+        cost: 1,
+        effectMultiplier: 1,
+      })
+      return { ok: true, fundsBefore }
+    })
+    expect(built.ok).toBe(true)
+
+    const afterSave = await readSavedGame(page)
+    expect(afterSave.state.underConstruction?.length || 0).toBe(
+      beforeQueued + 1,
+    )
+    expect(afterSave.state.funds).toBeLessThan(built.fundsBefore)
+  })
+
+  test('alliance, negotiation, and carbon-tax actions persist immediately', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    const acceptedRegion = await page.evaluate(() => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      const regionId = Object.keys(st.alliance || {}).find(
+        (id) => st.alliance[id]?.status !== b.ALLIANCE_STATUS.ALLIED,
+      )
+      if (!regionId) return null
+      st.alliance[regionId].status = b.ALLIANCE_STATUS.NEUTRAL
+      window.acceptSpontaneousRequest(regionId)
+      return regionId
+    })
+    expect(acceptedRegion).toBeTruthy()
+
+    let save = await readSavedGame(page)
+    expect(save.state.alliance[acceptedRegion].status).toBe('allied')
+
+    const rejectedRegion = await page.evaluate((accepted) => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      const regionId = Object.keys(st.alliance || {}).find(
+        (id) =>
+          id !== accepted &&
+          st.alliance[id]?.status !== b.ALLIANCE_STATUS.ALLIED,
+      )
+      if (!regionId) return null
+      st.alliance[regionId].status = b.ALLIANCE_STATUS.NEUTRAL
+      st.alliance[regionId].interest = 80
+      window.rejectSpontaneousRequest(regionId)
+      return regionId
+    }, acceptedRegion)
+    expect(rejectedRegion).toBeTruthy()
+
+    save = await readSavedGame(page)
+    expect(save.state.alliance[rejectedRegion].status).toBe('neutral')
+    expect(save.state.alliance[rejectedRegion].interest).toBe(65)
+
+    const negotiation = await page.evaluate(() => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      const regionId = 'autosave_test_region'
+      st.alliance[regionId] = {
+        status: b.ALLIANCE_STATUS.NEUTRAL,
+        interest: 50,
+        lastApproached: null,
+      }
+      st.funds = Math.max(st.funds, 1000)
+      const cost = b.calculateNegotiationCost(regionId)
+      const fundsBefore = st.funds
+      window.startNegotiation(regionId)
+      return { regionId, cost, fundsBefore, fundsAfter: st.funds }
+    })
+    expect(negotiation).toBeTruthy()
+
+    save = await readSavedGame(page)
+    expect(save.state.pendingNegotiation?.regionId).toBe(negotiation.regionId)
+    expect(save.state.alliance[negotiation.regionId].status).toBe('negotiating')
+    expect(negotiation.cost).toBeGreaterThan(0)
+    expect(save.state.funds).toBeLessThan(negotiation.fundsBefore)
+    expect(save.state.funds).toBe(negotiation.fundsAfter)
+
+    const tax = await page.evaluate(() => {
+      const b = window.__carbonTestBridge
+      const st = b.getState()
+      const regionId = Object.keys(st.alliance || {}).find(
+        (id) => st.alliance[id]?.status === b.ALLIANCE_STATUS.ALLIED,
+      )
+      if (!regionId) return null
+      window.updateCarbonTaxRate(regionId, 42)
+      window.updateCarbonTaxGrowth(regionId, 9)
+      return { regionId }
+    })
+    expect(tax).toBeTruthy()
+
+    save = await readSavedGame(page)
+    expect(save.state.alliance[tax.regionId].carbonTax.ratePerTon).toBe(42)
+    expect(save.state.alliance[tax.regionId].carbonTax.yearlyGrowthRate).toBe(9)
   })
 })
 

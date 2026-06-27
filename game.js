@@ -9001,6 +9001,7 @@ function updateCarbonTaxRate(regionId, newRate) {
 
   // Re-render the region panel to update the carbon-tax row revenue display
   updateSelectedRegionPanel();
+  saveGame();
 }
 
 /**
@@ -9027,6 +9028,7 @@ function updateCarbonTaxGrowth(regionId, newGrowth) {
 
   // Re-render the region panel so the carbon-tax row reflects the new growth projection
   updateSelectedRegionPanel();
+  saveGame();
 }
 
 /**
@@ -9443,6 +9445,7 @@ function acceptSpontaneousRequest(regionId) {
   state.pendingSpontaneousRequest = null;
   updateAllianceMapVisuals();
   updateUI();
+  saveGame();
 }
 
 // Reject a spontaneous join request
@@ -9468,6 +9471,7 @@ function rejectSpontaneousRequest(regionId) {
   state.pendingSpontaneousRequest = null;
   updateAllianceMapVisuals();
   updateUI();
+  saveGame();
 }
 
 // Get happiness level class for styling
@@ -9642,6 +9646,7 @@ function startNegotiation(regionId) {
   // Show negotiation popup
   showNegotiationPopup(regionId, demands);
   updateAllianceMapVisuals();
+  saveGame();
 }
 
 // Show the negotiation popup
@@ -10169,6 +10174,7 @@ function submitNegotiationOffer() {
   state.pendingNegotiation = null;
   updateAllianceMapVisuals();
   updateUI();
+  saveGame();
 }
 
 // Get the negotiate button HTML for region panel
@@ -11365,6 +11371,7 @@ function startConstruction(regionId, projectType, cost, effectMultiplier, buildM
 
   pushMessage(`Construction started: ${project.label} in ${regionName}. ${timeStr} to completion.${modeStr}`, "good");
   updateUI();
+  saveGame();
 }
 
 function processConstruction() {
@@ -14730,6 +14737,7 @@ function executeEffectivenessBuild(regionId, projectType, effectiveness, cost, b
     pushMessage(`${project.label} built in ${getRegionName(regionId)}${bonusText}`, "good");
   }
   updateUI();
+  saveGame();
 }
 
 function renderRegionProjects() {
@@ -16214,6 +16222,7 @@ if (typeof window !== "undefined") {
   window.__carbonTestBridge = {
     getState: () => state,
     buildProjectWithEffectiveness,
+    calculateNegotiationCost,
     getClimateDataForRegion,
     ALLIANCE_STATUS,
   };
