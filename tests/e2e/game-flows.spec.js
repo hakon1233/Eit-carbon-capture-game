@@ -334,6 +334,48 @@ test.describe('Core gameplay loop', () => {
   })
 })
 
+// CAR-398: "Advance 1 Year" (advanceOneYear, game.js) was never driven through
+// the real button. Its contract is a synchronous for-loop of up to 12
+// nextMonth() calls that breaks early on state.gameOver or
+// isPlayerPromptOpen() (an event/negotiation/build-mode popup). Random events
+// mean the exact month count isn't deterministic across runs, so this asserts
+// the contract (1-12 months elapse in one click, never more, game stays
+// playable afterward) rather than a fixed count.
+test.describe('Advance 1 Year', () => {
+  test('one click advances up to 12 months and stops early for a blocking popup', async ({
+    page,
+  }) => {
+    await startGame(page)
+
+    const totalMonths = () =>
+      page.evaluate(() => {
+        const st = window.__carbonTestBridge.getState()
+        return st.year * 12 + st.month
+      })
+
+    const before = await totalMonths()
+    await dismissEventPopupIfPresent(page)
+    await page.locator('#advance-year').click()
+    // advanceOneYear() itself runs synchronously to completion/break before
+    // this click resolves; any popup left open just needs dismissing so the
+    // game is left in a normal playable state.
+    await dismissEventPopupIfPresent(page)
+
+    const after = await totalMonths()
+    const monthsElapsed = after - before
+    expect(monthsElapsed).toBeGreaterThan(0)
+    expect(monthsElapsed).toBeLessThanOrEqual(12)
+
+    const gameOver = await page.evaluate(
+      () => window.__carbonTestBridge.getState().gameOver,
+    )
+    if (!gameOver) {
+      await expect(page.locator('#next-month')).toBeEnabled()
+      await expect(page.locator('#advance-year')).toBeEnabled()
+    }
+  })
+})
+
 // Climate build-a-project coverage (originally CAR-171 / CAR-192). Unlike the
 // CAR-217 power tests, this drives the REAL project-button click path end to end:
 // open the Climate tab, click an affordable project, and assert the player-visible
