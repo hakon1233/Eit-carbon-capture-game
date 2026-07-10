@@ -196,6 +196,31 @@ Modified `calculateProjectedIncome()` to aggregate climate finance from constitu
 
 ## MEDIUM BUGS (New)
 
+### BUG-CAR-397: Legacy Saves Without Alliance State Crash on January Tick
+
+**Severity:** MEDIUM
+**Status:** ✅ FIXED
+**Location:** `game.js` - `loadGame()` migration block
+
+**Description:**
+Save files created before the diplomatic alliance system did not include
+`state.alliance`. `loadGame()` migrated several newer runtime collections, but
+left alliance state missing. A loaded legacy game could continue until the month
+advanced from December to January, where `nextMonth()` applies yearly carbon tax
+growth with `Object.entries(state.alliance)` and crashed because `state.alliance`
+was `undefined`.
+
+**Fix Applied:**
+`loadGame()` now rebuilds missing or partial alliance entries from loaded
+`state.regions` using `initializeAllianceState()`. If the save has a known
+`homeRegion` or selected region, that region is preserved as allied with default
+carbon tax terms so the old run remains playable.
+
+**Regression Guard:**
+`scripts/test-legacy-save-alliance-migration.mjs` loads a legacy save shape and
+asserts the alliance migration runs before the January carbon-tax loop can touch
+`state.alliance`.
+
 ### BUG-009: Disasters Stat Shows "NaN" Intermittently
 
 **Severity:** MEDIUM (Transient UI Issue)
@@ -668,4 +693,3 @@ All bugs BUG-012 through BUG-017 have been fixed and verified:
 - **BUG-015**: Regional campaigns apply climate finance to all constituent countries
 - **BUG-016**: Income calculation properly aggregates from countries at continent level
 - **BUG-017**: Save/load handles all state properties for backwards compatibility
-

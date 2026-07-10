@@ -6682,6 +6682,40 @@ function loadGame() {
       state.campaignHistory = [];
     }
 
+    // Migration: saves predating the diplomatic alliance system have regions but
+    // no alliance object. nextMonth() reads state.alliance unguarded during the
+    // January carbon-tax growth pass, so rebuild the missing per-region entries
+    // at load time and preserve the known home region as allied when available.
+    if (state.regions) {
+      const defaultAlliance = initializeAllianceState(state.regions);
+      if (!state.alliance || typeof state.alliance !== "object") {
+        state.alliance = defaultAlliance;
+      } else {
+        Object.entries(defaultAlliance).forEach(([regionId, alliance]) => {
+          state.alliance[regionId] = {
+            ...alliance,
+            ...state.alliance[regionId],
+          };
+        });
+      }
+
+      const homeRegion = state.homeRegion || selectedRegionId;
+      if (homeRegion && state.alliance[homeRegion]) {
+        state.homeRegion = homeRegion;
+        state.alliance[homeRegion] = {
+          ...state.alliance[homeRegion],
+          status: ALLIANCE_STATUS.ALLIED,
+          happiness: state.alliance[homeRegion].happiness || 100,
+          isHomeRegion: true,
+          turnsInAlliance: state.alliance[homeRegion].turnsInAlliance || 1,
+          carbonTax: state.alliance[homeRegion].carbonTax || {
+            ratePerTon: NEGOTIABLE_TERMS.carbonTaxRate.default,
+            yearlyGrowthRate: NEGOTIABLE_TERMS.carbonTaxGrowth.default,
+          },
+        };
+      }
+    }
+
     // Migration: Add retiredFossilGW to regions if missing
     if (state.regions) {
       Object.values(state.regions).forEach(region => {
