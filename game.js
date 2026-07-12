@@ -11571,6 +11571,47 @@ function getTotalUnderConstruction() {
   return state.underConstruction?.length || 0;
 }
 
+/**
+ * REGIONAL CAP CHECK (CAR-405): enforce REGIONAL_PROJECT_CAPS for a project type
+ * in a region. Returns true (and shows the "reached maximum capacity" message)
+ * when the region is already at or above its cap; false otherwise (including for
+ * uncapped types). Counts both completed projects (region.projects — stored as
+ * either bare type strings or {type,...} objects) AND queued builds in
+ * state.underConstruction, so caps bind across the whole pipeline.
+ *
+ * Single source of truth shared by the legacy buildProject() and the live
+ * buildProjectWithEffectiveness() path — previously the check lived only in the
+ * dead buildProject(), so the caps were inert for the player.
+ */
+function isRegionalCapReached(regionId, projectType) {
+  const regionalCap = REGIONAL_PROJECT_CAPS[projectType];
+  if (regionalCap === undefined || regionalCap === null) {
+    return false;
+  }
+  const region = state.regions[regionId];
+  if (!region) {
+    return false;
+  }
+  // Count existing projects of this type in this region (completed + under construction)
+  const existingCount = (region.projects || []).filter(p => {
+    const pType = typeof p === "string" ? p : p.type;
+    return pType === projectType;
+  }).length;
+  const underConstructionCount = (state.underConstruction || []).filter(c =>
+    c.regionId === regionId && c.type === projectType
+  ).length;
+  const totalCount = existingCount + underConstructionCount;
+
+  if (totalCount >= regionalCap) {
+    const project = PROJECT_TYPES[projectType];
+    const regionName = getRegionName(regionId);
+    const label = project?.label || projectType;
+    pushMessage(`${regionName} has reached maximum ${label} capacity (${regionalCap}). Try another region.`, "bad");
+    return true;
+  }
+  return false;
+}
+
 function buildProject(regionId, projectType) {
   const region = state.regions[regionId];
   const project = PROJECT_TYPES[projectType];
@@ -11591,23 +11632,8 @@ function buildProject(regionId, projectType) {
   }
 
   // REGIONAL CAP CHECK: Limit projects of each type per region
-  const regionalCap = REGIONAL_PROJECT_CAPS[projectType];
-  if (regionalCap !== undefined && regionalCap !== null) {
-    // Count existing projects of this type in this region (completed + under construction)
-    const existingCount = region.projects.filter(p => {
-      const pType = typeof p === "string" ? p : p.type;
-      return pType === projectType;
-    }).length;
-    const underConstructionCount = (state.underConstruction || []).filter(c =>
-      c.regionId === regionId && c.type === projectType
-    ).length;
-    const totalCount = existingCount + underConstructionCount;
-
-    if (totalCount >= regionalCap) {
-      const regionName = getRegionName(regionId);
-      pushMessage(`${regionName} has reached maximum ${project.label} capacity (${regionalCap}). Try another region.`, "bad");
-      return;
-    }
+  if (isRegionalCapReached(regionId, projectType)) {
+    return;
   }
 
   // Apply difficulty-based cost multiplier
@@ -14724,6 +14750,13 @@ function buildProjectWithEffectiveness(regionId, projectType, effectiveness) {
     } else {
       pushMessage(`Cannot build in ${regionName} - they must join the Climate Alliance first.`, "bad");
     }
+    return;
+  }
+
+  // REGIONAL CAP CHECK (CAR-405): enforce REGIONAL_PROJECT_CAPS on the live build
+  // path too. Checked before the funds gate and before opening the power build-mode
+  // dialog, mirroring buildProject(), so a capped type is refused up front.
+  if (isRegionalCapReached(regionId, projectType)) {
     return;
   }
 
