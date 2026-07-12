@@ -3809,6 +3809,7 @@ function showAchievementNotification(achievement) {
 // Queue for pending popups
 const popupQueue = [];
 let isPopupShowing = false;
+let eventPopupDelay = null;
 let activeDialogState = null;
 
 const FOCUSABLE_SELECTOR = [
@@ -3910,6 +3911,22 @@ function showEventPopup(config) {
   }
 }
 
+function clearEventPopups() {
+  if (eventPopupDelay !== null) {
+    clearTimeout(eventPopupDelay);
+    eventPopupDelay = null;
+  }
+
+  popupQueue.length = 0;
+  isPopupShowing = false;
+
+  const container = document.getElementById("event-popup-container");
+  if (!container) return;
+
+  deactivateDialog(container);
+  container.classList.add("hidden");
+}
+
 /**
  * Display the next popup from the queue
  */
@@ -3977,7 +3994,8 @@ function hideEventPopup() {
   container.classList.add("hidden");
 
   // Small delay before showing next popup
-  setTimeout(() => {
+  eventPopupDelay = setTimeout(() => {
+    eventPopupDelay = null;
     displayNextPopup();
   }, 200);
 }
@@ -15334,6 +15352,8 @@ function showEndgameResultsModal() {
   const container = document.getElementById("endgame-results-popup");
   const dialog = document.getElementById("endgame-results-dialog");
   if (!container || !dialog) return;
+
+  clearEventPopups();
 
   const titleEl = document.getElementById("endgame-results-title");
   const outcomeEl = document.getElementById("endgame-results-outcome");

@@ -140,6 +140,32 @@ test.describe('Launch screen (index.html)', () => {
   })
 })
 
+test.describe('Reference pages', () => {
+  for (const path of [
+    'Game_Data_Reference.html',
+    'Emissions_Data_Reference.html',
+  ]) {
+    test(`${path} external source links isolate new tabs`, async ({ page }) => {
+      await page.goto(path)
+
+      const insecureLinks = await page
+        .locator('a[target="_blank"][href^="http"]')
+        .evaluateAll((links) =>
+          links
+            .filter((link) => {
+              const rel = new Set(
+                (link.getAttribute('rel') || '').toLowerCase().split(/\s+/),
+              )
+              return !rel.has('noopener') || !rel.has('noreferrer')
+            })
+            .map((link) => link.getAttribute('href')),
+        )
+
+      expect(insecureLinks).toEqual([])
+    })
+  }
+})
+
 test.describe('Game setup & start', () => {
   test('setup panel shows until a region is chosen, then game starts', async ({
     page,
