@@ -11238,6 +11238,47 @@ function getRegionClimateData(regionId) {
   return null;
 }
 
+/**
+ * Single source of truth for a Climate Policy Campaign quote.
+ *
+ * CAR-406: the region panel's campaign button and startClimateCampaign() both
+ * need the *same* cost/duration/increase. They previously computed these inline
+ * in two places and drifted — the button omitted the 1.5x aggregate multiplier
+ * the charge applies, so at "continents" granularity (where every region is an
+ * aggregate) the button showed a price ~33% below what it charged and could look
+ * affordable while the charge failed "Cannot afford". Both call sites now derive
+ * their numbers here from the same regionData (getRegionClimateData()), so they
+ * can't drift again.
+ *
+ * @param {string} regionId - region whose disaster-awareness modifier applies
+ * @param {object} regionData - result of getRegionClimateData(regionId)
+ * @returns {{cost:number, duration:number, increaseAmount:number, aggregateMultiplier:number}}
+ */
+function campaignQuote(regionId, regionData) {
+  const finance = regionData.climateFinance;
+  const gdpTrillions = regionData.gdp || 1;
+  // Regions that experienced disasters are easier (cheaper/faster) to campaign in.
+  const awarenessModifier = getDisasterAwarenessModifier(regionId);
+  // Aggregate (multi-country) campaigns cost more due to coordination complexity.
+  const aggregateMultiplier = regionData.isAggregate ? 1.5 : 1.0;
+
+  const cost = gdpTrillions * GAME_CONFIG.lobbyCostFactor * finance.difficulty * awarenessModifier * aggregateMultiplier * 1000; // In billions
+  const duration = Math.ceil(
+    GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier * aggregateMultiplier
+  );
+
+  // Smart increase: more remaining room to max = larger step (diminishing returns).
+  const remainingRoom = Math.max(0, finance.maxPercent - finance.currentPercent);
+  const difficultyMultiplier = 1 - finance.difficulty * 0.5; // 0.5 to 1.0 (easier = higher)
+  const increasePercent = 0.2 + (0.1 * difficultyMultiplier); // 20-30% of remaining room
+  const increaseAmount = Math.max(
+    GAME_CONFIG.lobbyMinIncrease * 0.5, // Minimum useful increase
+    Math.min(remainingRoom * increasePercent, remainingRoom) // Cap at remaining room
+  );
+
+  return { cost, duration, increaseAmount, aggregateMultiplier };
+}
+
 // Start a Climate Policy Campaign in a region
 function startClimateCampaign(regionId) {
   const regionData = getRegionClimateData(regionId);
@@ -11260,27 +11301,10 @@ function startClimateCampaign(regionId) {
     return false;
   }
 
-  // Calculate campaign cost and duration
-  const gdpTrillions = regionData.gdp || 1;
-  // Apply disaster awareness modifier - regions that experienced disasters are easier to campaign
-  const awarenessModifier = getDisasterAwarenessModifier(regionId);
-  // Aggregate campaigns cost more due to complexity
-  const aggregateMultiplier = regionData.isAggregate ? 1.5 : 1.0;
-  const cost = gdpTrillions * GAME_CONFIG.lobbyCostFactor * finance.difficulty * awarenessModifier * aggregateMultiplier * 1000; // In billions
-  const duration = Math.ceil(
-    GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier * aggregateMultiplier
-  );
-
-  // Smart increase based on remaining room to max
-  // More room = larger increase, close to max = smaller increase (diminishing returns)
-  const remainingRoom = Math.max(0, finance.maxPercent - finance.currentPercent);
-  const difficultyMultiplier = 1 - finance.difficulty * 0.5; // 0.5 to 1.0 (easier = higher)
-  // Take 20-30% of remaining room based on difficulty
-  const increasePercent = 0.2 + (0.1 * difficultyMultiplier);
-  const increaseAmount = Math.max(
-    GAME_CONFIG.lobbyMinIncrease * 0.5, // Minimum useful increase
-    Math.min(remainingRoom * increasePercent, remainingRoom) // Cap at remaining room
-  );
+  // Cost/duration/increase come from the shared quote (CAR-406) so the region
+  // panel's button and this charge can never diverge (both apply the aggregate
+  // multiplier and read the same regionData).
+  const { cost, duration, increaseAmount } = campaignQuote(regionId, regionData);
 
   // Check if player can afford it
   if (state.funds < cost) {
@@ -13654,18 +13678,16 @@ function renderRegionIncome(region, climateData) {
       const campaignSection = document.createElement("div");
       campaignSection.className = "campaign-section";
 
-      // Calculate campaign details with disaster awareness modifier
-      const awarenessModifier = getDisasterAwarenessModifier(selectedRegionId);
-      const cost = gdpTrillions * GAME_CONFIG.lobbyCostFactor * finance.difficulty * awarenessModifier * 1000;
-      const duration = Math.ceil(GAME_CONFIG.lobbyBaseMonths * finance.difficulty * finance.politicalResistance * awarenessModifier);
-      // Smart increase based on remaining room to max
-      const remainingRoom = Math.max(0, finance.maxPercent - finance.currentPercent);
-      const difficultyMultiplier = 1 - finance.difficulty * 0.5;
-      const increasePercent = 0.2 + (0.1 * difficultyMultiplier);
-      const increaseAmount = Math.max(
-        GAME_CONFIG.lobbyMinIncrease * 0.5,
-        Math.min(remainingRoom * increasePercent, remainingRoom)
-      );
+      // CAR-406: quote from the *same* source and formula startClimateCampaign()
+      // charges from (getRegionClimateData), so the button can't advertise a
+      // price below what it charges. getRegionClimateData covers the
+      // granularities the charge supports (continents = aggregate, countries =
+      // single). If it has no data for this region (e.g. major_regions, where the
+      // charge itself bails with "no climate finance data"), fall back to the
+      // panel's climateData — quote multiplier 1.0, matching the pre-fix display
+      // for that case.
+      const quoteData = getRegionClimateData(selectedRegionId) || climateData;
+      const { cost, duration, increaseAmount } = campaignQuote(selectedRegionId, quoteData);
       const awarenessBonus = state.disasterHistory?.[selectedRegionId]?.climateAwarenessBoost || 0;
 
       const campaignBtn = document.createElement("button");
