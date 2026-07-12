@@ -55,6 +55,25 @@ if (typeof window !== "undefined") {
   window.CLIMATE_DATA = CLIMATE_DATA;
 }
 
+// CAR-404: pristine per-country climate-finance snapshot, captured once at module
+// load before any game mutates it. Campaigns and alliance negotiations raise a
+// country's climate dedication (climateFinance.currentPercent / .maxPercent) by
+// writing the imported COUNTRY_DATA singleton in place. That singleton is treated
+// as a per-session cache: the authoritative record lives in
+// state.climateFinanceOverrides (so it survives save/load), and New Game restores
+// the singleton from this snapshot so a fresh run never inherits the previous
+// run's inflated percentages. See setClimateFinanceOverride /
+// applyClimateFinanceOverrides / resetClimateFinanceDefaults below.
+const CLIMATE_FINANCE_DEFAULTS = {};
+Object.entries(COUNTRY_DATA || {}).forEach(([countryKey, countryData]) => {
+  if (countryData && countryData.climateFinance) {
+    CLIMATE_FINANCE_DEFAULTS[countryKey] = {
+      currentPercent: countryData.climateFinance.currentPercent,
+      maxPercent: countryData.climateFinance.maxPercent,
+    };
+  }
+});
+
 // ═══════════════════════════════════════════════════════════════
 // DEBUG LOGGING
 // ═══════════════════════════════════════════════════════════════
@@ -6620,6 +6639,69 @@ let currentDifficulty = "normal";
 let isSetupMode = true; // Start in setup mode
 
 // ═══════════════════════════════════════════════════════════════
+// CLIMATE-FINANCE OVERRIDES (CAR-404)
+// ═══════════════════════════════════════════════════════════════
+// Campaigns and alliance negotiations raise a country's climate dedication.
+// Persist every such change in state.climateFinanceOverrides (keyed by the same
+// country id used to resolve the COUNTRY_DATA entry) AND mirror it onto the live
+// singleton so in-session income reads stay correct. On load we re-hydrate the
+// singleton from state; on New Game we reset it to CLIMATE_FINANCE_DEFAULTS.
+
+// Record a climate-dedication change on both the live COUNTRY_DATA cache and the
+// persisted state override. `countryData` is the already-resolved COUNTRY_DATA
+// entry; `key` is the id to persist it under (ISO code or COUNTRY_DATA key).
+function setClimateFinanceOverride(key, countryData, patch) {
+  if (!countryData || !countryData.climateFinance) return;
+  if (patch.currentPercent != null) {
+    countryData.climateFinance.currentPercent = patch.currentPercent;
+  }
+  if (patch.maxPercent != null) {
+    countryData.climateFinance.maxPercent = patch.maxPercent;
+  }
+  if (!key) return;
+  if (!state.climateFinanceOverrides || typeof state.climateFinanceOverrides !== "object") {
+    state.climateFinanceOverrides = {};
+  }
+  state.climateFinanceOverrides[key] = {
+    currentPercent: countryData.climateFinance.currentPercent,
+    maxPercent: countryData.climateFinance.maxPercent,
+  };
+}
+
+// Re-apply persisted overrides onto the COUNTRY_DATA singleton. Called on load so
+// income (read live from COUNTRY_DATA, directly and via aggregation) reflects
+// prior campaign/negotiation progress after a page reload.
+function applyClimateFinanceOverrides() {
+  const overrides = state && state.climateFinanceOverrides;
+  if (!overrides || typeof overrides !== "object") return;
+  Object.entries(overrides).forEach(([key, override]) => {
+    if (!override) return;
+    const countryData =
+      CLIMATE_DATA.getCountryByIso?.(key) || CLIMATE_DATA.COUNTRY_DATA?.[key];
+    if (countryData && countryData.climateFinance) {
+      if (override.currentPercent != null) {
+        countryData.climateFinance.currentPercent = override.currentPercent;
+      }
+      if (override.maxPercent != null) {
+        countryData.climateFinance.maxPercent = override.maxPercent;
+      }
+    }
+  });
+}
+
+// Reset the COUNTRY_DATA singleton back to its pristine file defaults so a new
+// game never inherits the previous run's inflated climate-dedication percentages.
+function resetClimateFinanceDefaults() {
+  Object.entries(CLIMATE_FINANCE_DEFAULTS).forEach(([key, def]) => {
+    const countryData = CLIMATE_DATA.COUNTRY_DATA?.[key];
+    if (countryData && countryData.climateFinance) {
+      countryData.climateFinance.currentPercent = def.currentPercent;
+      countryData.climateFinance.maxPercent = def.maxPercent;
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // SAVE/LOAD SYSTEM
 // ═══════════════════════════════════════════════════════════════
 
@@ -6699,6 +6781,14 @@ function loadGame() {
     if (!Array.isArray(state.campaignHistory)) {
       state.campaignHistory = [];
     }
+
+    // CAR-404: climate-finance overrides live in state; re-apply them onto the
+    // COUNTRY_DATA singleton so income (read live from it) reflects prior
+    // campaign/negotiation progress after a reload. Older saves lack the map.
+    if (!state.climateFinanceOverrides || typeof state.climateFinanceOverrides !== "object") {
+      state.climateFinanceOverrides = {};
+    }
+    applyClimateFinanceOverrides();
 
     // Migration: saves predating the diplomatic alliance system have regions but
     // no alliance object. nextMonth() reads state.alliance unguarded during the
@@ -10178,10 +10268,10 @@ function submitNegotiationOffer() {
             mr.countries.forEach(isoCode => {
               const countryData = CLIMATE_DATA.getCountryByIso?.(isoCode);
               if (countryData?.climateFinance) {
-                countryData.climateFinance.currentPercent = acceptedTerms.climateDedicationMin;
-                if (acceptedTerms?.climateDedicationMax) {
-                  countryData.climateFinance.maxPercent = acceptedTerms.climateDedicationMax;
-                }
+                setClimateFinanceOverride(isoCode, countryData, {
+                  currentPercent: acceptedTerms.climateDedicationMin,
+                  maxPercent: acceptedTerms?.climateDedicationMax || undefined,
+                });
               }
             });
           }
@@ -10191,20 +10281,20 @@ function submitNegotiationOffer() {
         majorRegion.countries.forEach(isoCode => {
           const countryData = CLIMATE_DATA.getCountryByIso?.(isoCode);
           if (countryData?.climateFinance) {
-            countryData.climateFinance.currentPercent = acceptedTerms.climateDedicationMin;
-            if (acceptedTerms?.climateDedicationMax) {
-              countryData.climateFinance.maxPercent = acceptedTerms.climateDedicationMax;
-            }
+            setClimateFinanceOverride(isoCode, countryData, {
+              currentPercent: acceptedTerms.climateDedicationMin,
+              maxPercent: acceptedTerms?.climateDedicationMax || undefined,
+            });
           }
         });
       } else {
         // Single country: try direct lookup
         const countryData = CLIMATE_DATA.getCountryByIso?.(regionId) || CLIMATE_DATA.COUNTRY_DATA?.[regionId];
         if (countryData?.climateFinance) {
-          countryData.climateFinance.currentPercent = acceptedTerms.climateDedicationMin;
-          if (acceptedTerms?.climateDedicationMax) {
-            countryData.climateFinance.maxPercent = acceptedTerms.climateDedicationMax;
-          }
+          setClimateFinanceOverride(regionId, countryData, {
+            currentPercent: acceptedTerms.climateDedicationMin,
+            maxPercent: acceptedTerms?.climateDedicationMax || undefined,
+          });
         }
       }
     }
@@ -10476,6 +10566,10 @@ Tip: Check Project Effectiveness ratings to see which projects work best in each
 
 function initGame() {
   clearSavedGame();
+  // CAR-404: restore the COUNTRY_DATA singleton to pristine defaults so a new
+  // game never inherits campaign/negotiation percentages from a previous run
+  // (the singleton is mutated in place and outlives per-game state).
+  resetClimateFinanceDefaults();
   const regionIds = getRegionIds();
   const regions = {};
   regionOffsets = {};
@@ -10579,6 +10673,9 @@ function initGame() {
     winStreakMonths: 0,
     loseStreakMonths: 0,
     activeCampaigns: [], // Active Climate Policy Campaigns
+    // CAR-404: per-country climate-dedication overrides from campaigns/negotiations,
+    // authoritative record backing the mutable COUNTRY_DATA singleton.
+    climateFinanceOverrides: {},
     difficulty: currentDifficulty,
     // New tracking for advanced features
     researchPoints: 0,  // Legacy - kept for compatibility
@@ -11139,7 +11236,7 @@ function processCampaigns() {
               countryData.climateFinance.maxPercent,
               oldPercent + campaign.increaseAmount
             );
-            countryData.climateFinance.currentPercent = newPercent;
+            setClimateFinanceOverride(countryId, countryData, { currentPercent: newPercent });
             totalOldPercent += oldPercent;
             totalNewPercent += newPercent;
             countriesAffected++;
@@ -11163,7 +11260,7 @@ function processCampaigns() {
             countryData.climateFinance.maxPercent,
             oldPercent + campaign.increaseAmount
           );
-          countryData.climateFinance.currentPercent = newPercent;
+          setClimateFinanceOverride(campaign.regionId, countryData, { currentPercent: newPercent });
 
           const countryName = countryData.name || campaign.regionId;
           pushMessage(

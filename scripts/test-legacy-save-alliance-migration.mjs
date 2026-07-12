@@ -63,6 +63,9 @@ const context = {
     },
   },
   mapDebug() {},
+  // CAR-404: loadGame() re-hydrates climate-finance overrides onto COUNTRY_DATA.
+  // A legacy save carries no overrides, so a no-op stub is sufficient here.
+  applyClimateFinanceOverrides() {},
   getClimateDataForRegion() {
     return null;
   },
