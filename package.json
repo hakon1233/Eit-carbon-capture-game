@@ -6,7 +6,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test:e2e": "playwright test"
+    "test:regression": "for f in scripts/test-*.mjs; do echo \"» $f\"; node \"$f\" || exit 1; done",
+    "test:e2e": "playwright test",
+    "test": "npm run test:regression && npm run test:e2e"
   },
   "devDependencies": {
     "@commitlint/cli": "^20.5.0",

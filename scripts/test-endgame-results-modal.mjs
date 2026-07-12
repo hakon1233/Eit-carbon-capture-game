@@ -98,6 +98,7 @@ const context = {
   initCount: 0,
   activatedDialog: null,
   bannerSyncCount: 0,
+  clearEventPopupsCount: 0,
   pushMessage(message, tone = "neutral") {
     context.messages.push({ message, tone });
   },
@@ -116,6 +117,12 @@ const context = {
   deactivateDialog() {},
   syncEndgameBanner() {
     context.bannerSyncCount += 1;
+  },
+  // showEndgameResultsModal() clears any queued/active event popups so a stale
+  // overlay cannot block the post-run Play Again banner. Track the call so the
+  // guard fails if that clear is ever dropped again.
+  clearEventPopups() {
+    context.clearEventPopupsCount += 1;
   },
   countTotalProjects() {
     return Object.values(context.state.regions).reduce(
@@ -176,6 +183,7 @@ assert.equal(context.state.gameOver, true, "win should set gameOver");
 assert.equal(context.state.won, true, "win should mark the run as won");
 assert.equal(elements["endgame-results-popup"].classList.contains("hidden"), false, "modal should be visible");
 assert.equal(context.activatedDialog.dialog, elements["endgame-results-dialog"], "modal should reuse the focus-trap dialog helper");
+assert.ok(context.clearEventPopupsCount >= 1, "opening the endgame modal should clear queued event popups");
 assert.equal(elements["endgame-results-outcome"].textContent, "Victory", "win outcome should be Victory");
 assert.match(elements["endgame-results-summary"].innerHTML, /Final temp anomaly/);
 assert.match(elements["endgame-results-summary"].innerHTML, /0\.92/);

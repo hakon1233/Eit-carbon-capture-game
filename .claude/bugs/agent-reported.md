@@ -2,7 +2,7 @@
 
 Bugs discovered by automated testing agents. Each entry is also tracked in the matching `workflows/*.md` file.
 
-<!-- Next ID: BUG-004 -->
+<!-- Next ID: BUG-005 -->
 
 ## BUG-001: Restart e2e cancelled its own confirmation
 
@@ -30,3 +30,12 @@ Bugs discovered by automated testing agents. Each entry is also tracked in the m
 **Workflow:** Gameplay
 **Reproducer:** `node scripts/test-construction-field-consistency.mjs`
 **Symptom:** Queued construction records were ignored by regional project caps, and embodied-carbon emissions increased as `monthsRemaining` fell.
+
+## BUG-004: Endgame regression harness broke when showEndgameResultsModal gained a clearEventPopups() call
+
+**Status:** Resolved
+**Classification:** MATRIX_BUG
+**Reporter:** Agent
+**Workflow:** Gameplay
+**Reproducer:** `node scripts/test-endgame-results-modal.mjs`
+**Symptom:** The endgame-modal regression script threw `ReferenceError: clearEventPopups is not defined`; nothing in CI/husky runs the `scripts/test-*.mjs` guards, so the break went unnoticed after commit `9b78587`.

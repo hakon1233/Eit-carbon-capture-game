@@ -22,3 +22,10 @@ Archive of fixed and verified bugs. The fix loop checks these for regressions on
 **Workflow:** Gameplay
 **Fix:** `game.js` construction readers now use persisted `type` and `monthsTotal` fields, while retaining the legacy `totalMonths` fallback for older saves.
 **Regression guard:** `node scripts/test-construction-field-consistency.mjs`
+
+## BUG-004: Endgame regression harness broke when showEndgameResultsModal gained a clearEventPopups() call
+
+**Resolved:** 2026-07-12
+**Workflow:** Gameplay
+**Fix:** `scripts/test-endgame-results-modal.mjs` stubs the new `clearEventPopups` dependency and asserts the endgame modal clears queued popups on open (mutation-checked). Added `npm run test:regression` so every `scripts/test-*.mjs` guard runs in one command.
+**Regression guard:** `node scripts/test-endgame-results-modal.mjs` / `npm run test:regression`
