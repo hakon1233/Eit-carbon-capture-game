@@ -2759,6 +2759,18 @@ function getTotalRegionalRPPerMonth() {
   return total;
 }
 
+// Total RP/month from global research centers. `state.globalResearchCenters` is a
+// list of { name, rpPerMonth } (currently never populated — the feature is
+// unbuilt), so this is 0 until such centers exist. Three display sites used to
+// read this via a no-argument getResearchCenterRPPerMonth call, which returns
+// NaN (level=undefined) and corrupted the shown RP/month rate (CAR-409).
+function getGlobalCentersRPPerMonth() {
+  return (state.globalResearchCenters || []).reduce(
+    (sum, center) => sum + (center?.rpPerMonth || 0),
+    0,
+  );
+}
+
 // Get RP/month from centers that are assigned to projects (actively researching)
 function getAssignedRPPerMonth() {
   if (!state.regionalResearchCenters) return 0;
@@ -4671,7 +4683,7 @@ function getResearchDetailContent() {
   const regionalCenters = countResearchCenters();
   const globalCenters = state.globalResearchCenters || [];
   const regionalRP = regionalCenters * RESEARCH_POINTS_PER_CENTER;
-  const globalRP = getResearchCenterRPPerMonth();
+  const globalRP = getGlobalCentersRPPerMonth();
   const totalRPPerMonth = regionalRP + globalRP;
 
   let html = '<div class="stat-detail-section">';
@@ -12201,7 +12213,7 @@ function updateUI() {
 
   // Research Points with generation rate (regional + global centers)
   const regionalRP = countResearchCenters() * RESEARCH_POINTS_PER_CENTER;
-  const globalRP = getResearchCenterRPPerMonth();
+  const globalRP = getGlobalCentersRPPerMonth();
   const rpPerMonth = regionalRP + globalRP;
   researchPointsEl.textContent = rpPerMonth > 0 ? `${state.researchPoints}(+${rpPerMonth})` : state.researchPoints;
 
@@ -16244,7 +16256,7 @@ function renderGlobalStatsCard() {
   const totalProjects = countTotalProjects();
   const constructionCount = getTotalUnderConstruction();
   const regionalRP = countResearchCenters() * RESEARCH_POINTS_PER_CENTER;
-  const globalRP = getResearchCenterRPPerMonth();
+  const globalRP = getGlobalCentersRPPerMonth();
   const rpPerMonth = regionalRP + globalRP;
   const tippingCount = state.tippingPointsTriggered?.length || 0;
   const yearsLeft = 2100 - state.year;
