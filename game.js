@@ -868,13 +868,21 @@ function calculateEmbodiedCarbon() {
 
     // Check if this is a power project with embodied carbon
     if (EMBODIED_CARBON[projectType]) {
-      // Get capacity being built (from construction data)
-      const capacityGW = construction.capacityGW || 1;
+      // Capacity being built comes from the project definition (fixed per type),
+      // matching how completeConstruction() adds physical capacity. The queued
+      // construction record never stores capacity, so reading it there always
+      // collapsed to the `|| 1` fallback (CAR-407). EMBODIED_CARBON is per-GW
+      // for generation but per-GWh for storage (see batteryStorage), so use
+      // storageGWh for storage-category projects.
+      const project = PROJECT_TYPES[projectType] || {};
+      const capacity = project.powerCategory === "storage"
+        ? (project.storageGWh || project.capacityGW || 1)
+        : (project.capacityGW || 1);
 
       // Embodied carbon spread over construction period
       const monthsRemaining = construction.monthsRemaining || 1;
       const totalMonths = construction.monthsTotal || construction.totalMonths || monthsRemaining;
-      const monthlyEmbodied = (EMBODIED_CARBON[projectType] * capacityGW) / totalMonths;
+      const monthlyEmbodied = (EMBODIED_CARBON[projectType] * capacity) / totalMonths;
 
       // Convert to annual rate (Gt/year)
       totalEmbodied += monthlyEmbodied * 12;

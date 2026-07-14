@@ -24,9 +24,12 @@ function extractFunction(name) {
 {
   const context = {
     EMBODIED_CARBON: { solar: 100 },
+    // Capacity is sourced from the project definition, not the construction
+    // record (CAR-407), so the per-type capacity lives here.
+    PROJECT_TYPES: { solar: { capacityGW: 2 } },
     state: {
       underConstruction: [
-        { type: "solar", capacityGW: 2, monthsTotal: 10, monthsRemaining: 5 },
+        { type: "solar", monthsTotal: 10, monthsRemaining: 5 },
       ],
     },
   };
