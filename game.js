@@ -12555,8 +12555,7 @@ function renderTechNode(tech) {
     actionHtml = `<div class="tooltip-status unlocked">✓ Unlocked</div>`;
   } else if (isBeingResearched) {
     const rpPerMonth = getResearchRPPerMonth(tech.id);
-    const monthsRemaining = Math.ceil((tech.cost - progress) / rpPerMonth);
-    actionHtml = `<div class="tooltip-status researching">🔬 In Progress (+${rpPerMonth} RP/mo, ~${monthsRemaining} months)</div>`;
+    actionHtml = `<div class="tooltip-status researching">${researchInProgressLabel(rpPerMonth, tech.cost, progress)}</div>`;
   } else if (!hasPrereqsMet) {
     actionHtml = `<div class="tooltip-status locked">🔒 Prerequisites needed</div>`;
   } else {
@@ -12614,6 +12613,21 @@ function getResearchRPPerMonth(techId) {
     total += getCenterRPPerMonth(center.level);
   }
   return total;
+}
+
+// Build the "In Progress" tooltip label for a tech currently being researched.
+// CAR-410: `rpPerMonth` comes from getResearchRPPerMonth(), which skips centers
+// on cooldown, while the caller's `isBeingResearched` (getResearchingCenters)
+// counts them — so rpPerMonth can legitimately be 0 while a center is assigned.
+// Guard the divide so a 0 rate never renders "~Infinity months".
+function researchInProgressLabel(rpPerMonth, cost, progress) {
+  if (rpPerMonth > 0) {
+    const monthsRemaining = Math.ceil((cost - progress) / rpPerMonth);
+    return `🔬 In Progress (+${rpPerMonth} RP/mo, ~${monthsRemaining} months)`;
+  }
+  // Every assigned center is temporarily on cooldown (e.g. just switched research
+  // field), contributing 0 RP this month — the ETA is undefined until it resumes.
+  return `🔬 In Progress (assigned centers on cooldown)`;
 }
 
 // Render a tree section (CCS or Other technologies) - VERTICAL LAYOUT
