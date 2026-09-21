@@ -1,8 +1,9 @@
 // Carbon Capture: Climate Overseer — brand package builder
 // Generates the full logo system (SVG), the derived app icon (SVG + PNG sizes),
 // the favicon set, and an embedded-font CSS. Run:  node brand/build-brand.mjs
-import pw from '~/.npm/_npx/99691537d4ce63c0/node_modules/playwright/index.js';
-const { chromium } = pw;
+// Playwright ships with @playwright/test (a devDependency), so resolve it by name
+// rather than through a machine-specific npx cache path.
+import { chromium } from 'playwright';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';

@@ -17,7 +17,7 @@ product gaps not already tracked.
 
 - Used the running Paperclip API for current issue context because the CAR-114
   workspace checkout was empty. The project registry points to the live repo at
-  `~/projects/school-reports/Eit-carbon-capture-game`.
+  the local checkout.
 - Reviewed the parent quality pass and active backlog, including all open
   product/UX issues.
 - Re-read the latest PM product passes:

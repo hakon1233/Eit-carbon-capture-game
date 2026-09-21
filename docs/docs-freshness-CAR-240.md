@@ -37,7 +37,7 @@ out of scope for an unattended pass.
   the harness owner. The script is the actual enforcement and is now correct.
 
 ## Remaining genuine strays (real signal, NOT re-filed — already covered by CAR-157 scope / need user confirmation to move)
-`ALLIANCE_BUGS_FIX_PLAN.md`, `BUGS.md`, `DEMO_DESCRIPTION.md`,
+`docs/working-notes/ALLIANCE_BUGS_FIX_PLAN.md`, `docs/working-notes/BUGS.md`, `DEMO_DESCRIPTION.md`,
 `EMISSIONS_DATA.md`, `data.md`, `data_sources.md`, `project-plan.md`,
 `brand/README.md`, `public/modules/README.md`.
 
